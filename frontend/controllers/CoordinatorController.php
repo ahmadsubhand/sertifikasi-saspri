@@ -7,7 +7,7 @@ use yii\web\Controller;
 use Yii;
 use yii\web\UnauthorizedHttpException;
 
-class WaliController extends Controller
+class CoordinatorController extends Controller
 {
   public function actionIndex()
   {

@@ -5,14 +5,14 @@ namespace common\enums;
 class UserRole
 {
     const USER = 'user';
-    const WALI = 'wali';
+    const COORDINATOR = 'coordinator';
     const ADMIN = 'admin';
 
     public static function list()
     {
         return [
             self::USER => 'User',
-            self::WALI => 'Wali',
+            self::COORDINATOR => 'Coordinator',
             self::ADMIN => 'Admin',
         ];
     }
