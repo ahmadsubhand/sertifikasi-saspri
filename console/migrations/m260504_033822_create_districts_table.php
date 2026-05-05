@@ -18,6 +18,7 @@ class m260504_033822_create_districts_table extends Migration
         $this->createTable('districts', [
             'id' => $this->primaryKey(),
             'regency_id' => $this->integer()->notNull(),
+            'code' => $this->string()->notNull(),
             'name' => $this->string()->notNull(),
         ]);
 

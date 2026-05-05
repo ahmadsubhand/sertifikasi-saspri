@@ -18,6 +18,7 @@ class m260504_033616_create_regencies_table extends Migration
         $this->createTable('regencies', [
             'id' => $this->primaryKey(),
             'province_id' => $this->integer()->notNull(),
+            'code' => $this->string()->notNull(),
             'name' => $this->string()->notNull(),
         ]);
 
