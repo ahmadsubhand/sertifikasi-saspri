@@ -40,6 +40,8 @@ class m260504_042603_create_certifications_table extends Migration
             'total_score' => $this->integer()->defaultValue(0),
             'grade' => $this->string(),
             'next_certification_due_date' => $this->dateTime(),
+            'is_rejected' => $this->boolean()->defaultValue(false),
+            'rejection_reason' => $this->string(),
         ]);
 
         // creates index for column `saspri_k_id`
