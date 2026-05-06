@@ -26,7 +26,7 @@ class m260504_042603_create_certifications_table extends Migration
             // Berkaitan dengan proses sertifikasi
             'purpose' => $this->string()->notNull(),
             'submitted_at' => $this->dateTime()->notNull(),
-            'status' => $this->string()->notNull(),
+            'status' => $this->string()->notNull()->defaultValue(CertificationStatus::PENDING_SELF_TEAM_FORMATION),
             'self_team_due_date' => $this->dateTime(),
             'self_review_due_date' => $this->dateTime(),
             'peer_team_due_date' => $this->dateTime(),
@@ -35,7 +35,7 @@ class m260504_042603_create_certifications_table extends Migration
 
             // Informasi hasil sertifikasi
             'level' => $this->string()->notNull(),
-            'code' => $this->string()->notNull(), // apakah generate hanya ketika sudah terbit?
+            'code' => $this->string(), // apakah generate hanya ketika sudah terbit?
             'issued_at' => $this->dateTime(),
             'total_score' => $this->integer()->defaultValue(0),
             'grade' => $this->string(),

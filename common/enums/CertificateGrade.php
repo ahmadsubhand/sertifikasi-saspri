@@ -7,8 +7,8 @@ class CertificateGrade
     const A = 'a';
     const AB = 'ab';
     const B = 'b';
-    const BC = 'bc';
     const C = 'c';
+    const D = 'd';
 
     public static function list()
     {
@@ -16,8 +16,8 @@ class CertificateGrade
             self::A => 'A',
             self::AB => 'AB',
             self::B => 'B',
-            self::BC => 'BC',
             self::C => 'C',
+            self::D => 'D',
         ];
     }
 
