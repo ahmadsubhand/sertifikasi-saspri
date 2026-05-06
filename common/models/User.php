@@ -222,4 +222,34 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**
+     * Gets query for [[SaspriK]] as coordinator.
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSaspriKAsCoordinator()
+    {
+        return $this->hasOne(SaspriK::class, ['coordinator_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[SaspriK]] as new coordinator candidate.
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSaspriKAsCoordinatorCandidate()
+    {
+        return $this->hasOne(SaspriK::class, ['new_coordinator_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[SaspriK]] as a member.
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSaspriK()
+    {
+        return $this->hasOne(SaspriK::class, ['id' => 'saspri_k_id']);
+    }
 }
