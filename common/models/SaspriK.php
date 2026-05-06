@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\enums\CertificationStatus;
 use Yii;
 
 /**
@@ -166,4 +167,10 @@ class SaspriK extends \yii\db\ActiveRecord
         return $this->hasOne(Certification::class, ['id' => 'valid_certificate_id']);
     }
 
+    public function getOnGoingCertification(): Certification | null {
+        return $this->getCertifications()
+            ->where(['saspri_k_id' => $this->id]) // sertifikasi milik saspri-k saat ini
+            ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]) // yang belum selesai
+            ->one();
+    }
 }

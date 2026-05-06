@@ -60,26 +60,9 @@ class SaspriKController extends Controller
     return $saspri_k;
   }
 
-  private function getOnGoingCertification(): Certification | null
-  {
-    try {
-      return Certification::find()
-        ->where(['saspri_k_id' => $this->findSaspriK()->id]) // sertifikasi milik saspri-k saat ini
-        ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]) // yang belum selesai
-        ->one();
-    } catch (Exception $error) {
-      // Didefinisikan ulang untuk kemudahan membaca seluruh pesan error function ini
-      if ($error instanceof ForbiddenHttpException) {
-        throw new ForbiddenHttpException($error->getMessage());
-      }
-      throw $error;
-    }
-  }
-
   private function requestNewCertification(): Certification
   {
     try {
-      // tambahkan pengecekan apakah sudah masuk tanggal next_certification_due_date dari valid_certificate_id
       $certification = new Certification();
       $certification->setNewCertificationRequest($this->findSaspriK());
       return $certification;
@@ -213,7 +196,7 @@ class SaspriKController extends Controller
   public function actionPengajuanSertifikasi()
   {
     try {
-      $certification = $this->getOnGoingCertification() ?: $this->requestNewCertification();
+      $certification = $this->findSaspriK()->getOnGoingCertification() ?: $this->requestNewCertification();
 
       $self_team_members = SelfTeamMember::find()
         ->with('user')
@@ -247,7 +230,7 @@ class SaspriKController extends Controller
   
       $saspri_k = $this->findSaspriK();
   
-      $certification = $this->getOnGoingCertification();
+      $certification = $saspri_k->getOnGoingCertification();
       
       $existingMemberIds = $certification 
         ? SelfTeamMember::find()
@@ -286,7 +269,7 @@ class SaspriKController extends Controller
       if (!empty($userIds)) {
         $saspri_k = $this->findSaspriK();
 
-        $certification = $this->getOnGoingCertification() ?: $this->requestNewCertification();
+        $certification = $saspri_k->getOnGoingCertification() ?: $this->requestNewCertification();
 
         $parsed_user_ids = array_unique(array_filter(array_map('trim', explode(',', $userIds))));
 
@@ -341,7 +324,7 @@ class SaspriKController extends Controller
   public function actionHapusAnggotaTimMandiri(int $id)
   {
     try {
-      $certification = $this->getOnGoingCertification();
+      $certification = $this->findSaspriK()->getOnGoingCertification();
   
       /** @var SelfTeamMember|null $member */
       $member = SelfTeamMember::find()
@@ -375,7 +358,7 @@ class SaspriKController extends Controller
   public function actionUbahPeranAnggotaTimMandiri(int $id)
   {
     try {
-      $certification = $this->getOnGoingCertification();
+      $certification = $this->findSaspriK()->getOnGoingCertification();
       $role = Yii::$app->request->post('role');
   
       if (!in_array($role, TeamRole::values())) {
@@ -419,7 +402,7 @@ class SaspriKController extends Controller
   public function actionAjukanSertifikasi()
   {
     try {
-      $certification = $this->getOnGoingCertification();
+      $certification = $this->findSaspriK()->getOnGoingCertification();
       if (!$certification) {
         throw new NotFoundHttpException('Tidak ada sertifikasi yang sedang berlangsung');
       }
