@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
@@ -40,6 +41,7 @@ class WaliController extends Controller
           'tambah-anggota-tim-mandiri' => ['post'],
           'hapus-anggota-tim-mandiri' => ['delete'],
           'ubah-peran-anggota-tim-mandiri' => ['post'],
+          'ajukan-sertifikasi' => ['post'],
         ],
       ],
     ];
@@ -306,6 +308,51 @@ class WaliController extends Controller
     $member->save(false);
 
     Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
+    return $this->redirect(['pengajuan-sertifikasi']);
+  }
+
+  public function actionAjukanSertifikasi()
+  {
+    $certification = $this->getOnGoingCertification();
+    if (!$certification) {
+      Yii::$app->session->setFlash('error', 'Tidak ada sertifikasi yang sedang berlangsung');
+      return $this->redirect(['index']);
+    }
+
+    if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
+      Yii::$app->session->setFlash('error', 'Sertifikasi sudah pernah diajukan');
+      return $this->redirect(['pengajuan-sertifikasi']);
+    }
+
+    $members = SelfTeamMember::find()
+      ->where(['certification_id' => $certification->id])
+      ->all();
+
+    $approvedMembers = array_filter($members, fn($m) => $m->status === ApprovalStatus::APPROVED);
+    $approvedCount = count($approvedMembers);
+    $leaderCount = count(array_filter($approvedMembers, fn($m) => $m->role === TeamRole::LEADER));
+    $memberCount = count(array_filter($approvedMembers, fn($m) => $m->role === TeamRole::MEMBER));
+
+    if ($approvedCount === 0 || $approvedCount % 3 !== 0) {
+      Yii::$app->session->setFlash('error', 'Jumlah anggota Tim Mandiri yang setuju bergabung harus kelipatan 3');
+      return $this->redirect(['pengajuan-sertifikasi']);
+    }
+
+    if ($leaderCount !== 1 || $memberCount < 2) {
+      Yii::$app->session->setFlash('error', 'Tim Mandiri harus terdiri dari 1 ketua dan minimal 2 anggota lainnya');
+      return $this->redirect(['pengajuan-sertifikasi']);
+    }
+
+    // Jika komposisi sudah terpenuhi namun masih ada yang pending, maka otomatis menjadi rejected
+    SelfTeamMember::updateAll(
+      ['status' => ApprovalStatus::REJECTED],
+      ['certification_id' => $certification->id, 'status' => ApprovalStatus::PENDING]
+    );
+
+    $certification->submitForSelfReview();
+
+    Yii::$app->session->setFlash('success', 'Sertifikasi berhasil diajukan');
+
     return $this->redirect(['pengajuan-sertifikasi']);
   }
 }

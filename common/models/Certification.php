@@ -5,6 +5,7 @@ namespace common\models;
 use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
+use common\enums\CertificationStatus;
 use DateTime;
 use Error;
 use Exception;
@@ -138,6 +139,14 @@ class Certification extends \yii\db\ActiveRecord
         // $this->status = CertificationStatus::PENDING_SELF_TEAM_FORMATION
 
         $this->self_team_due_date = date('Y-m-d H:i:s', strtotime('+1 week'));
+    }
+
+    public function submitForSelfReview()
+    {
+        $this->status = CertificationStatus::SELF_REVIEW;
+        $this->self_team_due_date = date('Y-m-d H:i:s');
+        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        return $this->save(false);
     }
 
     /**
