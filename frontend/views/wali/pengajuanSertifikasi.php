@@ -6,7 +6,6 @@ namespace frontend\views\wali;
 
 use Yii;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 ?>
 <style>
@@ -75,7 +74,7 @@ use yii\helpers\Url;
 
       <div id="selected-users-container" class="user-chips"></div>
 
-      <form id="add-members-form" method="post" action="<?= Url::to(['wali/tambah-anggota-tim-mandiri']) ?>">
+      <form id="add-members-form" method="post" action="<?= \yii\helpers\Url::to(['wali/tambah-anggota-tim-mandiri']) ?>">
         <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
         <input type="hidden" name="user_ids" id="selected-user-ids">
         <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">Tambah Terpilih</button>
@@ -97,7 +96,17 @@ use yii\helpers\Url;
           <tr>
             <th scope="row"><?= $index + 1 ?></th>
             <td><?= Html::encode($member->user->username) ?></td>
-            <td scope="row"><?= $member->role ?></td>
+            <td>
+              <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'id' => $member->id], 'post') ?>
+                <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
+                    <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
+                      <?= $label ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              <?= Html::endForm() ?>
+            </td>
             <td scope="row"><?= $member->status ?></td>
             <td>
               <?= Html::a('Hapus', ['hapus-anggota-tim-mandiri', 'id' => $member->id], [
@@ -136,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     timeout = setTimeout(() => {
-      fetch('<?= Url::to(['wali/cari-anggota-tim-mandiri']) ?>?q=' + encodeURIComponent(q))
+      fetch('<?= \yii\helpers\Url::to(['wali/cari-anggota-tim-mandiri']) ?>?q=' + encodeURIComponent(q))
         .then(response => response.json())
         .then(data => {
           dropdown.innerHTML = '';

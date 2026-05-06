@@ -5,12 +5,9 @@ namespace common\models;
 use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
-use common\enums\CertificationStatus;
 use DateTime;
 use Error;
 use Exception;
-use Yii;
-use yii\web\UnauthorizedHttpException;
 
 /**
  * This is the model class for table "certifications".

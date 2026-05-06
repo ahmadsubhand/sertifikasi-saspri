@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\enums\CertificationStatus;
+use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\models\Certification;
 use common\models\SaspriK;
@@ -37,7 +38,8 @@ class WaliController extends Controller
           'tambah-anggota' => ['post'],
           'hapus-anggota' => ['delete'],
           'tambah-anggota-tim-mandiri' => ['post'],
-          'hapus-anggota-tim-mandiri' => ['delete']
+          'hapus-anggota-tim-mandiri' => ['delete'],
+          'ubah-peran-anggota-tim-mandiri' => ['post'],
         ],
       ],
     ];
@@ -266,16 +268,44 @@ class WaliController extends Controller
     /** @var SelfTeamMember|null $member */
     $member = SelfTeamMember::find()
       ->with('user')
-      ->where(['id' => $id])
+      ->where(['id' => $id, 'certification_id' => $certification->id])
       ->one();
 
-    if ($member->certification_id !== $certification->id) {
-      Yii::$app->session->setFlash('error', $member->user->username . ' tidak ditemukan atau bukan anggota Tim Mandiri');
+    if (!$member) {
+      Yii::$app->session->setFlash('error', 'User tidak ditemukan atau bukan anggota Tim Mandiri');
       return $this->redirect(['index']);
     }
     $member->delete();
 
     Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Mandiri');
+    return $this->redirect(['pengajuan-sertifikasi']);
+  }
+
+  public function actionUbahPeranAnggotaTimMandiri(int $id)
+  {
+    $certification = $this->getOnGoingCertification();
+    $role = Yii::$app->request->post('role');
+
+    if (!in_array($role, TeamRole::values())) {
+      Yii::$app->session->setFlash('error', 'Peran tidak valid');
+      return $this->redirect(['pengajuan-sertifikasi']);
+    }
+
+    /** @var SelfTeamMember|null $member */
+    $member = SelfTeamMember::find()
+      ->with('user')
+      ->where(['id' => $id, 'certification_id' => $certification->id])
+      ->one();
+
+    if (!$member) {
+      Yii::$app->session->setFlash('error', 'User tidak ditemukan atau bukan anggota Tim Mandiri');
+      return $this->redirect(['index']);
+    }
+
+    $member->role = $role;
+    $member->save(false);
+
+    Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
     return $this->redirect(['pengajuan-sertifikasi']);
   }
 }
