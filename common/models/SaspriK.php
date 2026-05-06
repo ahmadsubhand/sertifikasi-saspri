@@ -3,7 +3,6 @@
 namespace common\models;
 
 use common\enums\CertificationStatus;
-use Yii;
 
 /**
  * This is the model class for table "saspri_k".
