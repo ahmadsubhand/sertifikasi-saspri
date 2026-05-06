@@ -1,11 +1,13 @@
 <?php
-namespace frontend\views\wali;
+namespace frontend\views\saspri_k;
 
-/** @var \common\models\Certification $certification */
-/** @var \common\models\SelfTeamMember[] $self_team_members */
+/** @var \common\models\SaspriK $saspri_k */
+/** @var \common\models\Certification $valid_certificate */
+/** @var \common\models\Certification[] $certifications */
+/** @var \common\models\User[] $users */
+/** @var \common\models\District $district */
 
 use Yii;
-use yii\helpers\Html;
 
 ?>
 <style>
@@ -55,27 +57,100 @@ use yii\helpers\Html;
 </style>
 
 <div class="d-flex flex-column align-items-start gap-3">
-  <h1>Pengajuan Sertifikasi</h1>
+  <h1>SASPRI-Kawasan</h1>
+  
+  <a class="btn btn-primary" href="<?= \yii\helpers\Url::to(['saspri-k/pengajuan-sertifikasi']) ?>">Pengajuan Sertifikasi</a>
+  
+  <div class="d-flex flex-row w-100 justify-content-between align-items-start">
+    <div class="card p-3 w-50 d-flex flex-column gap-2">
+      <h2>Identitas</h2>
+      
+      <div class="d-flex flex-column">
+        <div class="d-flex flex-row gap-2">
+          <div>SASPRI-K </div>
+          <div>:</div>
+          <div><?= $district->name ?></div>
+        </div>
+        <div class="d-flex flex-row gap-2">
+          <div>Nama unit usaha (koperasi)</div>
+          <div>:</div>
+          <div><?= $saspri_k->cooperative_name ?></div>
+        </div>
+        <div class="d-flex flex-row gap-2">
+          <div>Jumlah anggota aktif dalam kelompok yang dibina</div>
+          <div>:</div>
+          <div><?= $saspri_k->number_of_active_members ?> orang</div>
+        </div>
+      </div>
+      
+      <div class="w-100 d-flex flex-row justify-content-between">
+        <button class="btn btn-danger">Pergantian Wali</button>
+        <button class="btn btn-primary">Edit Data</button>
+      </div>
+    </div>
+  
+    <div class="card p-3 w-25 d-flex flex-column gap-2">
+      <h2>Sertifikat</h2>
+  
+      <div>
+        <div class="d-flex flex-row gap-2">
+          <div>Level Sertifikat</div>
+          <div>:</div>
+          <div><?=  $valid_certificate->level ?></div>
+        </div>
+        <div class="d-flex flex-row gap-2">
+          <div>Nomor Sertifikat</div>
+          <div>:</div>
+          <div><?=  $valid_certificate->code ?></div>
+        </div>
+      </div>
+  
+      <button class="btn btn-primary">Download Sertifikat</button>
+    </div>
+  </div>
+
+  <div class="card p-3 d-flex flex-column gap-2">
+    <h2>Riwayat Sertifikasi</h2>
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th scope="col">No</th>
+          <th scope="col">Nomor Pengajuan</th>
+          <th scope="col">Tingkatan</th>
+          <th scope="col">Tanggal Pengajuan</th>
+          <th scope="col">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($certifications as $index => $certification): ?>
+          <tr>
+            <th scope="row"><?= $index + 1 ?></th>
+            <td><?= $certification->code ?: '-' ?></td>
+            <td><?= ucfirst($certification->level) ?></td>
+            <td><?= $certification->issued_at ? date('Y-m-d', strtotime($certification->issued_at)) : '-' ?></td>
+            <td>
+              <button class="btn btn-primary">Unduh</button>
+              <button class="btn btn-primary">Lihat</button>
+            </td>
+          </tr>
+        <?php endforeach ?>
+      </tbody>
+    </table>
+  </div>
 
   <div class="card p-3 d-flex flex-column gap-2 w-100">
-    <h2>Tim Mandiri</h2>
-
-    <p>
-      Pengajuan 
-      <?= $certification->purpose === 'level_up' ? 'sertifikasi naik ke tingkat ' : 'pengulangan sertifikasi tingkat' ?> 
-      <?= ucfirst($certification->level) ?>
-    </p>
+    <h2>Anggota Kawasan</h2>
 
     <div class="d-flex flex-column gap-2">
       <div class="user-search-container">
-        <input type="text" id="user-search-input" placeholder="Cari anggota tim mandiri (username) ..." class="form-control" autocomplete="off">
+        <input type="text" id="user-search-input" placeholder="Cari anggota baru (username) ..." class="form-control" autocomplete="off">
         <div id="search-dropdown" class="search-dropdown shadow"></div>
       </div>
 
       <div id="selected-users-container" class="user-chips"></div>
 
-      <form id="add-members-form" method="post" action="<?= \yii\helpers\Url::to(['wali/tambah-anggota-tim-mandiri']) ?>">
-        <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
+      <form id="add-members-form" method="post" action="<?= \yii\helpers\Url::to(['saspri-k/tambah-anggota']) ?>">
+        <?= \yii\helpers\Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
         <input type="hidden" name="user_ids" id="selected-user-ids">
         <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">Tambah Terpilih</button>
       </form>
@@ -86,52 +161,28 @@ use yii\helpers\Html;
         <tr>
           <th scope="col">No</th>
           <th scope="col">Nama Anggota</th>
-          <th scope="col">Peran</th>
-          <th scope="col">Status</th>
           <th scope="col">Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <?php foreach ($self_team_members as $index => $member): ?>
+        <?php foreach ($users as $index => $user): ?>
           <tr>
             <th scope="row"><?= $index + 1 ?></th>
-            <td><?= Html::encode($member->user->username) ?></td>
+            <td><?= \yii\helpers\Html::encode($user->username) ?></td>
             <td>
-              <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'id' => $member->id], 'post') ?>
-                <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
-                  <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
-                    <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
-                      <?= $label ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              <?= Html::endForm() ?>
-            </td>
-            <td scope="row"><?= $member->status ?></td>
-            <td>
-              <?= Html::a('Hapus', ['hapus-anggota-tim-mandiri', 'id' => $member->id], [
+              <?= \yii\helpers\Html::a('Hapus', ['hapus-anggota', 'id' => $user->id], [
                 'class' => 'btn btn-danger btn-sm',
                 'data' => [
                   'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
                   'method' => 'delete',
                 ],
               ]) ?>
-              <button class="btn btn-primary btn-sm">Liat</button>
+              <button class="btn btn-primary btn-sm">Lihat</button>
             </td>
           </tr>
         <?php endforeach ?>
       </tbody>
     </table>
-
-    <?php if ($certification->status === \common\enums\CertificationStatus::PENDING_SELF_TEAM_FORMATION): ?>
-      <div class="d-flex justify-content-end mt-3">
-        <?= Html::beginForm(['ajukan-sertifikasi'], 'post') ?>
-          <button type="submit" class="btn btn-primary" onclick="return confirm('Apakah Anda yakin ingin mengajukan sertifikasi? Pastikan komposisi tim sudah benar.')">
-            Ajukan Sertifikasi
-          </button>
-        <?= Html::endForm() ?>
-      </div>
-    <?php endif; ?>
   </div>
 </div>
 
@@ -142,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const chipsContainer = document.getElementById('selected-users-container');
   const hiddenInput = document.getElementById('selected-user-ids');
   const submitBtn = document.getElementById('submit-add-btn');
-
+  
   let selectedUsers = [];
   let timeout = null;
 
@@ -155,14 +206,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     timeout = setTimeout(() => {
-      fetch('<?= \yii\helpers\Url::to(['wali/cari-anggota-tim-mandiri']) ?>?q=' + encodeURIComponent(q))
+      fetch('<?= \yii\helpers\Url::to(['saspri-k/cari-user']) ?>?q=' + encodeURIComponent(q))
         .then(response => response.json())
         .then(data => {
           dropdown.innerHTML = '';
           if (data.length > 0) {
             data.forEach(user => {
               if (selectedUsers.some(u => u.id === user.id)) return;
-
+              
               const item = document.createElement('div');
               item.className = 'search-item';
               item.textContent = user.username;

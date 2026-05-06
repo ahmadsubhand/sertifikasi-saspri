@@ -19,7 +19,7 @@ use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\web\UnprocessableEntityHttpException;
 
-class WaliController extends Controller
+class SaspriKController extends Controller
 {
   public function behaviors()
   {
@@ -51,7 +51,7 @@ class WaliController extends Controller
   {
     $saspri_k = SaspriK::findOne(['coordinator_id' => Yii::$app->user->id]);
     if (!$saspri_k) {
-      $message = 'Halaman ini hanya boleh diakses oleh Wali SASPRI-K';
+      $message = 'Halaman ini hanya boleh diakses oleh Koordinator SASPRI-K';
       Yii::$app->session->setFlash('error', $message);
       throw new ForbiddenHttpException($message);
     }
@@ -92,7 +92,7 @@ class WaliController extends Controller
       'certifications' => $saspri_k->certifications,
       'users' => User::find()
         ->where(['saspri_k_id' => $saspri_k->id]) // anggota saspri-k saat ini
-        ->andWhere(['!=', 'id', Yii::$app->user->id]) // selain wali saspri-k
+        ->andWhere(['!=', 'id', Yii::$app->user->id]) // selain koordinator SASPRI-K
         ->all(),
       'district' => $saspri_k->district,
     ]);
@@ -202,7 +202,7 @@ class WaliController extends Controller
     $users = User::find()
       ->select(['id', 'username'])
       ->where(['saspri_k_id' => $saspri_k->id]) // anggota saspri-k saat ini
-      ->andWhere(['!=', 'id', $saspri_k->coordinator_id]) // bukan wali saspri-k
+      ->andWhere(['!=', 'id', $saspri_k->coordinator_id]) // bukan koordinator SASPRI-K
       ->andWhere(['not in', 'id', $existingMemberIds]) // belum tergabung dalam tim mandiri ini
       ->andWhere(['like', 'username', $q])
       ->limit(10)
@@ -231,7 +231,7 @@ class WaliController extends Controller
         $valid_users = User::find()
           ->where(['id' => $parsed_user_ids]) // anggota yang ditambahkan
           ->andWhere(['saspri_k_id' => $saspri_k->id]) // merupakan anggota saspri-k saat ini
-          ->andWhere(['!=', 'id', $saspri_k->coordinator_id]) // bukan wali saspri-k
+          ->andWhere(['!=', 'id', $saspri_k->coordinator_id]) // bukan koordinator SASPRI-K
           ->andWhere(['not in', 'id', $existingMemberIds]) // belum tergabung dalam tim mandiri ini
           ->select('username')
           ->column();
