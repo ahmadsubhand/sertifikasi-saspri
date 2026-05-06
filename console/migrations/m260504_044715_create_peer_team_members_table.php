@@ -22,8 +22,8 @@ class m260504_044715_create_peer_team_members_table extends Migration
             'id' => $this->primaryKey(),
             'certification_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
-            'status' => $this->string()->notNull(),
-            'role' => $this->string()->notNull(),
+            'status' => $this->string()->notNull()->defaultValue(ApprovalStatus::PENDING),
+            'role' => $this->string()->notNull()->defaultValue(TeamRole::MEMBER),
         ]);
 
         // creates index for column `certification_id`

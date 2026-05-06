@@ -25,7 +25,7 @@ class m260504_042603_create_certifications_table extends Migration
 
             // Berkaitan dengan proses sertifikasi
             'purpose' => $this->string()->notNull(),
-            'submitted_at' => $this->dateTime()->notNull(),
+            'submitted_at' => $this->dateTime()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
             'status' => $this->string()->notNull()->defaultValue(CertificationStatus::PENDING_SELF_TEAM_FORMATION),
             'self_team_due_date' => $this->dateTime(),
             'self_review_due_date' => $this->dateTime(),
