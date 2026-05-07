@@ -85,7 +85,7 @@ class m260504_045531_create_indicator_scores_table extends Migration
             'uq-indicator_scores-certification',
             'indicator_scores'
         );
-        
+
         $this->dropCheck('chk-indicator_scores-status', 'indicator_scores');
 
         // drops foreign key for table `indicators`

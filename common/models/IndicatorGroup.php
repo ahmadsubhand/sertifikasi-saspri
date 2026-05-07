@@ -18,8 +18,6 @@ namespace common\models;
  */
 class IndicatorGroup extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

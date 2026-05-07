@@ -15,8 +15,6 @@ namespace common\models;
  */
 class Regency extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

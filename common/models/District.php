@@ -15,8 +15,6 @@ namespace common\models;
  */
 class District extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

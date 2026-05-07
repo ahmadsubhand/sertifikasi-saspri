@@ -19,7 +19,7 @@ class DbController extends Controller
     {
         $dbDir = Yii::getAlias('@console/db');
         $files = glob($dbDir . '/*.sql');
-        
+
         if (empty($files)) {
             $this->stdout("No SQL files found in $dbDir\n", Console::FG_RED);
             return ExitCode::UNSPECIFIED_ERROR;
@@ -33,7 +33,7 @@ class DbController extends Controller
         foreach ($files as $file) {
             $fileName = basename($file);
             $this->stdout("Executing $fileName... ");
-            
+
             $sql = file_get_contents($file);
             if ($sql === false) {
                 $this->stdout("FAILED (Could not read file)\n", Console::FG_RED);
@@ -42,7 +42,7 @@ class DbController extends Controller
 
             $transaction = $db->beginTransaction();
             try {
-                // PDO::exec or createCommand()->execute() can handle multiple statements 
+                // PDO::exec or createCommand()->execute() can handle multiple statements
                 // in one string for MySQL if the driver allows it.
                 $db->createCommand($sql)->execute();
                 $transaction->commit();

@@ -1,6 +1,5 @@
 <?php
 
-use common\enums\UserRole;
 use yii\db\Migration;
 
 /**

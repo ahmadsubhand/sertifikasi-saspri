@@ -14,8 +14,6 @@ namespace common\models;
  */
 class AssessmentIndicatorRelation extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

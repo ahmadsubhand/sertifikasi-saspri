@@ -19,8 +19,6 @@ namespace common\models;
  */
 class Assessment extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

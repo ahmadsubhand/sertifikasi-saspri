@@ -18,8 +18,6 @@ namespace common\models;
  */
 class IndicatorScore extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

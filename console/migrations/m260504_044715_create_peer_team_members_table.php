@@ -92,7 +92,7 @@ class m260504_044715_create_peer_team_members_table extends Migration
             'uq-peer_team_members-certification-user',
             'peer_team_members',
         );
-        
+
         // peer_team_members (status)
         $this->dropCheck('chk-peer_team_members-status', 'peer_team_members');
 

@@ -16,8 +16,6 @@ namespace common\models;
  */
 class PeerTeamMember extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

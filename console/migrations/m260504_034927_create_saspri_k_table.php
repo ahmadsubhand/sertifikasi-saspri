@@ -22,7 +22,7 @@ class m260504_034927_create_saspri_k_table extends Migration
             'id' => $this->primaryKey(),
             'coordinator_id' => $this->integer()->notNull()->unique(),
             // role wali sebenarnya bisa di dapat dari sini,
-            // users.id === saspri_k.coordinator_id 
+            // users.id === saspri_k.coordinator_id
 
             // Informasi SASPRI-K
             // Apa saja informasi yang opsional?
@@ -105,7 +105,7 @@ class m260504_034927_create_saspri_k_table extends Migration
     {
         // drop constraint for column `change_status`
         $this->dropCheck('chk-saspri_k-change_status', 'saspri_k');
-        
+
         // drop constraint for column `request_status`
         $this->dropCheck('chk-saspri_k-request_status', 'saspri_k');
 

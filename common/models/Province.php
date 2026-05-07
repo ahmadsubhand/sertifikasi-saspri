@@ -13,8 +13,6 @@ namespace common\models;
  */
 class Province extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

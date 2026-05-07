@@ -45,8 +45,6 @@ use Exception;
  */
 class Certification extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -134,7 +132,7 @@ class Certification extends \yii\db\ActiveRecord
 
         $assessment_id = Assessment::findOne(['is_active' => true])->id;
         $this->assessment_id = $assessment_id;
-        
+
         // Sudah di handle db melalui defaultValue di migrasi
         // $this->status = CertificationStatus::PENDING_SELF_TEAM_FORMATION
 

@@ -16,8 +16,6 @@ namespace common\models;
  */
 class SelfTeamMember extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

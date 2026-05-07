@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\views\saspri_k;
 
 /** @var \common\models\SaspriK $saspri_k */

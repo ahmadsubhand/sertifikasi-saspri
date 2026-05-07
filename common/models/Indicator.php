@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use Yii;
-
 /**
  * This is the model class for table "indicators".
  *
@@ -22,8 +20,6 @@ use Yii;
  */
 class Indicator extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */

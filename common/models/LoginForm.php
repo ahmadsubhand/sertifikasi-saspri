@@ -10,12 +10,11 @@ use yii\base\Model;
  */
 class LoginForm extends Model
 {
-    public $username;
-    public $password;
-    public $rememberMe = true;
+    public string $username;
+    public string $password;
+    public bool $rememberMe = true;
 
-    private $_user;
-
+    private User | null $_user;
 
     /**
      * {@inheritdoc}

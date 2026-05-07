@@ -102,17 +102,23 @@ class m260504_042603_create_certifications_table extends Migration
         );
 
         // status
-        $this->dropCheck('chk-certifications-status', 'certifications',
+        $this->dropCheck(
+            'chk-certifications-status',
+            'certifications',
         );
-        
+
         // level
-        $this->dropCheck('chk-certifications-level', 'certifications',
+        $this->dropCheck(
+            'chk-certifications-level',
+            'certifications',
         );
 
         // grade (nullable)
-        $this->dropCheck('chk-certifications-grade', 'certifications',
+        $this->dropCheck(
+            'chk-certifications-grade',
+            'certifications',
         );
-        
+
         // drops foreign key for table `saspri_k`
         $this->dropForeignKey(
             'fk-certifications-saspri_k_id',

@@ -14,8 +14,6 @@ namespace common\models;
  */
 class SaspriKDocument extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
