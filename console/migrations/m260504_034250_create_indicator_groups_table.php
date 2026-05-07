@@ -17,11 +17,11 @@ class m260504_034250_create_indicator_groups_table extends Migration
     {
         $this->createTable('indicator_groups', [
             'id' => $this->primaryKey(),
-            'parent_group_id' => $this->integer()->notNull(),
+            'parent_group_id' => $this->integer(),
             'code' => $this->string()->notNull(),
             'label' => $this->string()->notNull(),
             'order' => $this->integer()->notNull(),
-            'weight' => $this->double()->notNull(),
+            'weight' => $this->integer()->notNull(),
         ]);
 
         // creates index for column `parent_group_id`

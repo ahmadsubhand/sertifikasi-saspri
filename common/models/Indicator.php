@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use Yii;
+
 /**
  * This is the model class for table "indicators".
  *
@@ -15,6 +17,7 @@ namespace common\models;
  * @property Assessment[] $assessments
  * @property Certification[] $certifications
  * @property IndicatorGroup $indicatorGroup
+ * @property IndicatorOption[] $indicatorOptions
  * @property IndicatorScore[] $indicatorScores
  */
 class Indicator extends \yii\db\ActiveRecord
@@ -94,6 +97,16 @@ class Indicator extends \yii\db\ActiveRecord
     public function getIndicatorGroup()
     {
         return $this->hasOne(IndicatorGroup::class, ['id' => 'indicator_group_id']);
+    }
+
+    /**
+     * Gets query for [[IndicatorOptions]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getIndicatorOptions()
+    {
+        return $this->hasMany(IndicatorOption::class, ['indicator_id' => 'id']);
     }
 
     /**

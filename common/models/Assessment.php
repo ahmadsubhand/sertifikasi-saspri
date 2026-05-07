@@ -7,7 +7,8 @@ namespace common\models;
  *
  * @property int $id
  * @property string $title
- * @property int|null $is_active
+ * @property string|null $active_at_level
+ * @property string $level
  * @property string $created_at
  * @property string $updated_at
  * @property string|null $released_at
@@ -34,13 +35,11 @@ class Assessment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['released_at'], 'default', 'value' => null],
-            [['is_active'], 'default', 'value' => 0],
-            [['title', 'created_at', 'updated_at'], 'required'],
-            [['is_active'], 'integer'],
+            [['active_at_level', 'released_at'], 'default', 'value' => null],
+            [['title', 'level', 'created_at', 'updated_at'], 'required'],
             [['created_at', 'updated_at', 'released_at'], 'safe'],
-            [['title'], 'string', 'max' => 255],
-            [['is_active'], 'unique'],
+            [['title', 'active_at_level', 'level'], 'string', 'max' => 255],
+            [['active_at_level'], 'unique'],
         ];
     }
 
@@ -52,7 +51,8 @@ class Assessment extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'title' => 'Title',
-            'is_active' => 'Is Active',
+            'active_at_level' => 'Active At Level',
+            'level' => 'Level',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'released_at' => 'Released At',

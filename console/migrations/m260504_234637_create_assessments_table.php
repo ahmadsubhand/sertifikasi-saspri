@@ -1,5 +1,6 @@
 <?php
 
+use common\enums\CertificateLevel;
 use yii\db\Migration;
 
 /**
@@ -15,18 +16,39 @@ class m260504_234637_create_assessments_table extends Migration
         $this->createTable('assessments', [
             'id' => $this->primaryKey(),
             'title' => $this->string()->notNull(),
-            'is_active' => $this->boolean()->defaultValue(0),
+            'active_at_level' => $this->string(),
+            'level' => $this->string()->notNull(),
             'created_at' => $this->dateTime()->notNull(),
             'updated_at' => $this->dateTime()->notNull(),
             'released_at' => $this->dateTime(),
         ]);
 
-        // only one assessment active
-        $this->createIndex(
-            'idx-unique-active-assessment',
+        // each level only one assessment active allowed
+        $this->addCheck(
+            'chk-assessments-active_at_level',
             'assessments',
-            'is_active',
-            true
+            "active_at_level IS NULL OR active_at_level IN ('" . implode("','", CertificateLevel::values()) . "')"
+        );
+
+        // creates index for column `active_at_level`
+        $this->createIndex(
+            'idx-assessments-active_at_level',
+            'assessments',
+            'active_at_level',
+            true,
+        );
+
+        // level
+        $this->addCheck(
+            'chk-assessments-level',
+            'assessments',
+            "level IN ('" . implode("','", CertificateLevel::values()) . "')"
+        );
+
+        $this->addCheck(
+            'chk-assessments-active_level_match',
+            'assessments',
+            'active_at_level IS NULL OR active_at_level = level'
         );
     }
 
@@ -35,8 +57,23 @@ class m260504_234637_create_assessments_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropCheck(
+            'chk-assessments-active_level_match',
+            'assessments',
+        );
+
+        $this->dropCheck(
+            'chk-assessments-level',
+            'assessments',
+        );
+
         $this->dropIndex(
-            'idx-unique-active-assessment',
+            'idx-assessments-active_at_level',
+            'assessments',
+        );
+
+        $this->dropCheck(
+            'chk-assessments-active_at_level',
             'assessments',
         );
 

@@ -6,11 +6,11 @@ namespace common\models;
  * This is the model class for table "indicator_groups".
  *
  * @property int $id
- * @property int $parent_group_id
+ * @property int|null $parent_group_id
  * @property string $code
  * @property string $label
  * @property int $order
- * @property float $weight
+ * @property int $weight
  *
  * @property IndicatorGroup[] $indicatorGroups
  * @property Indicator[] $indicators
@@ -34,9 +34,9 @@ class IndicatorGroup extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['parent_group_id', 'code', 'label', 'order', 'weight'], 'required'],
-            [['parent_group_id', 'order'], 'integer'],
-            [['weight'], 'number'],
+            [['parent_group_id'], 'default', 'value' => null],
+            [['parent_group_id', 'order', 'weight'], 'integer'],
+            [['code', 'label', 'order', 'weight'], 'required'],
             [['code', 'label'], 'string', 'max' => 255],
             [['parent_group_id'], 'exist', 'skipOnError' => true, 'targetClass' => IndicatorGroup::class, 'targetAttribute' => ['parent_group_id' => 'id']],
         ];

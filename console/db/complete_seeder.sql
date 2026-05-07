@@ -23,32 +23,6 @@ INSERT INTO `auth_assignment` (item_name, user_id, created_at) values
 ('user', 5, 1778028133);
 
 -- --------------------------------------------------------
--- Indicator Groups and Indicators
--- --------------------------------------------------------
-
-INSERT INTO indicator_groups (id, parent_group_id, code, label, `order`, weight) VALUES
-(1, 1, 'G1', 'Group 1', 1, 10.0),
-(2, 1, 'G1.1', 'Sub Group 1.1', 1, 5.0),
-(3, 1, 'G1.2', 'Sub Group 1.2', 2, 5.0);
-
-INSERT INTO indicators (id, indicator_group_id, code, label, `order`) VALUES
-(1, 2, 'I1.1.1', 'Indicator 1.1.1', 1),
-(2, 2, 'I1.1.2', 'Indicator 1.1.2', 2),
-(3, 3, 'I1.2.1', 'Indicator 1.2.1', 1);
-
--- --------------------------------------------------------
--- Assessments
--- --------------------------------------------------------
-
-INSERT INTO assessments (id, title, is_active, created_at, updated_at, released_at) VALUES
-(1, 'Assessment Utama 2024', 1, '2024-01-01 00:00:00', '2024-01-01 00:00:00', '2024-01-01 00:00:00');
-
-INSERT INTO assessment_indicator_relations (assessment_id, indicator_id) VALUES
-(1, 1),
-(1, 2),
-(1, 3);
-
--- --------------------------------------------------------
 -- SASPRI-K
 -- --------------------------------------------------------
 
@@ -77,14 +51,5 @@ INSERT INTO self_team_members (id, certification_id, user_id, status, role) VALU
 INSERT INTO peer_team_members (id, certification_id, user_id, status, role) VALUES
 (1, 1, 4, 'approved', 'leader'),
 (2, 1, 5, 'approved', 'member');
-
--- --------------------------------------------------------
--- Indicator Scores
--- --------------------------------------------------------
-
-INSERT INTO indicator_scores (id, indicator_id, certification_id, self_team_score, peer_team_score, status, evidence_url) VALUES
-(1, 1, 1, 4, 4, 'identical', 'https://example.com/evidence/1_1.jpg'),
-(2, 2, 1, 5, 4, 'different', 'https://example.com/evidence/1_2.jpg'),
-(3, 3, 1, 3, 3, 'agreed', 'https://example.com/evidence/1_3.jpg');
 
 SET FOREIGN_KEY_CHECKS = 1;
