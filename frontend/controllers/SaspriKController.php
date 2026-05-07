@@ -63,16 +63,24 @@ class SaspriKController extends Controller
     private function requestNewCertification(): Certification
     {
         try {
-            $certification = new Certification();
-            $certification->setNewCertificationRequest($this->findSaspriK());
-            return $certification;
+            return $this->findSaspriK()->createNewCertificationRequest();
         } catch (Exception $error) {
-            $message = explode('|', $error->getMessage());
-            if ($message[0] === 'not time yet') {
-                throw new UnprocessableEntityHttpException('Sertifikasi baru bisa dilakukan setelah tanggal ' . $message[1]);
+            if ($error instanceof UnprocessableEntityHttpException) {
+                throw new UnprocessableEntityHttpException($error->getMessage());
             }
             throw $error;
         }
+    }
+
+    private function findAMemberOfSelfTeam(int $user_id, int $certification_id): SelfTeamMember
+    {
+        $member = SelfTeamMember::find()
+            ->with('user')
+            ->where(['id' => $user_id, 'certification_id' => $certification_id])
+            ->one();
+        if (!$member)
+            throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Mandiri');
+        return $member;
     }
 
     public function actionIndex()
@@ -325,18 +333,8 @@ class SaspriKController extends Controller
     {
         try {
             $certification = $this->findSaspriK()->getOnGoingCertification();
-
-            /** @var SelfTeamMember|null $member */
-            $member = SelfTeamMember::find()
-              ->with('user')
-              ->where(['id' => $id, 'certification_id' => $certification->id])
-              ->one();
-
-            if (!$member) {
-                throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Mandiri');
-            }
+            $member = $this->findAMemberOfSelfTeam($id, $certification->id);
             $member->delete();
-
             Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Mandiri');
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
@@ -365,16 +363,7 @@ class SaspriKController extends Controller
                 throw new BadRequestHttpException('Peran tidak valid');
             }
 
-            /** @var SelfTeamMember|null $member */
-            $member = SelfTeamMember::find()
-              ->with('user')
-              ->where(['id' => $id, 'certification_id' => $certification->id])
-              ->one();
-
-            if (!$member) {
-                throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Mandiri');
-            }
-
+            $member = $this->findAMemberOfSelfTeam($id, $certification->id);
             $member->role = $role;
             $member->save(false);
 

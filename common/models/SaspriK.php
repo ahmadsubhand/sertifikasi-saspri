@@ -2,7 +2,13 @@
 
 namespace common\models;
 
+use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
+use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
+use DateTime;
+use Exception;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is the model class for table "saspri_k".
@@ -170,5 +176,45 @@ class SaspriK extends \yii\db\ActiveRecord
             ->where(['saspri_k_id' => $this->id]) // sertifikasi milik saspri-k saat ini
             ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]) // yang belum selesai
             ->one();
+    }
+
+    public function createNewCertificationRequest(): Certification
+    {
+        $valid_certificate = $this->validCertificate;
+
+        $next_certification_date = new DateTime($valid_certificate->next_certification_due_date);
+        $today = new DateTime('today');
+        if ($next_certification_date > $today) {
+            throw new UnprocessableEntityHttpException(
+                'Sertifikasi baru bisa dilakukan setelah tanggal ' . $next_certification_date->format('Y-m-d')
+            );
+        }
+
+        $certification = new Certification();
+        if ($valid_certificate->grade === CertificateGrade::C || $valid_certificate->grade === CertificateGrade::D) {
+            $certification->purpose = CertificationPurpose::RENEWAL;
+            $certification->level = $valid_certificate->level;
+        } else {
+            $certification->purpose = CertificationPurpose::LEVEL_UP;
+            switch ($valid_certificate->level) {
+                case CertificateLevel::NATALIA:
+                    $certification->level = CertificateLevel::WEANIA;
+                    break;
+                case CertificateLevel::WEANIA:
+                    $certification->level = CertificateLevel::PREMATURA;
+                    break;
+                case CertificateLevel::PREMATURA:
+                    $certification->level = CertificateLevel::MATURA;
+                    break;
+                default:
+                    throw new Exception('Maximum level has been reached');
+            }
+        }
+
+        $certification->assessment_id = Assessment::findOne(['active_at_level' => $certification->level])->id;
+        $certification->saspri_k_id = $this->id;
+        $certification->self_team_due_date = date('Y-m-d H:i:s', strtotime('+1 week'));
+
+        return $certification;
     }
 }
