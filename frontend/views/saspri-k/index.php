@@ -1,10 +1,6 @@
 <?php
 
 /** @var \common\models\SaspriK $saspri_k */
-/** @var \common\models\Certification $valid_certificate */
-/** @var \common\models\Certification[] $certifications */
-/** @var \common\models\User[] $users */
-/** @var \common\models\District $district */
 
 ?>
 <style>
@@ -74,7 +70,7 @@
                 <div class="d-flex flex-row gap-2">
                     <div>SASPRI-K </div>
                     <div>:</div>
-                    <div><?= $district->name ?></div>
+                    <div><?= $saspri_k->district->name ?></div>
                 </div>
                 <div class="d-flex flex-row gap-2">
                     <div>Nama unit usaha (koperasi)</div>
@@ -102,12 +98,12 @@
                 <div class="d-flex flex-row gap-2">
                     <div>Level Sertifikat</div>
                     <div>:</div>
-                    <div><?=  $valid_certificate->level ?></div>
+                    <div><?=  $saspri_k->validCertificate->level ?></div>
                 </div>
                 <div class="d-flex flex-row gap-2">
                     <div>Nomor Sertifikat</div>
                     <div>:</div>
-                    <div><?=  $valid_certificate->code ?></div>
+                    <div><?=  $saspri_k->validCertificate->code ?></div>
                 </div>
             </div>
 
@@ -128,7 +124,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($certifications as $index => $certification): ?>
+                <?php foreach ($saspri_k->certifications as $index => $certification): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= $certification->code ?: '-' ?>
@@ -176,7 +172,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($users as $index => $user): ?>
+                <?php foreach ($saspri_k->users as $index => $user): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= \yii\helpers\Html::encode($user->username) ?>

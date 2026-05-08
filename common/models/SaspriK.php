@@ -7,7 +7,7 @@ use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use DateTime;
-use Exception;
+use yii\db\ActiveQuery;
 use yii\web\UnprocessableEntityHttpException;
 
 /**
@@ -40,6 +40,7 @@ use yii\web\UnprocessableEntityHttpException;
  * @property SaspriKDocument[] $saspriKDocuments
  * @property User[] $users
  * @property Certification $validCertificate
+ * @property Certification|null $onGoingCertification
  */
 class SaspriK extends \yii\db\ActiveRecord
 {
@@ -170,12 +171,10 @@ class SaspriK extends \yii\db\ActiveRecord
         return $this->hasOne(Certification::class, ['id' => 'valid_certificate_id']);
     }
 
-    public function getOnGoingCertification(): Certification | null
+    public function getOnGoingCertification(): ActiveQuery
     {
-        return $this->getCertifications()
-            ->where(['saspri_k_id' => $this->id]) // sertifikasi milik saspri-k saat ini
-            ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]) // yang belum selesai
-            ->one();
+        return $this->hasOne(Certification::class, ['saspri_k_id' => 'id'])
+            ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]);
     }
 
     public function createNewCertificationRequest(): Certification
@@ -207,11 +206,18 @@ class SaspriK extends \yii\db\ActiveRecord
                     $certification->level = CertificateLevel::MATURA;
                     break;
                 default:
-                    throw new Exception('Maximum level has been reached');
+                    throw new UnprocessableEntityHttpException('Sertifikasi sudah mencapai tingkat paling tinggi');
             }
         }
 
-        $certification->assessment_id = Assessment::findOne(['active_at_level' => $certification->level])->id;
+        $assessment = Assessment::findOne(['active_at_level' => $certification->level]);
+        if (!$assessment) {
+            throw new UnprocessableEntityHttpException(
+                'Belum ada instrumen penilaian aktif untuk sertifikasi tingkat ' . ucfirst($certification->level)
+            );
+        }
+
+        $certification->assessment_id = $assessment->id;
         $certification->saspri_k_id = $this->id;
         $certification->self_team_due_date = date('Y-m-d H:i:s', strtotime('+1 week'));
 

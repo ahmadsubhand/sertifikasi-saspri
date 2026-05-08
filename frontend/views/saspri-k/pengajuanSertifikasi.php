@@ -1,7 +1,6 @@
 <?php
 
 /** @var \common\models\Certification $certification */
-/** @var \common\models\SelfTeamMember[] $self_team_members */
 
 use yii\helpers\Html;
 
@@ -100,7 +99,7 @@ use yii\helpers\Html;
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($self_team_members as $index => $member): ?>
+                <?php foreach ($certification->selfTeamMembers as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= Html::encode($member->user->username) ?>
