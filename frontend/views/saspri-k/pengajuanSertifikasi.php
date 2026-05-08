@@ -131,7 +131,7 @@ use yii\helpers\Html;
             </tbody>
         </table>
 
-        <?php if ($certification->status === \common\enums\CertificationStatus::PENDING_SELF_TEAM_FORMATION): ?>
+        <?php // if ($certification->status === \common\enums\CertificationStatus::PENDING_SELF_TEAM_FORMATION): ?>
         <div class="d-flex justify-content-end mt-3">
             <?= Html::beginForm(['ajukan-sertifikasi'], 'post') ?>
             <button type="submit" class="btn btn-primary"
@@ -140,7 +140,7 @@ use yii\helpers\Html;
             </button>
             <?= Html::endForm() ?>
         </div>
-        <?php endif; ?>
+        <?php // endif; ?>
     </div>
 </div>
 

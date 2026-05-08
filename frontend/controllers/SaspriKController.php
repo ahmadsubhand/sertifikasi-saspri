@@ -236,6 +236,11 @@ class SaspriKController extends Controller
             if (!empty($userIds)) {
                 $saspri_k = User::findOne(['id' => Yii::$app->user->id])->saspriKAsCoordinator;
                 $certification = $saspri_k->onGoingCertification ?: $saspri_k->createNewCertificationRequest();
+                if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
+                    throw new UnprocessableEntityHttpException(
+                        'Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai'
+                    );
+                }
                 $existing_member_ids = $certification
                     ->getSelfTeamMembers()
                     ->select('user_id')
@@ -270,6 +275,9 @@ class SaspriKController extends Controller
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof UnprocessableEntityHttpException) {
+                    if (str_contains($error->getMessage(), 'Tim Mandiri')) {
+                        return $this->redirect(['pengajuan-sertifikasi']);
+                    }
                     return $this->redirect(['index']);
                 } elseif ($error instanceof BadRequestHttpException) {
                     return $this->redirect(['pengajuan-sertifikasi']);
@@ -282,18 +290,23 @@ class SaspriKController extends Controller
     public function actionHapusAnggotaTimMandiri(int $id)
     {
         try {
-            $certification_id = User::findOne(['id' => Yii::$app->user->id])
+            $certification = User::findOne(['id' => Yii::$app->user->id])
                 ->saspriKAsCoordinator
-                ->onGoingCertification
-                ->id;
+                ->onGoingCertification;
+            if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
+                throw new UnprocessableEntityHttpException('Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai');
+            }
 
-            $member = $this->findAMemberOfSelfTeam($id, $certification_id);
+            $member = $this->findAMemberOfSelfTeam($id, $certification->id);
             $member->delete();
 
             Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Mandiri');
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
-            if ($error instanceof NotFoundHttpException) {
+            if (
+                $error instanceof NotFoundHttpException || 
+                $error instanceof UnprocessableEntityHttpException
+            ) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 return $this->redirect(['pengajuan-sertifikasi']);
             }
@@ -309,19 +322,25 @@ class SaspriKController extends Controller
                 throw new BadRequestHttpException('Peran tidak valid');
             }
 
-            $certification_id = User::findOne(['id' => Yii::$app->user->id])
+            $certification = User::findOne(['id' => Yii::$app->user->id])
                 ->saspriKAsCoordinator
-                ->onGoingCertification
-                ->id;
+                ->onGoingCertification;
+            if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
+                throw new UnprocessableEntityHttpException('Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai');
+            }
 
-            $member = $this->findAMemberOfSelfTeam($id, $certification_id);
+            $member = $this->findAMemberOfSelfTeam($id, $certification->id);
             $member->role = $role;
             $member->save(false);
 
             Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
-            if ($error instanceof BadRequestHttpException || $error instanceof NotFoundHttpException) {
+            if (
+                $error instanceof BadRequestHttpException || 
+                $error instanceof NotFoundHttpException ||
+                $error instanceof UnprocessableEntityHttpException
+            ) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 return $this->redirect(['pengajuan-sertifikasi']);
             }
