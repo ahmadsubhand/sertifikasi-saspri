@@ -330,6 +330,7 @@ class SaspriKController extends Controller
             }
 
             $member = $this->findAMemberOfSelfTeam($id, $certification->id);
+            $member->status = ApprovalStatus::PENDING;
             $member->role = $role;
             $member->save(false);
 

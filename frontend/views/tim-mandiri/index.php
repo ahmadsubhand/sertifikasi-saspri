@@ -1,0 +1,136 @@
+<?php
+
+use yii\helpers\Html;
+
+/** @var \common\models\Certification[] $certifications */
+/** @var \common\models\SelfTeamMember[] $self_team_member_request */
+/** @var \common\models\SelfTeamMember[] $self_team_member_uncompleted */
+/** @var \common\models\SelfTeamMember[] $self_team_member_completed */
+?>
+
+<div class="d-flex flex-column align-items-start gap-3">
+    <h1>Tim Mandiri</h1>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Permintaan Partisipasi Tim Mandiri</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Alamat Sekretaris</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Peran</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tenggat Waktu Konfirmasi</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($self_team_member_request as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?>
+                    </td>
+                    <td><?= $member->certification->saspriK->address ?>
+                    </td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?= ucfirst($member->role) ?></td>
+                    <td><?= ucfirst($member->status) ?></td>
+                    <td><?=
+                            $member->certification->self_review_due_date
+                            ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
+                            : '-'
+                    ?></td>
+                    <td>
+                        <?= Html::a('Setuju', ['setuju', 'id' => $member->id], [
+                            'class' => 'btn btn-success',
+                            'data-method' => 'post',
+                        ]) ?>
+                        <?= Html::a('Tolak', ['tolak', 'id' => $member->id], [
+                            'class' => 'btn btn-danger',
+                            'data-method' => 'post',
+                            'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Mandiri ini?',
+                        ]) ?>
+                        <button class="btn btn-primary">Lihat</button>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Sertifikasi Berjalan</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Tahapan</th>
+                    <th scope="col">Tenggat Waktu Penilaian</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($self_team_member_uncompleted as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?= $member->certification->status ?></td>
+                    <td><?=
+                        $member->certification->self_review_due_date
+                        ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
+                        : '-'
+                    ?></td>
+                    <td>
+                        <button class="btn btn-primary">Lihat</button>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Riwayat Sertifikasi</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Tanggal Pengajuan</th>
+                    <th scope="col">Tanggal Penerbitan</th>
+                    <th scope="col">Predikat</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($self_team_member_completed as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?=
+                        $member->certification->submitted_at
+                        ? date('Y-m-d', strtotime($member->certification->submitted_at))
+                        : '-'
+                    ?></td>
+                    <td><?=
+                        $member->certification->issued_at
+                        ? date('Y-m-d', strtotime($member->certification->issued_at))
+                        : '-'
+                    ?></td>
+                    <td><?= ucfirst($member->certification->grade ?: '-') ?></td>
+                    <td>
+                        <button class="btn btn-primary">Lihat</button>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+</div>
