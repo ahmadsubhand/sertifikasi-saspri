@@ -61,19 +61,26 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
 
 <div class="d-flex flex-column align-items-start gap-3">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p class="text-muted">Sertifikasi: <?= Html::encode($certification->level) ?> - <?= Html::encode($certification->saspriK->cooperative_name) ?>
-        <?php if ($isLeader): ?> <span class="badge bg-info">Ketua Tim</span> <?php endif; ?>
-    </p>
+    <div class="text-muted d-flex align-items-center gap-2 mb-2">
+        <?php if ($isLeader): ?>
+            <span class="badge bg-info">Ketua Tim</span>
+        <?php else: ?>
+            <span class="badge bg-secondary">Anggota Tim</span>
+        <?php endif; ?>
+        <div>
+            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->district->name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
+        </div>
+    </div>
 
     <div class="card p-3 d-flex flex-column gap-2 w-100">
         <h2><?= Html::encode($currentRootGroup->code) ?>. <?= Html::encode($currentRootGroup->label) ?> (<?= Html::encode($currentRootGroup->weight) ?>%)</h2>
         
         <?php
-            $formAction = ($page == $totalPages && $isLeader)
-                ? Url::to(['finalisasi-self-review', 'id' => $certification->id])
-                : Url::to(['simpan-sementara-self-review', 'id' => $certification->id, 'page' => $page]);
+            // Default action is always save temporary
+            $saveAction = Url::to(['simpan-sementara-self-review', 'id' => $certification->id, 'page' => $page]);
+            $finalizeAction = Url::to(['finalisasi-self-review', 'id' => $certification->id]);
         ?>
-        <form id="self-review-form" action="<?= $formAction ?>" method="post" enctype="multipart/form-data">
+        <form id="self-review-form" action="<?= $saveAction ?>" method="post" enctype="multipart/form-data">
             <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
             
             <table class="table align-middle">
@@ -100,12 +107,21 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                                     <td class="text-center"><?= $index + 1 ?></td>
                                     <td><?= Html::encode($indicator->label) ?></td>
                                     <td>
-                                        <select name="IndicatorScore[<?= $indicator->id ?>][self_team_score]" class="form-select score-select" data-subgroup-id="<?= $subGroup->id ?>">
-                                            <option value="">Pilih Penilaian</option>
+                                        <select 
+                                            name="IndicatorScore[<?= $indicator->id ?>][self_team_score]" 
+                                            class="form-select score-select" 
+                                            data-subgroup-id="<?= $subGroup->id ?>"
+                                        >
+                                            <option value="0">Pilih Penilaian</option>
+
                                             <?php foreach ($indicator->indicatorOptions as $option): ?>
                                                 <?php
-                                            $selected = (isset($scores[$indicator->id]) && $scores[$indicator->id]->self_team_score !== null && $scores[$indicator->id]->self_team_score == $option->weight) ? 'selected' : '';
+                                                    $selected = (
+                                                        isset($scores[$indicator->id]) &&
+                                                        $scores[$indicator->id]->self_team_score == $option->weight
+                                                    ) ? 'selected' : '';
                                                 ?>
+
                                                 <option value="<?= $option->weight ?>" <?= $selected ?>>
                                                     <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
                                                 </option>
@@ -144,19 +160,19 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
     </div>
 
     <div class="d-flex justify-content-between w-100 mt-3">
-        <button type="submit" form="self-review-form" name="target_page" value="<?= $page ?>" class="btn btn-outline-primary">Simpan sementara</button>
+        <button type="submit" id="btn-save-temp" form="self-review-form" name="target_page" value="<?= $page ?>" class="btn btn-outline-primary">Simpan sementara</button>
         
         <div class="d-flex gap-2">
             <?php if ($page > 1): ?>
-                <button type="submit" form="self-review-form" name="target_page" value="<?= $page - 1 ?>" class="btn btn-secondary">Sebelumnya</button>
+                <button type="submit" id="btn-prev" form="self-review-form" name="target_page" value="<?= $page - 1 ?>" class="btn btn-secondary">Sebelumnya</button>
             <?php else: ?>
                 <button class="btn btn-secondary" disabled>Sebelumnya</button>
             <?php endif; ?>
 
             <?php if ($page < $totalPages): ?>
-                <button type="submit" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-primary">Berikutnya</button>
+                <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-primary">Berikutnya</button>
             <?php elseif ($isLeader): ?>
-                <button type="submit" form="self-review-form" name="finish" value="1" class="btn btn-success">Selesai Review</button>
+                <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn btn-success">Selesai Review</button>
             <?php endif; ?>
         </div>
     </div>
@@ -164,6 +180,15 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
 
 <?php
 $this->registerJs(<<<JS
+    // Handle form action changes
+    $('#btn-finish').on('click', function() {
+        $('#self-review-form').attr('action', '$finalizeAction');
+    });
+
+    $('#btn-save-temp, #btn-prev, #btn-next').on('click', function() {
+        $('#self-review-form').attr('action', '$saveAction');
+    });
+
     $('.score-select').on('change', function() {
         var subgroupId = $(this).data('subgroup-id');
         var subGroupSum = 0;

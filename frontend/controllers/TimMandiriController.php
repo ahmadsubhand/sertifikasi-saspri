@@ -117,7 +117,7 @@ class TimMandiriController extends Controller
                 ]);
 
             // 2. Simpan score setiap indicator
-            if (isset($data['self_team_score']) && $data['self_team_score'] !== "") {
+            if (isset($data['self_team_score'])) {
                 $val = (int) $data['self_team_score'];
                 // Rentang penilaian minimal 0 dan maksimal 100
                 if ($val < 0 || $val > 100) {
@@ -233,7 +233,7 @@ class TimMandiriController extends Controller
             /** @var Certification $certification*/
             $certification = Certification::find()
                 ->where(['id' => $id])
-                ->with(['assessment', 'assessment.indicators'])
+                ->with('saspriK.district')
                 ->one();
             if (!$certification) {
                 throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
