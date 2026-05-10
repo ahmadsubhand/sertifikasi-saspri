@@ -1,0 +1,139 @@
+<?php
+
+use yii\helpers\Html;
+
+/** @var \common\models\Certification[] $certifications */
+/** @var \common\models\PeerTeamMember[] $peer_team_member_request */
+/** @var \common\models\PeerTeamMember[] $peer_team_member_uncompleted */
+/** @var \common\models\PeerTeamMember[] $peer_team_member_completed */
+?>
+
+<div class="d-flex flex-column align-items-start gap-3">
+    <h1>Tim Sebaya</h1>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Permintaan Partisipasi Tim Sebaya</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Alamat Sekretaris</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Peran</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tenggat Waktu Konfirmasi</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($peer_team_member_request as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?>
+                    </td>
+                    <td><?= $member->certification->saspriK->address ?>
+                    </td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?= ucfirst($member->role) ?></td>
+                    <td><?= ucfirst($member->status) ?></td>
+                    <td><?=
+                            $member->certification->peer_team_due_date
+                            ? date('Y-m-d', strtotime($member->certification->peer_team_due_date))
+                            : '-'
+                    ?></td>
+                    <td>
+                        <?= Html::a('Setuju', ['setuju', 'id' => $member->id], [
+                            'class' => 'btn btn-success',
+                            'data-method' => 'post',
+                        ]) ?>
+                        <?= Html::a('Tolak', ['tolak', 'id' => $member->id], [
+                            'class' => 'btn btn-danger',
+                            'data-method' => 'post',
+                            'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Sebaya ini?',
+                        ]) ?>
+                        <button class="btn btn-primary">Lihat</button>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Sertifikasi Berjalan</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Tahapan</th>
+                    <th scope="col">Tenggat Waktu Penilaian</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($peer_team_member_uncompleted as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?= $member->certification->status ?></td>
+                    <td><?=
+                        $member->certification->peer_review_due_date
+                        ? date('Y-m-d', strtotime($member->certification->peer_review_due_date))
+                        : '-'
+                    ?></td>
+                    <td>
+                        <a class="btn btn-primary"
+                            href="<?= \yii\helpers\Url::to(['tim-sebaya/peer-review', 'id' => $member->certification->id]) ?>">
+                            Lihat
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-2">
+        <h2>Riwayat Sertifikasi</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Wilayah</th>
+                    <th scope="col">Tingkatan</th>
+                    <th scope="col">Tanggal Pengajuan</th>
+                    <th scope="col">Tanggal Penerbitan</th>
+                    <th scope="col">Predikat</th>
+                    <th scope="col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($peer_team_member_completed as $index => $member): ?>
+                <tr>
+                    <th scope="row"><?= $index + 1 ?></th>
+                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?=
+                        $member->certification->submitted_at
+                        ? date('Y-m-d', strtotime($member->certification->submitted_at))
+                        : '-'
+                    ?></td>
+                    <td><?=
+                        $member->certification->issued_at
+                        ? date('Y-m-d', strtotime($member->certification->issued_at))
+                        : '-'
+                    ?></td>
+                    <td><?= ucfirst($member->certification->grade ?: '-') ?></td>
+                    <td>
+                        <button class="btn btn-primary">Lihat</button>
+                    </td>
+                </tr>
+                <?php endforeach ?>
+            </tbody>
+        </table>
+    </div>
+</div>

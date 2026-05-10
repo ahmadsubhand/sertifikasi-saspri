@@ -4,11 +4,12 @@ namespace frontend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
-use common\enums\UserRole;
+use common\enums\IndicatorStatus;
 use common\enums\TeamRole;
+use common\enums\UserRole;
 use common\models\Certification;
 use common\models\IndicatorScore;
-use common\models\SelfTeamMember;
+use common\models\PeerTeamMember;
 use Exception;
 use Yii;
 use yii\filters\AccessControl;
@@ -19,9 +20,8 @@ use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
-use yii\web\UploadedFile;
 
-class TimMandiriController extends Controller
+class TimSebayaController extends Controller
 {
     use AssessmentReviewTrait;
 
@@ -33,7 +33,7 @@ class TimMandiriController extends Controller
             'rules' => [
               [
                 'allow' => true,
-                'roles' => [UserRole::USER],
+                'roles' => [UserRole::USER, UserRole::COORDINATOR],
               ]
             ]
           ],
@@ -42,8 +42,8 @@ class TimMandiriController extends Controller
             'actions' => [
               'setuju' => ['post'],
               'tolak' => ['post'],
-              'simpan-sementara-self-review' => ['post'],
-              'finalisasi-self-review' => ['post'],
+              'simpan-sementara-peer-review' => ['post'],
+              'finalisasi-peer-review' => ['post'],
             ],
           ],
         ];
@@ -51,34 +51,34 @@ class TimMandiriController extends Controller
 
     public function actionIndex()
     {
-        $base_query = SelfTeamMember::find()
+        $base_query = PeerTeamMember::find()
             ->joinWith('certification')
-            ->where(['self_team_members.user_id' => Yii::$app->user->id])
+            ->where(['peer_team_members.user_id' => Yii::$app->user->id])
             ->with('certification.saspriK.district');
 
-        $self_team_member_request = (clone $base_query)
-            ->andWhere(['certifications.status' => CertificationStatus::PENDING_SELF_TEAM_FORMATION])
+        $peer_team_member_request = (clone $base_query)
+            ->andWhere(['certifications.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
             ->all();
 
-        $self_team_member_uncompleted = (clone $base_query)
+        $peer_team_member_uncompleted = (clone $base_query)
             ->andWhere([
                 'not in',
                 'certifications.status',
                 [
-                    CertificationStatus::PENDING_SELF_TEAM_FORMATION,
+                    CertificationStatus::PENDING_PEER_TEAM_FORMATION,
                     CertificationStatus::COMPLETED,
                 ]
             ])
             ->all();
 
-        $self_team_member_completed = (clone $base_query)
+        $peer_team_member_completed = (clone $base_query)
             ->andWhere(['certifications.status' => CertificationStatus::COMPLETED])
             ->all();
 
         return $this->render('index', [
-            'self_team_member_request' => $self_team_member_request,
-            'self_team_member_uncompleted' => $self_team_member_uncompleted,
-            'self_team_member_completed' => $self_team_member_completed,
+            'peer_team_member_request' => $peer_team_member_request,
+            'peer_team_member_uncompleted' => $peer_team_member_uncompleted,
+            'peer_team_member_completed' => $peer_team_member_completed,
         ]);
     }
 
@@ -89,7 +89,7 @@ class TimMandiriController extends Controller
             $member->status = ApprovalStatus::APPROVED;
             $member->save(false);
 
-            Yii::$app->session->setFlash('success', 'Berhasil menyetujui permintaan bergabung Tim Mandiri');
+            Yii::$app->session->setFlash('success', 'Berhasil menyetujui permintaan bergabung Tim Sebaya');
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -107,7 +107,7 @@ class TimMandiriController extends Controller
             $member->status = ApprovalStatus::REJECTED;
             $member->save(false);
 
-            Yii::$app->session->setFlash('success', 'Berhasil menolak permintaan bergabung Tim Mandiri');
+            Yii::$app->session->setFlash('success', 'Berhasil menolak permintaan bergabung Tim Sebaya');
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -118,10 +118,10 @@ class TimMandiriController extends Controller
         }
     }
 
-    public function actionSelfReview(int $id, int $page = 1)
+    public function actionPeerReview(int $id, int $page = 1)
     {
         try {
-            $this->checkSelfReviewPermission($id);
+            $this->checkPeerReviewPermission($id);
             $certification = $this->findCertification($id);
             $assessmentData = $this->prepareAssessmentGroups($certification, $page);
             $indicators = $this->findIndicatorsByRootGroup(
@@ -130,7 +130,7 @@ class TimMandiriController extends Controller
                 $assessmentData['allGroupIds'],
             );
             $scores = $this->findIndicatorScores($id, $assessmentData['indicatorIds']);
-            return $this->render('self-review', [
+            return $this->render('peer-review', [
                 'certification' => $certification,
                 'rootGroups' => $assessmentData['rootGroups'],
                 'currentRootGroup' => $assessmentData['currentRootGroup'],
@@ -148,15 +148,15 @@ class TimMandiriController extends Controller
         }
     }
 
-    public function actionSimpanSementaraSelfReview(int $id, int $page = 1)
+    public function actionSimpanSementaraPeerReview(int $id, int $page = 1)
     {
         try {
-            $this->checkSelfReviewPermission($id);
+            $this->checkPeerReviewPermission($id);
             $this->saveScores($id, Yii::$app->request->post('IndicatorScore', []));
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
-            return $this->redirect(['self-review', 'id' => $id, 'page' => $targetPage]);
+            return $this->redirect(['peer-review', 'id' => $id, 'page' => $targetPage]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -166,26 +166,25 @@ class TimMandiriController extends Controller
                     $error instanceof UnprocessableEntityHttpException ||
                     $error instanceof BadRequestHttpException
                 ) {
-                    // Redirect back to the same page if validation fails
-                    return $this->redirect(['self-review', 'id' => $id, 'page' => $page]);
+                    return $this->redirect(['peer-review', 'id' => $id, 'page' => $page]);
                 }
             }
             throw $error;
         }
     }
 
-    public function actionFinalisasiSelfReview(int $id)
+    public function actionFinalisasiPeerReview(int $id)
     {
         try {
-            $member = $this->checkSelfReviewPermission($id);
+            $member = $this->checkPeerReviewPermission($id);
             $this->isMemberALeader($member);
 
             $certification = $this->saveScores($id, Yii::$app->request->post('IndicatorScore', []));
             $this->areAllIndicatorsFilledIn($certification);
 
-            $certification->status = CertificationStatus::PENDING_PEER_TEAM_FORMATION;
+            $certification->status = CertificationStatus::EXTERNAL_REVIEW;
             $certification->save(false);
-            Yii::$app->session->setFlash('success', 'Self Review berhasil difinalisasi');
+            Yii::$app->session->setFlash('success', 'Peer Review berhasil difinalisasi');
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -196,27 +195,27 @@ class TimMandiriController extends Controller
                     $error instanceof UnprocessableEntityHttpException ||
                     $error instanceof BadRequestHttpException
                 ) {
-                    return $this->redirect(['self-review', 'id' => $id, 'page' => Yii::$app->request->get('page', 1)]);
+                    return $this->redirect(['peer-review', 'id' => $id, 'page' => Yii::$app->request->get('page', 1)]);
                 }
             }
             throw $error;
         }
     }
 
-    private function checkApprovalPermission(int $id): SelfTeamMember
+    private function checkApprovalPermission(int $id): PeerTeamMember
     {
-        $member = SelfTeamMember::find()
+        $member = PeerTeamMember::find()
             ->joinWith('certification')
             ->where([
-                'self_team_members.id' => $id,
-                'self_team_members.user_id' => Yii::$app->user->id,
+                'peer_team_members.id' => $id,
+                'peer_team_members.user_id' => Yii::$app->user->id,
             ])
             ->one();
 
         if (!$member) {
-            throw new NotFoundHttpException('Data tidak ditemukan atau Anda bukan anggota Tim Mandiri ini');
+            throw new NotFoundHttpException('Data tidak ditemukan atau Anda bukan anggota Tim Sebaya ini');
         }
-        if ($member->certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
+        if ($member->certification->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
             throw new UnprocessableEntityHttpException('Permintaan sudah tidak dapat diubah karena status sertifikasi sudah berjalan');
         }
         if ($member->status !== ApprovalStatus::PENDING) {
@@ -226,9 +225,9 @@ class TimMandiriController extends Controller
         return $member;
     }
 
-    private function checkSelfReviewPermission(int $id): SelfTeamMember
+    private function checkPeerReviewPermission(int $id): PeerTeamMember
     {
-        $member = SelfTeamMember::find()
+        $member = PeerTeamMember::find()
             ->where([
                 'certification_id' => $id,
                 'user_id' => Yii::$app->user->id,
@@ -236,7 +235,7 @@ class TimMandiriController extends Controller
             ])
             ->one();
         if (!$member) {
-            throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Mandiri');
+            throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Sebaya');
         }
         return $member;
     }
@@ -244,7 +243,7 @@ class TimMandiriController extends Controller
     private function saveScores(int $certificationId, array $postData): Certification
     {
         $certification = $this->findCertification($certificationId);
-        $this->checkCertificationStatusIsSelfReview($certification);
+        $this->checkCertificationStatusIsPeerReview($certification);
 
         foreach ($postData as $indicatorId => $data) {
             $score = $this->findOrCreateIndicatorScore(
@@ -252,21 +251,15 @@ class TimMandiriController extends Controller
                 $indicatorId,
             );
 
-            $this->fillSelfTeamScore($score, $data);
-
-            $this->handleEvidenceUpload(
-                $score,
-                $certificationId,
-                $indicatorId,
-            );
-
+            $this->fillPeerTeamScore($score, $data);
+            $this->fillPeerTeamStatus($score, $data);
             $score->save(false);
         }
 
         return $certification;
     }
 
-    private function isMemberALeader(SelfTeamMember $member) 
+    private function isMemberALeader(PeerTeamMember $member) 
     {
         if ($member->role !== TeamRole::LEADER) {
             throw new UnprocessableEntityHttpException('Hanya ketua tim yang dapat melakukan finalisasi');
@@ -281,35 +274,61 @@ class TimMandiriController extends Controller
             ->indexBy('indicator_id')
             ->all();
         foreach ($indicatorIds as $reqId) {
-            if (!isset($existingScores[$reqId]) || !$existingScores[$reqId]->self_team_score) {
+            if (!isset($existingScores[$reqId]) || !$existingScores[$reqId]->peer_team_score || !$existingScores[$reqId]->status) {
                 throw new UnprocessableEntityHttpException(
-                    'Seluruh indikator wajib diberikan penilaian sebelum finalisasi'
+                    'Seluruh indikator wajib diberikan penilaian dan status sebelum finalisasi'
                 );
             }
         }
     }
 
-    private function checkCertificationStatusIsSelfReview(Certification $certification)
+    private function fillPeerTeamStatus(
+        IndicatorScore $score,
+        array $data,
+    ): void {
+        if (!isset($data['status']) || empty($data['status'])) {
+            $score->status = null;
+        } else {
+            $status = $data['status'];
+            if (!in_array($status, IndicatorStatus::values())) {
+                throw new BadRequestHttpException('Status penilaian tidak valid' . $data['status']);
+            }
+    
+            if ($score->peer_team_score === $score->self_team_score) {
+                if ($status !== IndicatorStatus::IDENTICAL) {
+                    throw new BadRequestHttpException('Status harus Identical jika skor sama');
+                }
+            } else {
+                if ($status === IndicatorStatus::IDENTICAL) {
+                    throw new BadRequestHttpException('Status tidak boleh Identical jika skor berbeda');
+                }
+            }
+    
+            $score->status = $status;
+        }
+    }
+
+    private function checkCertificationStatusIsPeerReview(Certification $certification)
     {
         if (
             !$certification ||
-            $certification->status !== CertificationStatus::SELF_REVIEW
+            $certification->status !== CertificationStatus::PEER_REVIEW
         ) {
             throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap self review'
+                'Sertifikasi tidak dalam tahap peer review'
             );
         }
     }
 
-    private function fillSelfTeamScore(
+    private function fillPeerTeamScore(
         IndicatorScore $score,
         array $data,
     ): void {
-        if (!isset($data['self_team_score'])) {
+        if (!isset($data['peer_team_score'])) {
             return;
         }
 
-        $value = (int) $data['self_team_score'];
+        $value = (int) $data['peer_team_score'];
 
         if ($value < 0 || $value > 100) {
             throw new BadRequestHttpException(
@@ -317,48 +336,6 @@ class TimMandiriController extends Controller
             );
         }
 
-        $score->self_team_score = $value;
-    }
-
-    private function handleEvidenceUpload(
-        IndicatorScore $score,
-        int $certificationId,
-        int $indicatorId,
-    ): void {
-        $file = UploadedFile::getInstanceByName(
-            "IndicatorScore[$indicatorId][evidence]"
-        );
-
-        if (!$file) {
-            return;
-        }
-
-        $relativeDir = '/uploads/evidence/' . $certificationId;
-        $absoluteDir = Yii::getAlias('@frontend/web' . $relativeDir);
-
-        $this->ensureDirectoryExists($absoluteDir);
-
-        $this->deleteOldEvidence($score);
-
-        $fileName = $this->generateEvidenceFileName(
-            $indicatorId,
-            $file->extension,
-        );
-
-        if ($file->saveAs($absoluteDir . '/' . $fileName)) {
-            $score->evidence_url = $relativeDir . '/' . $fileName;
-        }
-    }
-
-    private function generateEvidenceFileName(
-        int $indicatorId,
-        string $extension,
-    ): string {
-        return sprintf(
-            'self_%d_%d.%s',
-            $indicatorId,
-            time(),
-            $extension,
-        );
+        $score->peer_team_score = $value;
     }
 }

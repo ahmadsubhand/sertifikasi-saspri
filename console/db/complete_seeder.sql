@@ -106,14 +106,58 @@ INSERT INTO self_team_members (id, certification_id, user_id, status, role) VALU
 (15, 9, 19, 'approved', 'member');
 
 INSERT INTO peer_team_members (id, certification_id, user_id, status, role) VALUES
-(1, 4, 1, 'approved', 'leader'),
-(2, 4, 2, 'approved', 'member'),
+(1, 4, 1, 'approved', 'facilitator'),
+(2, 4, 2, 'approved', 'leader'),
 (3, 4, 6, 'approved', 'member'),
-(4, 7, 1, 'pending', 'leader'),
-(5, 7, 2, 'pending', 'member'),
+(4, 7, 1, 'pending', 'facilitator'),
+(5, 7, 2, 'pending', 'leader'),
 (6, 7, 6, 'pending', 'member'),
-(7, 9, 1, 'approved', 'leader'),
-(8, 9, 8, 'approved', 'member'),
+(7, 9, 1, 'approved', 'facilitator'),
+(8, 9, 8, 'approved', 'leader'),
 (9, 9, 12, 'approved', 'member');
+
+-- --------------------------------------------------------
+-- Indicator Scores
+-- --------------------------------------------------------
+
+INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, evidence_url) VALUES
+-- Certification 2 (Self Review In Progress - Draft)
+(2, 1, 100, '/uploads/evidence/2/self_1.pdf'),
+(2, 2, 75, '/uploads/evidence/2/self_2.pdf'),
+(2, 3, 50, '/uploads/evidence/2/self_3.pdf'),
+(2, 4, 100, NULL),
+(2, 5, 25, NULL),
+-- Certification 7 (Pending Peer Team Formation - Passed Self Review)
+(7, 1, 100, '/uploads/evidence/7/self_1.pdf'),
+(7, 2, 100, '/uploads/evidence/7/self_2.pdf'),
+(7, 3, 75, '/uploads/evidence/7/self_3.pdf'),
+(7, 4, 50, '/uploads/evidence/7/self_4.pdf'),
+(7, 5, 100, '/uploads/evidence/7/self_5.pdf'),
+(7, 6, 75, '/uploads/evidence/7/self_6.pdf'),
+(7, 7, 25, '/uploads/evidence/7/self_7.pdf'),
+(7, 8, 100, '/uploads/evidence/7/self_8.pdf'),
+(7, 9, 50, '/uploads/evidence/7/self_9.pdf'),
+(7, 10, 100, '/uploads/evidence/7/self_10.pdf'),
+(7, 11, 75, NULL),
+(7, 12, 100, NULL),
+(7, 13, 25, NULL),
+(7, 14, 50, NULL),
+(7, 15, 100, NULL),
+-- Certification 9 (Peer Review In Progress - Passed Self Review)
+(9, 1, 75, '/uploads/evidence/9/self_1.pdf'),
+(9, 2, 50, '/uploads/evidence/9/self_2.pdf'),
+(9, 3, 100, '/uploads/evidence/9/self_3.pdf'),
+(9, 4, 100, '/uploads/evidence/9/self_4.pdf'),
+(9, 5, 25, '/uploads/evidence/9/self_5.pdf'),
+(9, 6, 75, '/uploads/evidence/9/self_6.pdf'),
+(9, 7, 50, '/uploads/evidence/9/self_7.pdf'),
+(9, 8, 100, '/uploads/evidence/9/self_8.pdf'),
+(9, 9, 100, '/uploads/evidence/9/self_9.pdf'),
+(9, 10, 25, '/uploads/evidence/9/self_10.pdf'),
+(9, 11, 50, NULL),
+(9, 12, 75, NULL),
+(9, 13, 100, NULL),
+(9, 14, 100, NULL),
+(9, 15, 25, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
