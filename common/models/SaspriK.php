@@ -220,6 +220,7 @@ class SaspriK extends \yii\db\ActiveRecord
         $certification->assessment_id = $assessment->id;
         $certification->saspri_k_id = $this->id;
         $certification->self_team_due_date = date('Y-m-d H:i:s', strtotime('+1 week'));
+        $certification->status = CertificationStatus::PENDING_SELF_TEAM_FORMATION;
 
         return $certification;
     }
