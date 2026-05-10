@@ -30,7 +30,9 @@ INSERT INTO `auth_assignment` (item_name, user_id, created_at) values
 ('coordinator', 6, 1778028133),
 ('user', 7, 1778028133),
 ('coordinator', 8, 1778028133),
-('user', 9, 1778028133);
+('user', 9, 1778028133),
+('user', 10, 1778028133),
+('user', 11, 1778028133);
 
 -- --------------------------------------------------------
 -- SASPRI-K
@@ -70,8 +72,8 @@ INSERT INTO self_team_members (id, certification_id, user_id, status, role) VALU
 (5, 4, 10, 'approved', 'member'),
 (6, 4, 11, 'approved', 'member'),
 (7, 5, 9, 'pending', 'member'),
-(8, 5, 10, 'approved', 'leader'),
-(9, 5, 11, 'approved', 'member');
+(8, 5, 10, 'pending', 'leader'),
+(9, 5, 11, 'pending', 'member');
 
 INSERT INTO peer_team_members (id, certification_id, user_id, status, role) VALUES
 (1, 4, 1, 'approved', 'leader'),

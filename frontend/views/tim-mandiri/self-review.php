@@ -171,7 +171,7 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
 
             <?php if ($page < $totalPages): ?>
                 <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-primary">Berikutnya</button>
-            <?php elseif ($isLeader): ?>
+            <?php else: ?>
                 <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn btn-success">Selesai Review</button>
             <?php endif; ?>
         </div>

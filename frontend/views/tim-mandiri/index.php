@@ -86,7 +86,10 @@ use yii\helpers\Html;
                         : '-'
                     ?></td>
                     <td>
-                        <button class="btn btn-primary">Lihat</button>
+                        <a class="btn btn-primary"
+                            href="<?= \yii\helpers\Url::to(['tim-mandiri/self-review', 'id' => $member->certification->id]) ?>">
+                            Lihat
+                        </a>
                     </td>
                 </tr>
                 <?php endforeach ?>
