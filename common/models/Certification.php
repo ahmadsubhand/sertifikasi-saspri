@@ -100,6 +100,14 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function submitForPeerReview(): Certification
+    {
+        $this->status = CertificationStatus::PEER_REVIEW;
+        $this->self_team_due_date = date('Y-m-d H:i:s');
+        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        return $this;
+    }
+
     /**
      * Gets query for [[Assessment]].
      *

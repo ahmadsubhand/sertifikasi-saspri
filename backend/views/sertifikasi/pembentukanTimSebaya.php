@@ -2,8 +2,10 @@
 
 /** @var \common\models\Certification $certification */
 
+use common\enums\UserRole;
 use yii\helpers\Html;
 
+$this->title = 'Pembentukan Tim Sebaya';
 ?>
 <style>
     .user-search-container {
@@ -58,26 +60,27 @@ use yii\helpers\Html;
 </style>
 
 <div class="d-flex flex-column align-items-start gap-3">
-    <h1>Pengajuan Sertifikasi</h1>
+    <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="card p-3 d-flex flex-column gap-2 w-100">
         <h2>Informasi Sertifikasi</h2>
         <p>
             SASPRI-K: <strong><?= Html::encode($certification->saspriK->cooperative_name) ?></strong> (<?= Html::encode($certification->saspriK->district->name) ?>)<br>
             Tingkat: <strong><?= Html::encode(ucfirst($certification->level)) ?></strong><br>
-            Tujuan: <strong><?= Html::encode($certification->purpose === 'level_up' ? 'Level Up' : 'Renewal') ?></strong>
+            Tujuan: <strong><?= Html::encode(ucfirst($certification->purpose)) ?></strong>
         </p>
 
         <hr>
 
-        <h2>Kelola Anggota Tim Mandiri</h2>
+        <h2>Kelola Anggota Tim Sebaya</h2>
         <p class="text-muted small">
-            Cari anggota dari internal SASPRI-K Anda untuk bergabung dalam tim penilaian mandiri.
+            Syarat: Minimal 3 orang, 1 Facilitator (Admin), 1 Leader (Luar SASPRI-K), Anggota (Luar SASPRI-K).<br>
+            Semua anggota luar SASPRI-K harus berasal dari SASPRI-K yang berbeda satu sama lain.
         </p>
 
         <div class="d-flex flex-column gap-2">
             <div class="user-search-container">
-                <input type="text" id="user-search-input" placeholder="Cari nama anggota SASPRI-K ..."
+                <input type="text" id="user-search-input" placeholder="Cari admin atau anggota/wali SASPRI-K lain ..."
                     class="form-control" autocomplete="off">
                 <div id="search-dropdown" class="search-dropdown shadow"></div>
             </div>
@@ -85,7 +88,7 @@ use yii\helpers\Html;
             <div id="selected-users-container" class="user-chips"></div>
 
             <form id="add-members-form" method="post"
-                action="<?= \yii\helpers\Url::to(['saspri-k/tambah-anggota-tim-mandiri']) ?>">
+                action="<?= \yii\helpers\Url::to(['sertifikasi/tambah-anggota-tim-sebaya', 'certification_id' => $certification->id]) ?>">
                 <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
                 <input type="hidden" name="user_ids" id="selected-user-ids">
                 <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">
@@ -98,19 +101,33 @@ use yii\helpers\Html;
             <thead>
                 <tr>
                     <th scope="col">No</th>
-                    <th scope="col">Nama Anggota</th>
+                    <th scope="col">Nama</th>
+                    <th scope="col">SASPRI-K</th>
                     <th scope="col">Peran</th>
                     <th scope="col">Status</th>
                     <th scope="col">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($certification->selfTeamMembers as $index => $member): ?>
+                <?php foreach ($certification->peerTeamMembers as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= Html::encode($member->user->username) ?></td>
                     <td>
-                        <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'id' => $member->id], 'post') ?>
+                        <?= Html::encode($member->user->username) ?>
+                        <?php if (\Yii::$app->authManager->getAssignment(UserRole::ADMIN, $member->user_id)): ?>
+                            <span class="badge bg-secondary ms-1">Admin</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= $member->user->saspriK ? Html::encode($member->user->saspriK->cooperative_name) : '-' ?></td>
+                    <td>
+                        <?= Html::beginForm(
+                            [
+                                'ubah-peran-anggota-tim-sebaya', 
+                                'user_id' => $member->user_id, 
+                                'certification_id' => $certification->id
+                            ], 
+                            'post'
+                        ) ?>
                         <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                             <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
                             <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
@@ -126,29 +143,36 @@ use yii\helpers\Html;
                         </span>
                     </td>
                     <td>
-                        <?= Html::a('Hapus', ['hapus-anggota-tim-mandiri', 'id' => $member->id], [
-                            'class' => 'btn btn-danger btn-sm',
-                            'data' => [
-                                'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                                'method' => 'post',
-                            ],
-                        ]) ?>
+                        <?= Html::a('Hapus', 
+                            [
+                                'hapus-anggota-tim-sebaya', 
+                                'user_id' => $member->user_id, 
+                                'certification_id' => $certification->id,
+                            ], 
+                            [
+                                'class' => 'btn btn-danger btn-sm',
+                                'data' => [
+                                    'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                                    'method' => 'delete',
+                                ],
+                            ]
+                        ) ?>
                     </td>
                 </tr>
                 <?php endforeach ?>
-                <?php if (empty($certification->selfTeamMembers)): ?>
+                <?php if (empty($certification->peerTeamMembers)): ?>
                 <tr>
-                    <td colspan="5" class="text-center">Belum ada anggota tim mandiri.</td>
+                    <td colspan="6" class="text-center">Belum ada anggota tim sebaya.</td>
                 </tr>
                 <?php endif; ?>
             </tbody>
         </table>
 
         <div class="d-flex justify-content-end mt-3">
-            <?= Html::beginForm(['ajukan-sertifikasi'], 'post') ?>
+            <?= Html::beginForm(['ajukan-peer-review', 'certification_id' => $certification->id], 'post') ?>
             <button type="submit" class="btn btn-primary"
-                onclick="return confirm('Apakah Anda yakin ingin mengajukan sertifikasi? Pastikan komposisi tim sudah benar.')">
-                Ajukan Sertifikasi
+                onclick="return confirm('Apakah Anda yakin ingin memproses ke tahap Peer Review? Pastikan komposisi tim sudah benar.')">
+                Selesaikan Pembentukan Tim
             </button>
             <?= Html::endForm() ?>
         </div>
@@ -175,8 +199,8 @@ use yii\helpers\Html;
             }
 
             timeout = setTimeout(() => {
-                fetch('<?= \yii\helpers\Url::to(['saspri-k/cari-anggota-tim-mandiri']) ?>?q=' +
-                        encodeURIComponent(q))
+                const url = '<?= \yii\helpers\Url::to(['sertifikasi/cari-anggota-tim-sebaya', 'certification_id' => $certification->id]) ?>' + '&q=' + encodeURIComponent(q);
+                fetch(url)
                     .then(response => response.json())
                     .then(data => {
                         dropdown.innerHTML = '';
@@ -219,9 +243,9 @@ use yii\helpers\Html;
                 const chip = document.createElement('div');
                 chip.className = 'chip';
                 chip.innerHTML = `
-        <span>${user.username}</span>
-        <span class="remove-btn" onclick="window.removeUserFromList(${user.id})">&times;</span>
-      `;
+                    <span>${user.username}</span>
+                    <span class="remove-btn" onclick="window.removeUserFromList(${user.id})">&times;</span>
+                `;
                 chipsContainer.appendChild(chip);
             });
             submitBtn.style.display = selectedUsers.length > 0 ? 'block' : 'none';

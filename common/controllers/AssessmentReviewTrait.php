@@ -1,6 +1,6 @@
 <?php
 
-namespace frontend\controllers;
+namespace common\controllers;
 
 use common\models\Certification;
 use common\models\Indicator;

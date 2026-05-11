@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\controllers\AssessmentReviewTrait;
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\IndicatorStatus;
