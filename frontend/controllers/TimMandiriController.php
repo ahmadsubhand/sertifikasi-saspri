@@ -167,7 +167,7 @@ class TimMandiriController extends Controller
         try {
             $this->checkSelfReviewPermission($certification_id);
             $this->findCertificationOrFail($certification_id)
-                ->saveSelfReviewScores(Yii::$app->request->post('indicator_scores'));
+                ->saveSelfReviewScores(Yii::$app->request->post('indicator_scores', []));
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);

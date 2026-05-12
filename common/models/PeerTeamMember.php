@@ -73,4 +73,15 @@ class PeerTeamMember extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+    public function approveRequest()
+    {
+        $this->status = \common\enums\ApprovalStatus::APPROVED;
+        return $this;
+    }
+
+    public function rejectRequest()
+    {
+        $this->status = \common\enums\ApprovalStatus::REJECTED;
+        return $this;
+    }
 }

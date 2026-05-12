@@ -205,13 +205,18 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitSelfReview(): Certification
     {
-        $indicatorIds = array_map(fn ($i) => $i->id, $this->assessment->indicators);
-        $existingScores = IndicatorScore::find()
-            ->where(['certification_id' => $this->id, 'indicator_id' => $indicatorIds])
+        $indicator_ids = array_map(fn ($i) => $i->id, $this->assessment->indicators);
+        /** @var IndicatorScore[] $existing_scores */
+        $existing_scores = IndicatorScore::find()
+            ->where(['certification_id' => $this->id, 'indicator_id' => $indicator_ids])
             ->indexBy('indicator_id')
             ->all();
-        foreach ($indicatorIds as $reqId) {
-            if (!isset($existingScores[$reqId]) || !$existingScores[$reqId]->self_team_score) {
+
+        foreach ($indicator_ids as $req_id) {
+            if (
+                !isset($existing_scores[$req_id]) || 
+                !$existing_scores[$req_id]->self_team_score
+            ) {
                 throw new BadRequestHttpException(
                     'Seluruh indikator wajib diberikan penilaian sebelum finalisasi'
                 );
@@ -229,6 +234,33 @@ class Certification extends \yii\db\ActiveRecord
         $this->status = CertificationStatus::PEER_REVIEW;
         $this->peer_team_due_date = date('Y-m-d H:i:s');
         $this->peer_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        return $this;
+    }
+
+    public function submitPeerReview(): Certification
+    {
+        $indicator_ids = array_map(fn ($i) => $i->id, $this->assessment->indicators);
+        /** @var IndicatorScore[] $existing_scores */
+        $existing_scores = IndicatorScore::find()
+            ->where(['certification_id' => $this->id, 'indicator_id' => $indicator_ids])
+            ->indexBy('indicator_id')
+            ->all();
+
+        foreach ($indicator_ids as $req_id) {
+            if (
+                !isset($existing_scores[$req_id]) || 
+                !$existing_scores[$req_id]->peer_team_score || 
+                !$existing_scores[$req_id]->status
+            ) {
+                throw new BadRequestHttpException(
+                    'Seluruh indikator wajib diberikan penilaian dan status sebelum finalisasi'
+                );
+            }
+        }
+
+        $this->status = CertificationStatus::EXTERNAL_REVIEW;
+        $this->peer_review_due_date = date('Y-m-d H:i:s');
+        $this->external_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
         return $this;
     }
 
@@ -263,8 +295,27 @@ class Certification extends \yii\db\ActiveRecord
         try {
             foreach ($indicator_scores as $indicator_id => $indicator_score) {
                 $indicator_score_model = $this->findOrCreateIndicatorScore($indicator_id);
-                $indicator_score_model->fillSelfTeamScore($indicator_score['self_team_score'])
+                $indicator_score_model->fillSelfTeamScore($indicator_score['self_team_score'] ?? 0)
                     ->handleEvidenceUpload($this->id)
+                    ->save(false);
+            }
+    
+            return $this;
+        } catch (Exception $error) {
+            if ($error instanceof BadRequestHttpException) {
+                throw new BadRequestHttpException($error->getMessage());
+            }
+            throw $error;
+        }
+    }
+
+    public function savePeerReviewScores(array $indicator_scores)
+    {
+        try {
+            foreach ($indicator_scores as $indicator_id => $indicator_score) {
+                $indicator_score_model = $this->findOrCreateIndicatorScore($indicator_id);
+                $indicator_score_model->fillPeerTeamScore($indicator_score['peer_team_score'] ?? 0)
+                    ->fillPeerTeamStatus($indicator_score['status'] ?? null)
                     ->save(false);
             }
     

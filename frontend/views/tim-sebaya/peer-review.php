@@ -1,50 +1,29 @@
 <?php
 
-use common\enums\TeamRole;
-use common\models\PeerTeamMember;
+use common\enums\IndicatorStatus;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
 /** @var common\models\Certification $certification */
-/** @var common\models\IndicatorGroup[] $rootGroups */
-/** @var common\models\IndicatorGroup $currentRootGroup */
-/** @var common\models\Indicator[] $indicators */
-/** @var common\models\IndicatorScore[] $scores */
+/** @var common\models\IndicatorGroup $current_root_group */
+/** @var common\models\IndicatorGroup[] $current_child_group */
 /** @var int $page */
-/** @var int $totalPages */
+/** @var int $total_pages */
+/** @var bool $is_leader */
 
 $this->title = 'Peer Review SASPRI-K';
-
-// Group indicators by subgroup ID
-$indicatorsByGroup = [];
-foreach ($indicators as $indicator) {
-    $indicatorsByGroup[$indicator->indicator_group_id][] = $indicator;
-}
-
-// Fetch immediate children of the current root group
-$subGroups = $currentRootGroup->getIndicatorGroups()->orderBy(['order' => SORT_ASC])->all();
-
-// Check if user is Leader
-$isLeader = PeerTeamMember::find()
-    ->where([
-        'certification_id' => $certification->id,
-        'user_id' => \Yii::$app->user->id,
-        'role' => TeamRole::LEADER
-    ])
-    ->exists();
 
 // Score Calculation Logic (Temporary)
 $groupTotalScore = 0;
 $subGroupResults = [];
 
-foreach ($subGroups as $subGroup) {
+foreach ($current_child_group as $subGroup) {
     $subGroupSum = 0;
-    if (isset($indicatorsByGroup[$subGroup->id])) {
-        foreach ($indicatorsByGroup[$subGroup->id] as $indicator) {
-            $score = isset($scores[$indicator->id]) ? $scores[$indicator->id]->peer_team_score : 0;
-            $subGroupSum += $score;
-        }
+
+    foreach ($subGroup->indicators as $indicator) {
+        $score = $indicator->indicatorScores[0]->peer_team_score ?? 0;
+        $subGroupSum += $score;
     }
 
     $subGroupWeighted = $subGroupSum * ($subGroup->weight / 100);
@@ -55,29 +34,29 @@ foreach ($subGroups as $subGroup) {
     $groupTotalScore += $subGroupWeighted;
 }
 
-$finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
+$finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 ?>
 
 <div class="d-flex flex-column align-items-start gap-3">
     <h1><?= Html::encode($this->title) ?></h1>
     <div class="text-muted d-flex align-items-center gap-2 mb-2">
-        <?php if ($isLeader): ?>
+        <?php if ($is_leader): ?>
             <span class="badge bg-info">Ketua Tim Sebaya</span>
         <?php else: ?>
             <span class="badge bg-secondary">Anggota Tim Sebaya</span>
         <?php endif; ?>
         <div>
-            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->district->name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
+            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
         </div>
     </div>
 
     <div class="card p-3 d-flex flex-column gap-2 w-100">
-        <h2><?= Html::encode($currentRootGroup->code) ?>. <?= Html::encode($currentRootGroup->label) ?> (<?= Html::encode($currentRootGroup->weight) ?>%)</h2>
+        <h2><?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h2>
         
         <?php
-            $saveAction = Url::to(['simpan-sementara-peer-review', 'id' => $certification->id, 'page' => $page]);
-            $finalizeAction = Url::to(['finalisasi-peer-review', 'id' => $certification->id]);
+            $saveAction = Url::to(['simpan-sementara-peer-review', 'certification_id' => $certification->id, 'page' => $page]);
+            $finalizeAction = Url::to(['finalisasi-peer-review', 'certification_id' => $certification->id]);
         ?>
         <form id="peer-review-form" action="<?= $saveAction ?>" method="post">
             <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
@@ -94,7 +73,7 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($subGroups as $subGroup): ?>
+                    <?php foreach ($current_child_group as $subGroup): ?>
                         <tr class="table-light">
                             <th scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
                             <td colspan="5" class="fw-bold">
@@ -102,12 +81,13 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                             </td>
                         </tr>
                         
-                        <?php if (isset($indicatorsByGroup[$subGroup->id])): ?>
-                            <?php foreach ($indicatorsByGroup[$subGroup->id] as $index => $indicator): ?>
+                        <?php if (isset($subGroup->indicators)): ?>
+                            <?php foreach ($subGroup->indicators as $index => $indicator): ?>
                                 <?php 
-                                    $selfScore = isset($scores[$indicator->id]) ? $scores[$indicator->id]->self_team_score : 0;
-                                    $peerScore = isset($scores[$indicator->id]) ? $scores[$indicator->id]->peer_team_score : 0;
-                                    $currentStatus = isset($scores[$indicator->id]) ? $scores[$indicator->id]->status : null;
+                                    $scoreModel = $indicator->indicatorScores[0] ?? null;
+                                    $selfScore = $scoreModel->self_team_score ?? 0;
+                                    $peerScore = $scoreModel->peer_team_score ?? 0;
+                                    $currentStatus = $scoreModel->status ?? null;
                                 ?>
                                 <tr>
                                     <td class="text-center"><?= $index + 1 ?></td>
@@ -118,15 +98,15 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                                         </span>
                                     </td>
                                     <td class="text-center">
-                                        <?php if (isset($scores[$indicator->id]) && $scores[$indicator->id]->evidence_url): ?>
-                                            <a href="<?= Url::to($scores[$indicator->id]->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat</a>
+                                        <?php if ($scoreModel && $scoreModel->evidence_url): ?>
+                                            <a href="<?= Url::to($scoreModel->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat</a>
                                         <?php else: ?>
                                             <span class="text-muted small">Tidak ada</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <select 
-                                            name="IndicatorScore[<?= $indicator->id ?>][peer_team_score]" 
+                                            name="indicator_scores[<?= $indicator->id ?>][peer_team_score]" 
                                             class="form-select score-select" 
                                             data-subgroup-id="<?= $subGroup->id ?>"
                                             data-indicator-id="<?= $indicator->id ?>"
@@ -146,12 +126,12 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                                     </td>
                                     <td>
                                         <select 
-                                            name="IndicatorScore[<?= $indicator->id ?>][status]" 
+                                            name="indicator_scores[<?= $indicator->id ?>][status]" 
                                             class="form-select status-select" 
                                             data-indicator-id="<?= $indicator->id ?>"
                                         >
                                             <option value="">Pilih Status</option>
-                                            <?php foreach (\common\enums\IndicatorStatus::list() as $val => $label): ?>
+                                            <?php foreach (IndicatorStatus::list() as $val => $label): ?>
                                                 <option value="<?= $val ?>" <?= ($currentStatus == $val) ? 'selected' : '' ?>>
                                                     <?= $label ?>
                                                 </option>
@@ -171,8 +151,8 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
 
                     <tr class="table-secondary">
                         <th scope="row"></th>
-                        <th colspan="4" class="text-end">Nilai Total <?= Html::encode($currentRootGroup->code) ?> (<?= Html::encode($currentRootGroup->label) ?>)</th>
-                        <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $currentRootGroup->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
+                        <th colspan="4" class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
+                        <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
                     </tr>
                 </tbody>
             </table>
@@ -189,7 +169,7 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                 <button class="btn btn-secondary" disabled>Sebelumnya</button>
             <?php endif; ?>
 
-            <?php if ($page < $totalPages): ?>
+            <?php if ($page < $total_pages): ?>
                 <button type="submit" id="btn-next" form="peer-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-primary">Berikutnya</button>
             <?php else: ?>
                 <button type="submit" id="btn-finish" form="peer-review-form" name="finish" value="1" class="btn btn-success">Selesai Review</button>
@@ -246,7 +226,7 @@ $this->registerJs(<<<JS
                 .prop('disabled', true);
 
             statusSelect.after(
-                '<input type="hidden" class="' + hiddenInputClass + '" name="IndicatorScore[' + indicatorId + '][status]" value="identical">'
+                '<input type="hidden" class="' + hiddenInputClass + '" name="indicator_scores[' + indicatorId + '][status]" value="identical">'
             );
         } else {
             statusSelect.prop('disabled', false);

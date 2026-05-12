@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 
-/** @var \common\models\Certification[] $certifications */
 /** @var \common\models\PeerTeamMember[] $peer_team_member_request */
 /** @var \common\models\PeerTeamMember[] $peer_team_member_uncompleted */
 /** @var \common\models\PeerTeamMember[] $peer_team_member_completed */
@@ -30,7 +29,7 @@ use yii\helpers\Html;
                 <?php foreach ($peer_team_member_request as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?>
                     </td>
                     <td><?= $member->certification->saspriK->address ?>
                     </td>
@@ -43,11 +42,11 @@ use yii\helpers\Html;
                             : '-'
                     ?></td>
                     <td>
-                        <?= Html::a('Setuju', ['setuju', 'id' => $member->id], [
+                        <?= Html::a('Setuju', ['setuju', 'peer_team_member_id' => $member->id], [
                             'class' => 'btn btn-success',
                             'data-method' => 'post',
                         ]) ?>
-                        <?= Html::a('Tolak', ['tolak', 'id' => $member->id], [
+                        <?= Html::a('Tolak', ['tolak', 'peer_team_member_id' => $member->id], [
                             'class' => 'btn btn-danger',
                             'data-method' => 'post',
                             'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Sebaya ini?',
@@ -77,7 +76,7 @@ use yii\helpers\Html;
                 <?php foreach ($peer_team_member_uncompleted as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
                     <td><?= ucfirst($member->certification->level) ?></td>
                     <td><?= $member->certification->status ?></td>
                     <td><?=
@@ -87,8 +86,8 @@ use yii\helpers\Html;
                     ?></td>
                     <td>
                         <a class="btn btn-primary"
-                            href="<?= \yii\helpers\Url::to(['tim-sebaya/peer-review', 'id' => $member->certification->id]) ?>">
-                            Lihat
+                            href="<?= \yii\helpers\Url::to(['tim-sebaya/peer-review', 'certification_id' => $member->certification->id]) ?>">
+                            Nilai
                         </a>
                     </td>
                 </tr>
@@ -115,7 +114,7 @@ use yii\helpers\Html;
                 <?php foreach ($peer_team_member_completed as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
                     <td><?= ucfirst($member->certification->level) ?></td>
                     <td><?=
                         $member->certification->submitted_at

@@ -29,7 +29,7 @@ use yii\helpers\Html;
                 <?php foreach ($self_team_member_request as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?>
                     </td>
                     <td><?= $member->certification->saspriK->address ?>
                     </td>
@@ -76,7 +76,7 @@ use yii\helpers\Html;
                 <?php foreach ($self_team_member_uncompleted as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
                     <td><?= ucfirst($member->certification->level) ?></td>
                     <td><?= $member->certification->status ?></td>
                     <td><?=
@@ -87,7 +87,7 @@ use yii\helpers\Html;
                     <td>
                         <a class="btn btn-primary"
                             href="<?= \yii\helpers\Url::to(['tim-mandiri/self-review', 'certification_id' => $member->certification->id]) ?>">
-                            Lihat
+                            Nilai
                         </a>
                     </td>
                 </tr>
@@ -114,7 +114,7 @@ use yii\helpers\Html;
                 <?php foreach ($self_team_member_completed as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->district->name) ?></td>
+                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
                     <td><?= ucfirst($member->certification->level) ?></td>
                     <td><?=
                         $member->certification->submitted_at

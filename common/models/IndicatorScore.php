@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\enums\IndicatorStatus;
 use Exception;
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -92,6 +93,43 @@ class IndicatorScore extends \yii\db\ActiveRecord
             );
         }
         $this->self_team_score = $value;
+        return $this;
+    }
+
+    public function fillPeerTeamScore(int $score)
+    {
+        $value = (int) $score;
+        if ($value < 0 || $value > 100) {
+            throw new BadRequestHttpException(
+                'Terdapat penilaian yang di luar rentang 0-100'
+            );
+        }
+        $this->peer_team_score = $value;
+        return $this;
+    }
+
+    public function fillPeerTeamStatus(?string $status)
+    {
+        if (!$status) {
+            $this->status = null;
+            return $this;
+        }
+
+        if (!in_array($status, IndicatorStatus::values())) {
+            throw new BadRequestHttpException('Status penilaian tidak valid: ' . $status);
+        }
+
+        if ($this->peer_team_score === $this->self_team_score) {
+            if ($status !== IndicatorStatus::IDENTICAL) {
+                throw new BadRequestHttpException('Status harus Identical jika skor sama');
+            }
+        } else {
+            if ($status === IndicatorStatus::IDENTICAL) {
+                throw new BadRequestHttpException('Status tidak boleh Identical jika skor berbeda');
+            }
+        }
+
+        $this->status = $status;
         return $this;
     }
 
