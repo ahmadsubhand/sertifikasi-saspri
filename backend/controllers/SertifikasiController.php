@@ -1,15 +1,16 @@
 <?php
 
 namespace backend\controllers;
-use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
+use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\PeerTeamMember;
 use common\models\User;
 use Exception;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -49,7 +50,7 @@ class SertifikasiController extends Controller
     {
         $certifications = Certification::find()
             ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
-            ->with(['saspriK.district'])
+            ->with(['saspriK'])
             ->all();
         return $this->render('index', [
             'certifications' => $certifications,
@@ -59,13 +60,29 @@ class SertifikasiController extends Controller
     public function actionPembentukanTimSebaya(int $certification_id)
     {
         try {
-            $certification = $this->findAndCheckCertification($certification_id);
+            $certification = $this->findCertificationOrFail($certification_id);
             return $this->render('pembentukanTimSebaya', [
+                'saspri_k' => $certification->saspriK,
+                'district' => $certification->saspriK->district,
                 'certification' => $certification,
+                'peer_team_members' => $certification
+                    ->getPeerTeamMembers()
+                    ->with([
+                        'user' => function (ActiveQuery $query) {
+                            $query->select(['id', 'username']);
+                        }
+                    ])
+                    ->all(),
             ]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
-                return $this->redirect(['index']);
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
             }
             throw $error;
         }
@@ -75,32 +92,25 @@ class SertifikasiController extends Controller
     {
         try {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            [ 
-                'certification' => $certification, 
-                'existing_member_ids' => $existing_member_ids,
-            ] = $this->getCertificationAndExistingMemberIds($certification_id);
-    
-            return User::find()
-                ->alias('u')
-                ->select(['u.id', 'u.username'])
-                ->leftJoin('auth_assignment aa', 'aa.user_id = u.id')
-                ->where(['like', 'u.username', $q])
-                ->andWhere(['not in', 'id', $existing_member_ids])
-                ->andWhere([
-                    'or',
-                    ['aa.item_name' => UserRole::ADMIN],
-                    [
-                        'and',
-                        ['not', ['u.saspri_k_id' => null]],
-                        ['!=', 'u.saspri_k_id', $certification->saspri_k_id]
-                    ]
-                ])
+
+            $certification = $this->findCertificationOrFail($certification_id);
+            $users = $this->getAvailablePeerTeamMembersQuery($certification)
+                ->andWhere(['like', 'username', $q])
+                ->select(['id', 'username'])
                 ->limit(10)
                 ->asArray()
                 ->all();
+
+            return $users;
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
-                return $this->redirect(['index']);
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
             }
             throw $error;
         }
@@ -111,58 +121,32 @@ class SertifikasiController extends Controller
         try {
             $user_ids = Yii::$app->request->post('user_ids');
             if (!empty($user_ids)) {
-                [ 
-                    'certification' => $certification, 
-                    'existing_member_ids' => $existing_member_ids,
-                ] = $this->getCertificationAndExistingMemberIds($certification_id);
+                $certification = $this->findCertificationOrFail($certification_id);
 
-                $parsed_user_ids = array_unique(array_filter(array_map('trim', explode(',', $user_ids))));
-                $valid_users = User::find()
-                    ->alias('u')
-                    ->leftJoin('auth_assignment aa', 'aa.user_id = u.id')
-                    ->andWhere(['id' => $parsed_user_ids])
-                    ->andWhere(['not in', 'id', $existing_member_ids])
-                    ->andWhere([
-                        'or',
-                        ['aa.item_name' => UserRole::ADMIN],
-                        [
-                            'and',
-                            ['not', ['u.saspri_k_id' => null]],
-                            ['!=', 'u.saspri_k_id', $certification->saspri_k_id]
-                        ]
-                    ])
+                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
+                $valid_users = $this->getAvailablePeerTeamMembersQuery($certification)
+                    ->andWhere(['id' => $array_user_ids])
                     ->select('username')
                     ->column();
     
-                if (count($valid_users) !== count($parsed_user_ids)) {
+                if (count($valid_users) !== count($array_user_ids)) {
                     throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di Tim Sebaya saat ini');
                 }
-    
-                foreach ($parsed_user_ids as $user_id) {
-                    $member = new PeerTeamMember();
-                    $member->certification_id = $certification->id;
-                    $member->user_id = $user_id;
-                    $member->status = ApprovalStatus::PENDING;
-                    
-                    // If member has admin role, set to facilitator
-                    if ($this->isUserAnAdmin($user_id)) {
-                        $member->role = TeamRole::FACILITATOR;
-                    } else {
-                        $member->role = TeamRole::MEMBER;
-                    }
-        
-                    $member->save(false);
-                }
-        
+
+                $certification->addPeerTeamMembers($array_user_ids);
+                
                 Yii::$app->session->setFlash('success', implode(', ', $valid_users) .' berhasil ditambahkan ke Tim Sebaya');
                 return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
             }
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
-                if ($error instanceof NotFoundHttpException) {
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
                     return $this->redirect(['index']);
-                } else {
+                } else if ($error instanceof BadRequestHttpException) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
                 }
             }
@@ -173,8 +157,8 @@ class SertifikasiController extends Controller
     public function actionHapusAnggotaTimSebaya(int $user_id, int $certification_id)
     {
         try {
-            $this->findAndCheckCertification($certification_id);
-            $member = $this->findAMemberOfPeerTeam($user_id, $certification_id);
+            $certification = $this->findCertificationOrFail($certification_id);
+            $member = $this->findAMemberOfPeerTeam($user_id, $certification);
             $member->delete();
     
             Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Sebaya');
@@ -182,13 +166,16 @@ class SertifikasiController extends Controller
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
-                if ($error instanceof NotFoundHttpException) {
-                    if (str_contains($error->getMessage(), 'anggota')) {
-                        return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
-                    }
-                    return $this->redirect(['index']);
-                } else {
+                if (
+                    $error instanceof NotFoundHttpException &&
+                    str_contains($error->getMessage(), 'anggota')
+                ) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
+                } else if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
                 }
             }
             throw $error;
@@ -198,34 +185,30 @@ class SertifikasiController extends Controller
     public function actionUbahPeranAnggotaTimSebaya(int $user_id, int $certification_id)
     {
         try {
+            $certification = $this->findCertificationOrFail($certification_id);
+            
             $role = Yii::$app->request->post('role');
-            if (!in_array($role, TeamRole::values())) {
-                throw new BadRequestHttpException('Peran tidak valid');
-            }
-    
-            $this->findAndCheckCertification($certification_id);
-            $member = $this->findAMemberOfPeerTeam($user_id, $certification_id);
-            if ($this->isUserAnAdmin($user_id) && $role !== TeamRole::FACILITATOR) {
-                throw new BadRequestHttpException('Admin hanya boleh menjadi fasilitator dalam Tim Sebaya');
-            } else if ($role === TeamRole::FACILITATOR) {
-                throw new BadRequestHttpException('Hanya Admin yang boleh menjadi fasilitator dalam Tim Sebaya');
-            }
-            $member->status = ApprovalStatus::PENDING;
-            $member->role = $role;
-            $member->save(false);
+            $member = $this->findAMemberOfPeerTeam($user_id, $certification);
+            $member->changeRole($role)->save(false);
 
             Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
             return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
-                if ($error instanceof NotFoundHttpException) {
-                    if (str_contains($error->getMessage(), 'anggota')) {
-                        return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
-                    }
-                    return $this->redirect(['index']);
-                } else {
+                if (
+                    $error instanceof BadRequestHttpException ||
+                    (
+                        $error instanceof NotFoundHttpException &&
+                        str_contains($error->getMessage(), 'anggota')
+                    )
+                ) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
+                } else if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
                 }
             }
             throw $error;
@@ -235,47 +218,8 @@ class SertifikasiController extends Controller
     public function actionAjukanPeerReview(int $certification_id)
     {
         try {
-            $certification = $this->findAndCheckCertification($certification_id);
-            /** @var PeerTeamMember[] $members */
-            $members = $certification->getPeerTeamMembers()->where(['status' => ApprovalStatus::APPROVED])->all();
-    
-            // Validasi komposisi tim
-            $facilitatorCount = 0;
-            $leaderCount = 0;
-            $memberCount = 0;
-            $saspriKIds = [];
-    
-            foreach ($members as $member) {
-                if ($member->role === TeamRole::FACILITATOR) {
-                    $facilitatorCount++;
-                } else {
-                    $saspriKIds[] = $member->user->saspri_k_id;
-                    if ($member->role === TeamRole::LEADER) {
-                        $leaderCount++;
-                    } else if ($member->role === TeamRole::MEMBER) {
-                        $memberCount++;
-                    }
-                }
-            }
-    
-            if ($facilitatorCount !== 1 || $leaderCount !== 1 || $memberCount < 1) {
-                throw new UnprocessableEntityHttpException(
-                    'Anggota yang menyetujui bergabung di Tim sebaya harus terdiri dari minimal 2 orang ' . 
-                    '(salah sartu bertindak sebagai ketua) dari SASPRI-K lainnya dan 1 pendamping dari SASPRI-N'
-                );
-            }
-            // Validasi tidak dari SASPRI-K yang sama
-            if (count(array_unique($saspriKIds)) !== count($saspriKIds)) {
-                throw new UnprocessableEntityHttpException(
-                    'Masing-masing anggota harus dari SASPRI-K yang berbeda satu sama lain'
-                );
-            }
-    
-            PeerTeamMember::updateAll(
-                ['status' => ApprovalStatus::REJECTED],
-                ['certification_id' => $certification_id, 'status' => ApprovalStatus::PENDING]
-            );
-    
+            $certification = $this->findCertificationOrFail($certification_id);
+            $certification->validateApprovedPeerTeamComposition();
             $certification->submitForPeerReview()->save(false);
     
             Yii::$app->session->setFlash('success', 'Sertifikasi berhasil dilanjutkan ke tahap peer review');
@@ -283,58 +227,63 @@ class SertifikasiController extends Controller
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
-                if ($error instanceof NotFoundHttpException) {
-                    return $this->redirect(['index']);
-                } else {
+                if (
+                    $error instanceof UnprocessableEntityHttpException &&
+                    str_contains($error->getMessage(), 'minimal')
+                ) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
+                } else if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
                 }
             }
             throw $error;
         }
     }
 
-    private function findAndCheckCertification(int $id)
+    private function findCertificationOrFail(int $id)
     {
         $certification = Certification::findOne($id);
         if (!$certification) {
             throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
         }
         if ($certification->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
-            throw new NotFoundHttpException('Sertifikasi sedang tidak dalam tahap pembentukan Tim Sebaya');
+            throw new UnprocessableEntityHttpException('Sertifikasi sedang tidak dalam tahap pembentukan Tim Sebaya');
         }
         return $certification;
     }
 
-    private function getCertificationAndExistingMemberIds(int $certification_id) {
-        $certification = $this->findAndCheckCertification($certification_id);
+    private function getAvailablePeerTeamMembersQuery(Certification $certification)
+    {
         $existing_member_ids = $certification
             ->getPeerTeamMembers()
             ->select('user_id')
             ->column();
-        return [
-            'certification' => $certification,
-            'existing_member_ids' => $existing_member_ids,
-        ];
+
+        return User::find()
+            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
+            ->andWhere(['not in', 'id', $existing_member_ids])
+            ->andWhere([
+                'or',
+                ['aa.item_name' => UserRole::ADMIN],
+                [
+                    'and',
+                    ['not', ['saspri_k_id' => null]],
+                    ['!=', 'saspri_k_id', $certification->saspri_k_id]
+                ]
+            ]);
     }
 
-    private function findAMemberOfPeerTeam(int $user_id, int $certification_id): PeerTeamMember
+    private function findAMemberOfPeerTeam(int $user_id, Certification $certification): PeerTeamMember
     {
-        $member = PeerTeamMember::find()
-            ->with('user')
-            ->where(['user_id' => $user_id, 'certification_id' => $certification_id])
+        $member = $certification->getPeerTeamMembers()
+            ->where(['user_id' => $user_id])
             ->one();
         if (!$member) {
             throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Sebaya');
         }
         return $member;
-    }
-
-    private function isUserAnAdmin(int $user_id): bool
-    {
-        if (Yii::$app->authManager->getAssignment(UserRole::ADMIN, $user_id)) {
-            return true;
-        } else {
-            return false;
-        }
     }
 }

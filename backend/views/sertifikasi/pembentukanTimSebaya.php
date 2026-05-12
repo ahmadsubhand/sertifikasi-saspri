@@ -1,6 +1,9 @@
 <?php
 
 /** @var \common\models\Certification $certification */
+/** @var \common\models\SaspriK $saspri_k */
+/** @var \common\models\District $district */
+/** @var \common\models\PeerTeamMember[] $peer_team_members */
 
 use common\enums\UserRole;
 use yii\helpers\Html;
@@ -65,7 +68,7 @@ $this->title = 'Pembentukan Tim Sebaya';
     <div class="card p-3 d-flex flex-column gap-2 w-100">
         <h2>Informasi Sertifikasi</h2>
         <p>
-            SASPRI-K: <strong><?= Html::encode($certification->saspriK->cooperative_name) ?></strong> (<?= Html::encode($certification->saspriK->district->name) ?>)<br>
+            SASPRI-K: <strong><?= Html::encode($saspri_k->cooperative_name) ?></strong> (<?= Html::encode($saspri_k->region_name) ?>)<br>
             Tingkat: <strong><?= Html::encode(ucfirst($certification->level)) ?></strong><br>
             Tujuan: <strong><?= Html::encode(ucfirst($certification->purpose)) ?></strong>
         </p>
@@ -92,7 +95,7 @@ $this->title = 'Pembentukan Tim Sebaya';
                 <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
                 <input type="hidden" name="user_ids" id="selected-user-ids">
                 <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">
-                    Tambah Terpilih ke Tim
+                    Tambah Anggota
                 </button>
             </form>
         </div>
@@ -109,7 +112,7 @@ $this->title = 'Pembentukan Tim Sebaya';
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($certification->peerTeamMembers as $index => $member): ?>
+                <?php foreach ($peer_team_members as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td>
@@ -160,7 +163,7 @@ $this->title = 'Pembentukan Tim Sebaya';
                     </td>
                 </tr>
                 <?php endforeach ?>
-                <?php if (empty($certification->peerTeamMembers)): ?>
+                <?php if (empty($peer_team_members)): ?>
                 <tr>
                     <td colspan="6" class="text-center">Belum ada anggota tim sebaya.</td>
                 </tr>

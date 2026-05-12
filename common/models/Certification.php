@@ -5,6 +5,7 @@ namespace common\models;
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
+use common\helpers\UserHelper;
 use Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\UnprocessableEntityHttpException;
@@ -231,6 +232,12 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitForPeerReview(): Certification
     {
+        // Jika masih ada yang pending, maka otomatis menjadi rejected
+        PeerTeamMember::updateAll(
+            ['status' => ApprovalStatus::REJECTED],
+            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
+        );
+
         $this->status = CertificationStatus::PEER_REVIEW;
         $this->peer_team_due_date = date('Y-m-d H:i:s');
         $this->peer_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
@@ -270,17 +277,37 @@ class Certification extends \yii\db\ActiveRecord
             $member = new SelfTeamMember();
             $member->user_id = $user_id;
             $member->certification_id = $this->id;
+            $member->status = ApprovalStatus::PENDING;
+            $member->role = TeamRole::MEMBER;
+            $member->save(false);
+        }
+    }
+
+    public function addPeerTeamMembers(array $user_ids)
+    {
+        foreach ($user_ids as $user_id) {
+            $member = new PeerTeamMember();
+            $member->user_id = $user_id;
+            $member->certification_id = $this->id;
+            $member->status = ApprovalStatus::PENDING;
+            
+            if (UserHelper::isUserAnAdmin($user_id)) {
+                $member->role = TeamRole::FACILITATOR;
+            } else {
+                $member->role = TeamRole::MEMBER;
+            }
+
             $member->save(false);
         }
     }
 
     public function validateApprovedSelfTeamComposition()
     {
-        $members = $this->selfTeamMembers;
-        $approvedMembers = array_filter($members, fn ($m) => $m->status === ApprovalStatus::APPROVED);
-        $approvedCount = count($approvedMembers);
-        $leaderCount = count(array_filter($approvedMembers, fn ($m) => $m->role === TeamRole::LEADER));
-        $memberCount = count(array_filter($approvedMembers, fn ($m) => $m->role !== TeamRole::LEADER));
+        /** @var SelfTeamMember[] $approved_members */
+        $approved_members = $this->getSelfTeamMembers()->where(['status' => ApprovalStatus::APPROVED])->all();
+        $approvedCount = count($approved_members);
+        $leaderCount = count(array_filter($approved_members, fn ($m) => $m->role === TeamRole::LEADER));
+        $memberCount = count(array_filter($approved_members, fn ($m) => $m->role !== TeamRole::LEADER));
 
         if ($approvedCount === 0 || $approvedCount % 3 !== 0) {
             throw new UnprocessableEntityHttpException('Jumlah anggota Tim Mandiri yang setuju bergabung harus kelipatan 3');
@@ -288,6 +315,44 @@ class Certification extends \yii\db\ActiveRecord
         if ($leaderCount !== 1 || $memberCount < 2) {
             throw new UnprocessableEntityHttpException('Tim Mandiri harus terdiri dari 1 ketua dan minimal 2 anggota lainnya');
         }
+    }
+
+    public function validateApprovedPeerTeamComposition()
+    {
+        /** @var PeerTeamMember[] $approved_members */
+        $approved_members = $this->getPeerTeamMembers()->where(['status' => ApprovalStatus::APPROVED])->all();
+
+        $facilitatorCount = 0;
+        $leaderCount = 0;
+        $memberCount = 0;
+        $saspriKIds = [];
+
+        foreach ($approved_members as $member) {
+            if ($member->role === TeamRole::FACILITATOR) {
+                $facilitatorCount++;
+            } else {
+                $saspriKIds[] = $member->user->saspri_k_id;
+                if ($member->role === TeamRole::LEADER) {
+                    $leaderCount++;
+                } else if ($member->role === TeamRole::MEMBER) {
+                    $memberCount++;
+                }
+            }
+        }
+
+        if ($facilitatorCount !== 1 || $leaderCount !== 1 || $memberCount < 1) {
+            throw new UnprocessableEntityHttpException(
+                'Anggota yang menyetujui bergabung di Tim sebaya harus terdiri dari minimal 2 orang ' . 
+                '(salah sartu bertindak sebagai ketua) dari SASPRI-K lainnya dan 1 pendamping dari SASPRI-N'
+            );
+        }
+
+        // Validasi tidak dari SASPRI-K yang sama
+        // if (count(array_unique($saspriKIds)) !== count($saspriKIds)) {
+        //     throw new UnprocessableEntityHttpException(
+        //         'Masing-masing anggota harus dari SASPRI-K yang berbeda satu sama lain'
+        //     );
+        // }
     }
 
     public function saveSelfReviewScores(array $indicator_scores)

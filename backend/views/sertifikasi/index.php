@@ -26,7 +26,7 @@ $this->title = 'Daftar Sertifikasi (Pembentukan Tim Sebaya)';
                 <?php foreach ($certifications as $index => $certification): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= Html::encode(ucfirst($certification->saspriK->district->name)) ?></td>
+                    <td><?= Html::encode(ucfirst($certification->saspriK->region_name)) ?></td>
                     <td><?= Html::encode($certification->saspriK->address) ?></td>
                     <td><?= Html::encode(ucfirst($certification->level)) ?></td>
                     <td><?= 

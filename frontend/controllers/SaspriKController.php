@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
+use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\SaspriK;
 use common\models\SelfTeamMember;
@@ -80,10 +81,7 @@ class SaspriKController extends Controller
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $users = User::find()
-            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
-            ->where(['!=', 'aa.item_name', UserRole::ADMIN])
-            ->andWhere(['saspri_k_id' => null])
+        $users = $this->getAvailableSaspriKMembersQuery()
             ->andWhere(['like', 'username', $q])
             ->select(['id', 'username'])
             ->limit(10)
@@ -98,11 +96,10 @@ class SaspriKController extends Controller
         try {
             $user_ids = Yii::$app->request->post('user_ids');
             if (!empty($user_ids)) {
-                $array_user_ids = $this->convertUserIdsToArray($user_ids);
+                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
 
-                $valid_users = User::find()
-                    ->where(['id' => $array_user_ids])
-                    ->andWhere(['saspri_k_id' => null])
+                $valid_users = $this->getAvailableSaspriKMembersQuery()
+                    ->andWhere(['id' => $array_user_ids])
                     ->select('username')
                     ->column();
 
@@ -221,7 +218,7 @@ class SaspriKController extends Controller
                 $certification = $this->findOrCreateOnGoingCertification($saspri_k);
                 $this->ensureSelfTeamCanBeModified($certification);
 
-                $array_user_ids = $this->convertUserIdsToArray($user_ids);
+                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
                 $valid_users = $this->getAvailableSelfTeamMembersQuery($saspri_k, $certification)
                     ->andWhere(['id' => $array_user_ids])
                     ->select('username')
@@ -336,8 +333,9 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
+                } else if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
                 } else if (
-                    $error instanceof NotFoundHttpException || 
                     $error instanceof ConflictHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {
@@ -356,6 +354,14 @@ class SaspriKController extends Controller
             throw new ForbiddenHttpException('Hanya wali yang boleh mengakses halaman ini');
         }
         return $saspri_k;
+    }
+
+    private function getAvailableSaspriKMembersQuery()
+    {
+        return User::find()
+            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
+            ->where(['!=', 'aa.item_name', UserRole::ADMIN])
+            ->andWhere(['saspri_k_id' => null]);
     }
 
     private function findAMemberOfSaspriK(int $user_id, SaspriK $saspri_k): User
@@ -387,11 +393,6 @@ class SaspriKController extends Controller
                 'Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai'
             );
         }
-    }
-
-    private function convertUserIdsToArray(string $user_ids)
-    {
-        return array_unique(array_filter(array_map('trim', explode(',', $user_ids))));
     }
 
     private function getAvailableSelfTeamMembersQuery(SaspriK $saspri_k, ?Certification $certification)

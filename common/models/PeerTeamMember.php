@@ -2,6 +2,11 @@
 
 namespace common\models;
 
+use common\enums\ApprovalStatus;
+use common\enums\TeamRole;
+use common\helpers\UserHelper;
+use yii\web\BadRequestHttpException;
+
 /**
  * This is the model class for table "peer_team_members".
  *
@@ -82,6 +87,22 @@ class PeerTeamMember extends \yii\db\ActiveRecord
     public function rejectRequest()
     {
         $this->status = \common\enums\ApprovalStatus::REJECTED;
+        return $this;
+    }
+
+    public function changeRole(string $role)
+    {
+        if (!in_array($role, TeamRole::values())) {
+            throw new BadRequestHttpException('Peran tidak valid');
+        }
+        if (UserHelper::isUserAnAdmin($this->user_id) && $role !== TeamRole::FACILITATOR) {
+            throw new BadRequestHttpException('Admin hanya boleh menjadi fasilitator dalam Tim Sebaya');
+        } else if ($role === TeamRole::FACILITATOR) {
+            throw new BadRequestHttpException('Hanya Admin yang boleh menjadi fasilitator dalam Tim Sebaya');
+        }
+
+        $this->status = ApprovalStatus::PENDING;
+        $this->role = $role;
         return $this;
     }
 }
