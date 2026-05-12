@@ -2,6 +2,10 @@
 
 namespace common\models;
 
+use common\enums\ApprovalStatus;
+use common\enums\TeamRole;
+use yii\web\BadRequestHttpException;
+
 /**
  * This is the model class for table "self_team_members".
  *
@@ -73,4 +77,13 @@ class SelfTeamMember extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
+    public function changeRole(string $role)
+    {
+        if (!in_array($role, TeamRole::values())) {
+            throw new BadRequestHttpException('Peran tidak valid');
+        }
+        $this->status = ApprovalStatus::PENDING;
+        $this->role = $role;
+        return $this;
+    }
 }

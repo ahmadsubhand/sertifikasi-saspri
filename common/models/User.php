@@ -23,6 +23,8 @@ use yii\web\IdentityInterface;
  * @property int $created_at
  * @property int $updated_at
  * @property string $password write-only password
+ * @property int|null $saspri_k_id
+ * @property string|null $phone_number
  * 
  * @property SaspriK $saspriKAsCoordinator
  * @property SaspriK $saspriKAsNewCoordinator
@@ -255,5 +257,11 @@ class User extends ActiveRecord implements IdentityInterface
     public function getSaspriK()
     {
         return $this->hasOne(SaspriK::class, ['id' => 'saspri_k_id']);
+    }
+
+    public function removeUserFromSaspriK()
+    {
+        $this->saspri_k_id = null;
+        return $this;
     }
 }

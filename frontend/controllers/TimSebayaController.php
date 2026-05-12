@@ -183,6 +183,7 @@ class TimSebayaController extends Controller
             $certification = $this->saveScores($id, Yii::$app->request->post('IndicatorScore', []));
             $this->areAllIndicatorsFilledIn($certification);
 
+            // tambahin due date
             $certification->status = CertificationStatus::EXTERNAL_REVIEW;
             $certification->save(false);
             Yii::$app->session->setFlash('success', 'Peer Review berhasil difinalisasi');

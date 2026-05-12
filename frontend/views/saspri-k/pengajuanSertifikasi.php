@@ -1,6 +1,9 @@
 <?php
 
 /** @var \common\models\Certification $certification */
+/** @var \common\models\SaspriK $saspri_k */
+/** @var \common\models\District $district */
+/** @var \common\models\SelfTeamMember[] $self_team_members */
 
 use yii\helpers\Html;
 
@@ -63,7 +66,7 @@ use yii\helpers\Html;
     <div class="card p-3 d-flex flex-column gap-2 w-100">
         <h2>Informasi Sertifikasi</h2>
         <p>
-            SASPRI-K: <strong><?= Html::encode($certification->saspriK->cooperative_name) ?></strong> (<?= Html::encode($certification->saspriK->district->name) ?>)<br>
+            SASPRI-K: <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)<br>
             Tingkat: <strong><?= Html::encode(ucfirst($certification->level)) ?></strong><br>
             Tujuan: <strong><?= Html::encode($certification->purpose === 'level_up' ? 'Level Up' : 'Renewal') ?></strong>
         </p>
@@ -89,7 +92,7 @@ use yii\helpers\Html;
                 <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
                 <input type="hidden" name="user_ids" id="selected-user-ids">
                 <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">
-                    Tambah Terpilih ke Tim
+                    Tambah Anggota
                 </button>
             </form>
         </div>
@@ -105,12 +108,12 @@ use yii\helpers\Html;
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($certification->selfTeamMembers as $index => $member): ?>
+                <?php foreach ($self_team_members as $index => $member): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= Html::encode($member->user->username) ?></td>
                     <td>
-                        <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'id' => $member->id], 'post') ?>
+                        <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'user_id' => $member->user->id], 'post') ?>
                         <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                             <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
                             <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
@@ -126,17 +129,17 @@ use yii\helpers\Html;
                         </span>
                     </td>
                     <td>
-                        <?= Html::a('Hapus', ['hapus-anggota-tim-mandiri', 'id' => $member->id], [
+                        <?= Html::a('Hapus', ['hapus-anggota-tim-mandiri', 'user_id' => $member->user->id], [
                             'class' => 'btn btn-danger btn-sm',
                             'data' => [
                                 'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                                'method' => 'post',
+                                'method' => 'delete',
                             ],
                         ]) ?>
                     </td>
                 </tr>
                 <?php endforeach ?>
-                <?php if (empty($certification->selfTeamMembers)): ?>
+                <?php if (empty($self_team_members)): ?>
                 <tr>
                     <td colspan="5" class="text-center">Belum ada anggota tim mandiri.</td>
                 </tr>

@@ -2,7 +2,10 @@
 
 namespace common\models;
 
+use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
+use common\enums\TeamRole;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is the model class for table "certifications".
@@ -90,22 +93,6 @@ class Certification extends \yii\db\ActiveRecord
             'rejection_reason' => 'Rejection Reason',
             'assessment_id' => 'Assessment ID',
         ];
-    }
-
-    public function submitForSelfReview(): Certification
-    {
-        $this->status = CertificationStatus::SELF_REVIEW;
-        $this->self_team_due_date = date('Y-m-d H:i:s');
-        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-        return $this;
-    }
-
-    public function submitForPeerReview(): Certification
-    {
-        $this->status = CertificationStatus::PEER_REVIEW;
-        $this->self_team_due_date = date('Y-m-d H:i:s');
-        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-        return $this;
     }
 
     /**
@@ -198,4 +185,51 @@ class Certification extends \yii\db\ActiveRecord
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('self_team_members', ['certification_id' => 'id']);
     }
 
+    public function submitForSelfReview(): Certification
+    {
+        // Jika masih ada yang pending, maka otomatis menjadi rejected
+        SelfTeamMember::updateAll(
+            ['status' => ApprovalStatus::REJECTED],
+            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
+        );
+
+        $this->status = CertificationStatus::SELF_REVIEW;
+        $this->self_team_due_date = date('Y-m-d H:i:s');
+        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        return $this;
+    }
+
+    public function submitForPeerReview(): Certification
+    {
+        $this->status = CertificationStatus::PEER_REVIEW;
+        $this->self_team_due_date = date('Y-m-d H:i:s');
+        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        return $this;
+    }
+
+    public function addSelfTeamMembers(array $user_ids)
+    {
+        foreach ($user_ids as $user_id) {
+            $member = new SelfTeamMember();
+            $member->user_id = $user_id;
+            $member->certification_id = $this->id;
+            $member->save(false);
+        }
+    }
+
+    public function validateApprovedSelfTeamComposition()
+    {
+        $members = $this->selfTeamMembers;
+        $approvedMembers = array_filter($members, fn ($m) => $m->status === ApprovalStatus::APPROVED);
+        $approvedCount = count($approvedMembers);
+        $leaderCount = count(array_filter($approvedMembers, fn ($m) => $m->role === TeamRole::LEADER));
+        $memberCount = count(array_filter($approvedMembers, fn ($m) => $m->role !== TeamRole::LEADER));
+
+        if ($approvedCount === 0 || $approvedCount % 3 !== 0) {
+            throw new UnprocessableEntityHttpException('Jumlah anggota Tim Mandiri yang setuju bergabung harus kelipatan 3');
+        }
+        if ($leaderCount !== 1 || $memberCount < 2) {
+            throw new UnprocessableEntityHttpException('Tim Mandiri harus terdiri dari 1 ketua dan minimal 2 anggota lainnya');
+        }
+    }
 }

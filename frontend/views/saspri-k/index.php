@@ -1,6 +1,9 @@
 <?php
 
 /** @var \common\models\SaspriK $saspri_k */
+/** @var \common\models\Certification $valid_certificate */
+/** @var \common\models\Certification[] $completed_certifications */
+/** @var \common\models\User[] $saspri_k_members */
 
 ?>
 <style>
@@ -68,9 +71,9 @@
 
             <div class="d-flex flex-column">
                 <div class="d-flex flex-row gap-2">
-                    <div>SASPRI-K </div>
+                    <div>SASPRI-K</div>
                     <div>:</div>
-                    <div><?= $saspri_k->district->name ?></div>
+                    <div><?= $saspri_k->region_name ?></div>
                 </div>
                 <div class="d-flex flex-row gap-2">
                     <div>Nama unit usaha (koperasi)</div>
@@ -98,12 +101,12 @@
                 <div class="d-flex flex-row gap-2">
                     <div>Level Sertifikat</div>
                     <div>:</div>
-                    <div><?=  $saspri_k->validCertificate->level ?></div>
+                    <div><?=  $valid_certificate->level ?></div>
                 </div>
                 <div class="d-flex flex-row gap-2">
                     <div>Nomor Sertifikat</div>
                     <div>:</div>
-                    <div><?=  $saspri_k->validCertificate->code ?></div>
+                    <div><?=  $valid_certificate->code ?></div>
                 </div>
             </div>
 
@@ -124,7 +127,7 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($saspri_k->certifications as $index => $certification): ?>
+                <?php foreach ($completed_certifications as $index => $certification): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= $certification->code ?: '-' ?>
@@ -159,7 +162,7 @@
                 <?= \yii\helpers\Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
                 <input type="hidden" name="user_ids" id="selected-user-ids">
                 <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">Tambah
-                    Terpilih</button>
+                    Anggota</button>
             </form>
         </div>
 
@@ -172,19 +175,19 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($saspri_k->users as $index => $user): ?>
+                <?php foreach ($saspri_k_members as $index => $user): ?>
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= \yii\helpers\Html::encode($user->username) ?>
                     </td>
                     <td>
-                        <?= \yii\helpers\Html::a('Hapus', ['hapus-anggota', 'id' => $user->id], [
-                'class' => 'btn btn-danger btn-sm',
-                'data' => [
-                  'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                  'method' => 'delete',
-                ],
-              ]) ?>
+                        <?= \yii\helpers\Html::a('Hapus', ['hapus-anggota', 'user_id' => $user->id], [
+                            'class' => 'btn btn-danger btn-sm',
+                            'data' => [
+                            'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                            'method' => 'delete',
+                            ],
+                        ]) ?>
                         <button class="btn btn-primary btn-sm">Lihat</button>
                     </td>
                 </tr>

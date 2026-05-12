@@ -224,4 +224,12 @@ class SaspriK extends \yii\db\ActiveRecord
 
         return $certification;
     }
+
+    public function addMembers(array $user_ids) 
+    {
+        User::updateAll(
+            ['saspri_k_id' => $this->id],
+            ['id' => $user_ids]
+        );
+    }
 }

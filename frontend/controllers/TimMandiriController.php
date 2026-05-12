@@ -184,6 +184,7 @@ class TimMandiriController extends Controller
             $certification = $this->saveScores($id, Yii::$app->request->post('IndicatorScore', []));
             $this->areAllIndicatorsFilledIn($certification);
 
+            // tambahin due date
             $certification->status = CertificationStatus::PENDING_PEER_TEAM_FORMATION;
             $certification->save(false);
             Yii::$app->session->setFlash('success', 'Self Review berhasil difinalisasi');
