@@ -20,7 +20,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UnprocessableEntityHttpException;
 
-class SertifikasiController extends Controller
+class PenentuanTimSebayaController extends Controller
 {
     public function behaviors()
     {

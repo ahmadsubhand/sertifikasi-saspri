@@ -206,18 +206,10 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitSelfReview(): Certification
     {
-        $indicator_ids = array_map(fn ($i) => $i->id, $this->assessment->indicators);
-        /** @var IndicatorScore[] $existing_scores */
-        $existing_scores = IndicatorScore::find()
-            ->where(['certification_id' => $this->id, 'indicator_id' => $indicator_ids])
-            ->indexBy('indicator_id')
-            ->all();
+        $existing_scores = $this->indicatorScores;
 
-        foreach ($indicator_ids as $req_id) {
-            if (
-                !isset($existing_scores[$req_id]) || 
-                !$existing_scores[$req_id]->self_team_score
-            ) {
+        foreach ($existing_scores as $existing_score) {
+            if (!$existing_score->self_team_score) {
                 throw new BadRequestHttpException(
                     'Seluruh indikator wajib diberikan penilaian sebelum finalisasi'
                 );
@@ -246,18 +238,12 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitPeerReview(): Certification
     {
-        $indicator_ids = array_map(fn ($i) => $i->id, $this->assessment->indicators);
-        /** @var IndicatorScore[] $existing_scores */
-        $existing_scores = IndicatorScore::find()
-            ->where(['certification_id' => $this->id, 'indicator_id' => $indicator_ids])
-            ->indexBy('indicator_id')
-            ->all();
+        $existing_scores = $this->indicatorScores;
 
-        foreach ($indicator_ids as $req_id) {
+        foreach ($existing_scores as $existing_score) {
             if (
-                !isset($existing_scores[$req_id]) || 
-                !$existing_scores[$req_id]->peer_team_score || 
-                !$existing_scores[$req_id]->status
+                !$existing_score->peer_team_score ||
+                !$existing_score->status
             ) {
                 throw new BadRequestHttpException(
                     'Seluruh indikator wajib diberikan penilaian dan status sebelum finalisasi'

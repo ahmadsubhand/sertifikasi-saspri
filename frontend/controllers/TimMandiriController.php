@@ -7,6 +7,7 @@ use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
 use common\enums\TeamRole;
+use common\helpers\TeamHelper;
 use common\models\Certification;
 use common\models\SelfTeamMember;
 use Exception;
@@ -137,7 +138,7 @@ class TimMandiriController extends Controller
             $current_child_group = $certification->assessment
                 ->getCurrentChildGroups($current_root_group, $certification_id);
 
-            return $this->render('self-review', [
+            return $this->render('selfReview', [
                 'is_leader' => $member->role === TeamRole::LEADER,
                 'saspri_k' => $certification->saspriK,
                 'certification' => $certification,
@@ -201,7 +202,7 @@ class TimMandiriController extends Controller
     {
         try {
             $member = $this->checkSelfReviewPermission($certification_id);
-            $this->isMemberALeader($member);
+            TeamHelper::isMemberALeader($member);
 
             $this->findCertificationOrFail($certification_id)
                 ->saveSelfReviewScores(Yii::$app->request->post('indicator_scores'))
@@ -287,12 +288,5 @@ class TimMandiriController extends Controller
             );
         }
         return $certification;
-    }
-
-    private function isMemberALeader(SelfTeamMember $member) 
-    {
-        if ($member->role !== TeamRole::LEADER) {
-            throw new UnprocessableEntityHttpException('Hanya ketua tim yang dapat melakukan finalisasi');
-        }
     }    
 }
