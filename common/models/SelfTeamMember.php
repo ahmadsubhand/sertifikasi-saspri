@@ -86,4 +86,16 @@ class SelfTeamMember extends \yii\db\ActiveRecord
         $this->role = $role;
         return $this;
     }
+
+    public function approveRequest()
+    {
+        $this->status = ApprovalStatus::APPROVED;
+        return $this;
+    }
+
+    public function rejectRequest()
+    {
+        $this->status = ApprovalStatus::REJECTED;
+        return $this;
+    }
 }

@@ -5,7 +5,11 @@ namespace common\models;
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
+use Exception;
+use yii\web\BadRequestHttpException;
 use yii\web\UnprocessableEntityHttpException;
+
+use function PHPUnit\Framework\once;
 
 /**
  * This is the model class for table "certifications".
@@ -199,11 +203,32 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function submitSelfReview(): Certification
+    {
+        $indicatorIds = array_map(fn ($i) => $i->id, $this->assessment->indicators);
+        $existingScores = IndicatorScore::find()
+            ->where(['certification_id' => $this->id, 'indicator_id' => $indicatorIds])
+            ->indexBy('indicator_id')
+            ->all();
+        foreach ($indicatorIds as $reqId) {
+            if (!isset($existingScores[$reqId]) || !$existingScores[$reqId]->self_team_score) {
+                throw new BadRequestHttpException(
+                    'Seluruh indikator wajib diberikan penilaian sebelum finalisasi'
+                );
+            }
+        }
+
+        $this->status = CertificationStatus::PENDING_PEER_TEAM_FORMATION;
+        $this->self_review_due_date = date('Y-m-d H:i:s');
+        $this->peer_team_due_date = date('Y-m-d H:i:s', strtotime('+1 weeks'));
+        return $this;
+    }
+
     public function submitForPeerReview(): Certification
     {
         $this->status = CertificationStatus::PEER_REVIEW;
-        $this->self_team_due_date = date('Y-m-d H:i:s');
-        $this->self_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+        $this->peer_team_due_date = date('Y-m-d H:i:s');
+        $this->peer_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
         return $this;
     }
 
@@ -231,5 +256,36 @@ class Certification extends \yii\db\ActiveRecord
         if ($leaderCount !== 1 || $memberCount < 2) {
             throw new UnprocessableEntityHttpException('Tim Mandiri harus terdiri dari 1 ketua dan minimal 2 anggota lainnya');
         }
+    }
+
+    public function saveSelfReviewScores(array $indicator_scores)
+    {
+        try {
+            foreach ($indicator_scores as $indicator_id => $indicator_score) {
+                $indicator_score_model = $this->findOrCreateIndicatorScore($indicator_id);
+                $indicator_score_model->fillSelfTeamScore($indicator_score['self_team_score'])
+                    ->handleEvidenceUpload($this->id)
+                    ->save(false);
+            }
+    
+            return $this;
+        } catch (Exception $error) {
+            if ($error instanceof BadRequestHttpException) {
+                throw new BadRequestHttpException($error->getMessage());
+            }
+            throw $error;
+        }
+    }
+
+    protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore 
+    {
+        return $this->getIndicatorScores()
+            ->where([
+                'indicator_id' => $indicator_id,
+            ])->one()
+            ?? new IndicatorScore([
+                'certification_id' => $this->id,
+                'indicator_id' => $indicator_id,
+            ]);
     }
 }

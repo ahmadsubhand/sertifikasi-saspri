@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 
-/** @var \common\models\Certification[] $certifications */
 /** @var \common\models\SelfTeamMember[] $self_team_member_request */
 /** @var \common\models\SelfTeamMember[] $self_team_member_uncompleted */
 /** @var \common\models\SelfTeamMember[] $self_team_member_completed */
@@ -43,11 +42,11 @@ use yii\helpers\Html;
                             : '-'
                     ?></td>
                     <td>
-                        <?= Html::a('Setuju', ['setuju', 'id' => $member->id], [
+                        <?= Html::a('Setuju', ['setuju', 'self_team_member_id' => $member->id], [
                             'class' => 'btn btn-success',
                             'data-method' => 'post',
                         ]) ?>
-                        <?= Html::a('Tolak', ['tolak', 'id' => $member->id], [
+                        <?= Html::a('Tolak', ['tolak', 'self_team_member_id' => $member->id], [
                             'class' => 'btn btn-danger',
                             'data-method' => 'post',
                             'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Mandiri ini?',
@@ -87,7 +86,7 @@ use yii\helpers\Html;
                     ?></td>
                     <td>
                         <a class="btn btn-primary"
-                            href="<?= \yii\helpers\Url::to(['tim-mandiri/self-review', 'id' => $member->certification->id]) ?>">
+                            href="<?= \yii\helpers\Url::to(['tim-mandiri/self-review', 'certification_id' => $member->certification->id]) ?>">
                             Lihat
                         </a>
                     </td>

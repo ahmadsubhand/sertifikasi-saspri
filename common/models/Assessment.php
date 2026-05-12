@@ -2,6 +2,11 @@
 
 namespace common\models;
 
+use ErrorException;
+use Exception;
+use yii\db\ActiveQuery;
+use yii\web\BadRequestHttpException;
+
 /**
  * This is the model class for table "assessments".
  *
@@ -87,4 +92,70 @@ class Assessment extends \yii\db\ActiveRecord
         return $this->hasMany(Indicator::class, ['id' => 'indicator_id'])->viaTable('assessment_indicator_relations', ['assessment_id' => 'id']);
     }
 
+    /**
+     * @return IndicatorGroup[]
+     */
+    public function getAllRootGroups()
+    {
+        $indicator_group_ids = array_unique(array_map(
+            fn ($indicator) => $indicator->indicatorGroup->parent_group_id,
+            $this->indicators,
+        ));
+
+        $indicator_groups = IndicatorGroup::find()
+            ->where(['id' => $indicator_group_ids])
+            ->orderBy(['order' => SORT_ASC])
+            ->all();
+
+        return $indicator_groups;
+    }
+
+    /**
+     * @return IndicatorGroup
+     */
+    public function getCurrentRootGroupOrFail(int $page, array $root_indicator_groups)
+    {
+        try {
+            return $root_indicator_groups[$page - 1];
+        } catch (Exception $error) {
+            if ($error instanceof ErrorException) {
+                throw new BadRequestHttpException('Nomor halaman tidak valid');
+            }
+            throw $error;
+        }
+    }
+
+    /**
+     * @return IndicatorGroup[]
+     */
+    public function getCurrentChildGroups(IndicatorGroup $root_indicator_group, int $certification_id)
+    {
+        $indicator_groups = $root_indicator_group->getIndicatorGroups()
+            ->orderBy(['order' => SORT_ASC])
+            ->with([
+                'indicators' => function (ActiveQuery $query) use ($certification_id) {
+                    $query->orderBy(['order' => SORT_ASC])
+                        ->with([
+                            'indicatorOptions',
+                            'indicatorScores' => function (ActiveQuery $query) use ($certification_id) {
+                                $query->where(['certification_id' => $certification_id]);
+                            },
+                        ]);
+                },
+            ])
+            ->all();
+
+        // Kalau pakai ini malah menyusahkan type di frontend, jadi lepas saja tidak snake case
+        // foreach ($indicator_groups as &$group) {
+        //     foreach ($group['indicators'] as &$indicator) {
+        //         $indicator['indicator_options'] = $indicator['indicatorOptions'] ?? [];
+        //         unset($indicator['indicatorOptions']);
+
+        //         $indicator['indicator_scores'] = $indicator['indicatorScores'][0] ?? [];
+        //         unset($indicator['indicatorScores']);
+        //     }
+        // }
+
+        return $indicator_groups;
+    }
 }

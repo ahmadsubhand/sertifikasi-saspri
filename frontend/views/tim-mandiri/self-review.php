@@ -1,50 +1,29 @@
 <?php
 
-use common\enums\TeamRole;
-use common\models\SelfTeamMember;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var yii\web\View $this */
+/** @var common\models\SaspriK $saspri_k */
 /** @var common\models\Certification $certification */
-/** @var common\models\IndicatorGroup[] $rootGroups */
-/** @var common\models\IndicatorGroup $currentRootGroup */
-/** @var common\models\Indicator[] $indicators */
-/** @var common\models\IndicatorScore[] $scores */
+/** @var common\models\IndicatorGroup $current_root_group */
+/** @var common\models\IndicatorGroup[] $current_child_group */
 /** @var int $page */
-/** @var int $totalPages */
+/** @var int $total_pages */
+/** @var bool $is_leader */
 
 $this->title = 'Self Review SASPRI-K';
-
-// Group indicators by subgroup ID
-$indicatorsByGroup = [];
-foreach ($indicators as $indicator) {
-    $indicatorsByGroup[$indicator->indicator_group_id][] = $indicator;
-}
-
-// Fetch immediate children of the current root group
-$subGroups = $currentRootGroup->getIndicatorGroups()->orderBy(['order' => SORT_ASC])->all();
-
-// Check if user is Leader
-$isLeader = SelfTeamMember::find()
-    ->where([
-        'certification_id' => $certification->id,
-        'user_id' => \Yii::$app->user->id,
-        'role' => TeamRole::LEADER
-    ])
-    ->exists();
 
 // Score Calculation Logic (Temporary)
 $groupTotalScore = 0;
 $subGroupResults = [];
 
-foreach ($subGroups as $subGroup) {
+foreach ($current_child_group as $subGroup) {
     $subGroupSum = 0;
-    if (isset($indicatorsByGroup[$subGroup->id])) {
-        foreach ($indicatorsByGroup[$subGroup->id] as $indicator) {
-            $score = isset($scores[$indicator->id]) ? $scores[$indicator->id]->self_team_score : 0;
-            $subGroupSum += $score;
-        }
+
+    foreach ($subGroup->indicators as $indicator) {
+        $score = $indicator->indicatorScores[0]->self_team_score ?? 0;
+        $subGroupSum += $score;
     }
 
     $subGroupWeighted = $subGroupSum * ($subGroup->weight / 100);
@@ -55,30 +34,30 @@ foreach ($subGroups as $subGroup) {
     $groupTotalScore += $subGroupWeighted;
 }
 
-$finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
+$finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 ?>
 
 <div class="d-flex flex-column align-items-start gap-3">
     <h1><?= Html::encode($this->title) ?></h1>
     <div class="text-muted d-flex align-items-center gap-2 mb-2">
-        <?php if ($isLeader): ?>
+        <?php if ($is_leader): ?>
             <span class="badge bg-info">Ketua Tim</span>
         <?php else: ?>
             <span class="badge bg-secondary">Anggota Tim</span>
         <?php endif; ?>
         <div>
-            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->district->name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
+            Sertifikasi SASPRI-K <?= Html::encode($saspri_k->region_name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
         </div>
     </div>
 
     <div class="card p-3 d-flex flex-column gap-2 w-100">
-        <h2><?= Html::encode($currentRootGroup->code) ?>. <?= Html::encode($currentRootGroup->label) ?> (<?= Html::encode($currentRootGroup->weight) ?>%)</h2>
+        <h2><?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h2>
         
         <?php
             // Default action is always save temporary
-            $saveAction = Url::to(['simpan-sementara-self-review', 'id' => $certification->id, 'page' => $page]);
-            $finalizeAction = Url::to(['finalisasi-self-review', 'id' => $certification->id]);
+            $saveAction = Url::to(['simpan-sementara-self-review', 'certification_id' => $certification->id, 'page' => $page]);
+            $finalizeAction = Url::to(['finalisasi-self-review', 'certification_id' => $certification->id]);
         ?>
         <form id="self-review-form" action="<?= $saveAction ?>" method="post" enctype="multipart/form-data">
             <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
@@ -93,7 +72,7 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($subGroups as $subGroup): ?>
+                    <?php foreach ($current_child_group as $subGroup): ?>
                         <tr class="table-light">
                             <th scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
                             <td colspan="3" class="fw-bold">
@@ -101,14 +80,14 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                             </td>
                         </tr>
                         
-                        <?php if (isset($indicatorsByGroup[$subGroup->id])): ?>
-                            <?php foreach ($indicatorsByGroup[$subGroup->id] as $index => $indicator): ?>
+                        <?php if (isset($subGroup->indicators)): ?>
+                            <?php foreach ($subGroup->indicators as $index => $indicator): ?>
                                 <tr>
                                     <td class="text-center"><?= $index + 1 ?></td>
                                     <td><?= Html::encode($indicator->label) ?></td>
                                     <td>
                                         <select 
-                                            name="IndicatorScore[<?= $indicator->id ?>][self_team_score]" 
+                                            name="indicator_scores[<?= $indicator->id ?>][self_team_score]" 
                                             class="form-select score-select" 
                                             data-subgroup-id="<?= $subGroup->id ?>"
                                         >
@@ -117,8 +96,8 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                                             <?php foreach ($indicator->indicatorOptions as $option): ?>
                                                 <?php
                                                     $selected = (
-                                                        isset($scores[$indicator->id]) &&
-                                                        $scores[$indicator->id]->self_team_score == $option->weight
+                                                        isset($indicator->indicatorScores[0]->self_team_score) &&
+                                                        $indicator->indicatorScores[0]->self_team_score == $option->weight
                                                     ) ? 'selected' : '';
                                                 ?>
 
@@ -129,12 +108,12 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                                         </select>
                                     </td>
                                     <td>
-                                        <?php if (isset($scores[$indicator->id]) && $scores[$indicator->id]->evidence_url): ?>
+                                        <?php if (isset($indicator->indicatorScores[0]) && $indicator->indicatorScores[0]->evidence_url): ?>
                                             <div class="mb-1">
-                                                <a href="<?= Url::to($scores[$indicator->id]->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat Bukti</a>
+                                                <a href="<?= Url::to($indicator->indicatorScores[0]->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat Bukti</a>
                                             </div>
                                         <?php endif; ?>
-                                        <input class="form-control form-control-sm" type="file" name="IndicatorScore[<?= $indicator->id ?>][evidence]">
+                                        <input class="form-control form-control-sm" type="file" name="indicator_scores[<?= $indicator->id ?>][evidence]">
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -146,12 +125,13 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                             <td class="text-center fw-bold text-primary subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
                             <td></td>
                         </tr>
+
                     <?php endforeach; ?>
 
                     <tr class="table-secondary">
                         <th scope="row"></th>
-                        <th class="text-end">Nilai Total <?= Html::encode($currentRootGroup->code) ?> (<?= Html::encode($currentRootGroup->label) ?>)</th>
-                        <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $currentRootGroup->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
+                        <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
+                        <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
                         <th></th>
                     </tr>
                 </tbody>
@@ -169,7 +149,7 @@ $finalGroupScore = $groupTotalScore * ($currentRootGroup->weight / 100);
                 <button class="btn btn-secondary" disabled>Sebelumnya</button>
             <?php endif; ?>
 
-            <?php if ($page < $totalPages): ?>
+            <?php if ($page < $total_pages): ?>
                 <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-primary">Berikutnya</button>
             <?php else: ?>
                 <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn btn-success">Selesai Review</button>
