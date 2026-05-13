@@ -284,7 +284,7 @@ class TimMandiriController extends Controller
         }
         if ($certification->status !== CertificationStatus::SELF_REVIEW) {
             throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap self review'
+                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[CertificationStatus::SELF_REVIEW]
             );
         }
         return $certification;

@@ -135,11 +135,11 @@ class IndicatorScore extends \yii\db\ActiveRecord
 
         if ($this->peer_team_score === $this->self_team_score) {
             if ($status !== IndicatorStatus::IDENTICAL) {
-                throw new BadRequestHttpException('Status harus Identical jika skor sama');
+                throw new BadRequestHttpException('Status harus ' . IndicatorStatus::list()[IndicatorStatus::IDENTICAL] . ' jika skor sama');
             }
         } else {
             if ($status === IndicatorStatus::IDENTICAL) {
-                throw new BadRequestHttpException('Status tidak boleh Identical jika skor berbeda');
+                throw new BadRequestHttpException('Status tidak boleh ' . IndicatorStatus::list()[IndicatorStatus::IDENTICAL] . ' jika skor berbeda');
             }
         }
 

@@ -162,7 +162,7 @@ class PenerbitanSertifikasiController extends Controller
         }
         if ($certification->status !== CertificationStatus::EXTERNAL_REVIEW) {
             throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap external review'
+                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[CertificationStatus::EXTERNAL_REVIEW]
             );
         }
         return $certification;

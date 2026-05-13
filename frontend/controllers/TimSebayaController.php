@@ -284,7 +284,7 @@ class TimSebayaController extends Controller
         }
         if ($certification->status !== CertificationStatus::PEER_REVIEW) {
             throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap peer review'
+                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[CertificationStatus::PEER_REVIEW]
             );
         }
         return $certification;
