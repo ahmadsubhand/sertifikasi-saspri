@@ -1,163 +1,218 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- --------------------------------------------------------
--- Users
+-- Users (Total ~158 Users)
+-- Admins: 1-3
+-- Independent: 4-13
+-- Reps (1-6): 14-133 (20 members each)
+-- Additionals (7-11): 134-158 (5 members each)
 -- --------------------------------------------------------
 
 INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
-(1, 'admin', 'test_auth_key_1', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin@example.com', 10, 1714876800, 1714876800, '08123456789', NULL),
-(2, 'wali1', 'test_auth_key_2', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'wali1@example.com', 10, 1714876800, 1714876800, '08123456780', 1),
-(3, 'user1', 'test_auth_key_3', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user1@example.com', 10, 1714876800, 1714876800, '08123456781', 1),
-(4, 'user2', 'test_auth_key_4', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user2@example.com', 10, 1714876800, 1714876800, '08123456782', 1),
-(5, 'user3', 'test_auth_key_5', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user3@example.com', 10, 1714876800, 1714876800, '08123456783', 1),
-(6, 'wali2', 'test_auth_key_6', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'wali2@example.com', 10, 1714876800, 1714876800, '08123456784', 2),
-(7, 'user4', 'test_auth_key_7', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user4@example.com', 10, 1714876800, 1714876800, '08123456783', 2),
-(8, 'wali3', 'test_auth_key_8', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'wali3@example.com', 10, 1714876800, 1714876800, '08123456785', 3),
-(9, 'user5', 'test_auth_key_9', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user5@example.com', 10, 1714876800, 1714876800, '08123456783', 3),
-(10, 'user6', 'test_auth_key_10', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user6@example.com', 10, 1714876800, 1714876800, '08123456783', 3),
-(11, 'user7', 'test_auth_key_11', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user7@example.com', 10, 1714876800, 1714876800, '08123456783', 3),
-(12, 'wali4', 'test_auth_key_12', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'wali4@example.com', 10, 1714876800, 1714876800, '08123456790', 4),
-(13, 'user12', 'test_auth_key_13', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user12@example.com', 10, 1714876800, 1714876800, '08123456791', 4),
-(14, 'user13', 'test_auth_key_14', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user13@example.com', 10, 1714876800, 1714876800, '08123456792', 4),
-(15, 'user14', 'test_auth_key_15', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user14@example.com', 10, 1714876800, 1714876800, '08123456793', 4),
-(16, 'wali5', 'test_auth_key_16', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'wali5@example.com', 10, 1714876800, 1714876800, '08123456794', 5),
-(17, 'user15', 'test_auth_key_17', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user15@example.com', 10, 1714876800, 1714876800, '08123456795', 5),
-(18, 'user16', 'test_auth_key_18', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user16@example.com', 10, 1714876800, 1714876800, '08123456796', 5),
-(19, 'user17', 'test_auth_key_19', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'user17@example.com', 10, 1714876800, 1714876800, '08123456797', 5);
+-- Admins
+(1, 'admin.nasional', 'ak1', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin1@saspri.id', 10, 1714876800, 1714876800, '08111111111', NULL),
+(2, 'admin.kawasan', 'ak2', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin2@saspri.id', 10, 1714876800, 1714876800, '08111111112', NULL),
+(3, 'admin.pusat', 'ak3', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin3@saspri.id', 10, 1714876800, 1714876800, '08111111113', NULL),
+
+-- Independent Users (10: 4-13)
+(4, 'bambang.sudjatmiko', 'ak4', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'bambang@gmail.com', 10, 1714876800, 1714876800, '08120000001', NULL),
+(5, 'siti.nurhaliza', 'ak5', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'siti.n@gmail.com', 10, 1714876800, 1714876800, '08120000002', NULL),
+(6, 'joko.widodo', 'ak6', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'joko.w@gmail.com', 10, 1714876800, 1714876800, '08120000003', NULL),
+(7, 'megawati.soekarno', 'ak7', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'mega@gmail.com', 10, 1714876800, 1714876800, '08120000004', NULL),
+(8, 'susilo.yudhoyono', 'ak8', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'sby@gmail.com', 10, 1714876800, 1714876800, '08120000005', NULL),
+(9, 'prabowo.subianto', 'ak9', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'prabowo@gmail.com', 10, 1714876800, 1714876800, '08120000006', NULL),
+(10, 'anies.baswedan', 'ak10', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'anies@gmail.com', 10, 1714876800, 1714876800, '08120000007', NULL),
+(11, 'ganjar.pranowo', 'ak11', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'ganjar@gmail.com', 10, 1714876800, 1714876800, '08120000008', NULL),
+(12, 'ridwan.kamil', 'ak12', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'rk@gmail.com', 10, 1714876800, 1714876800, '08120000009', NULL),
+(13, 'khofifah.parawansa', 'ak13', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'khofifah@gmail.com', 10, 1714876800, 1714876800, '08120000010', NULL);
+
+-- Coords and Members for SASPRI-K units
+-- Reps (1-6) - 20 members each
+-- 14-33: Rep 1
+-- 34-53: Rep 2
+-- 54-73: Rep 3
+-- 74-93: Rep 4
+-- 94-113: Rep 5
+-- 114-133: Rep 6
+-- Additionals (7-11) - 5 members each
+-- 134-138: Add 7
+-- 139-143: Add 8
+-- 144-148: Add 9
+-- 149-153: Add 10
+-- 154-158: Add 11
+
+-- Realistic names for Coordinators
+INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
+(14, 'budiman.sujatmiko', 'ak14', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'budiman@gmail.com', 10, 1714876800, 1714876800, '08130000001', 1),
+(34, 'agus.harimurti', 'ak34', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'agus@gmail.com', 10, 1714876800, 1714876800, '08130000002', 2), -- SASPRI-K 2: Representative for self_review
+(54, 'erick.thohir', 'ak54', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'erick@gmail.com', 10, 1714876800, 1714876800, '08130000003', 3), -- SASPRI-K 3: Representative for pending_peer_team_formation
+(74, 'sandiaga.uno', 'ak74', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'sandi@gmail.com', 10, 1714876800, 1714876800, '08130000004', 4), -- SASPRI-K 4: Representative for peer_review
+(94, 'nadiem.makarim', 'ak94', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'nadiem@gmail.com', 10, 1714876800, 1714876800, '08130000005', 5), -- SASPRI-K 5: Representative for external_review
+(114, 'luhut.pandjaitan', 'ak114', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'luhut@gmail.com', 10, 1714876800, 1714876800, '08130000006', 6), -- SASPRI-K 6: Representative for completed
+(134, 'mahfud.md', 'ak134', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'mahfud@gmail.com', 10, 1714876800, 1714876800, '08130000007', 7),
+(139, 'muhaimin.iskandar', 'ak139', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'cakimin@gmail.com', 10, 1714876800, 1714876800, '08130000008', 8),
+(144, 'ahmad.syaikhu', 'ak144', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'ahmad@gmail.com', 10, 1714876800, 1714876800, '08130000009', 9),
+(149, 'zulkifli.hasan', 'ak149', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'zulkifli@gmail.com', 10, 1714876800, 1714876800, '08130000010', 10),
+(154, 'suharso.monoarfa', 'ak154', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'suharso@gmail.com', 10, 1714876800, 1714876800, '08130000011', 11);
+
+-- Rest of members bulk insert
+INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id)
+SELECT i, CONCAT('user.', i), 'auth_key', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', CONCAT('u', i, '@saspri.id'), 10, 1714876800, 1714876800, CONCAT('0813', LPAD(i, 7, '0')),
+CASE 
+  WHEN i BETWEEN 14 AND 33 THEN 1
+  WHEN i BETWEEN 34 AND 53 THEN 2
+  WHEN i BETWEEN 54 AND 73 THEN 3
+  WHEN i BETWEEN 74 AND 93 THEN 4
+  WHEN i BETWEEN 94 AND 113 THEN 5
+  WHEN i BETWEEN 114 AND 133 THEN 6
+  WHEN i BETWEEN 134 AND 138 THEN 7
+  WHEN i BETWEEN 139 AND 143 THEN 8
+  WHEN i BETWEEN 144 AND 148 THEN 9
+  WHEN i BETWEEN 149 AND 153 THEN 10
+  WHEN i BETWEEN 154 AND 158 THEN 11
+END
+FROM (
+  SELECT a.N + b.N * 10 + c.N * 100 AS i
+  FROM (SELECT 0 AS N UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) a
+  CROSS JOIN (SELECT 0 AS N UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) b
+  CROSS JOIN (SELECT 0 AS N UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) c
+) AS numbers
+WHERE i BETWEEN 14 AND 158 AND i NOT IN (14,34,54,74,94,114,134,139,144,149,154);
 
 -- --------------------------------------------------------
--- Roles
+-- Roles Assignment
 -- --------------------------------------------------------
 
-INSERT INTO `auth_assignment` (item_name, user_id, created_at) values
-('admin', 1, 1778028133),
-('coordinator', 2, 1778028133),
-('user', 3, 1778028133),
-('user', 4, 1778028133),
-('user', 5, 1778028133),
-('coordinator', 6, 1778028133),
-('user', 7, 1778028133),
-('coordinator', 8, 1778028133),
-('user', 9, 1778028133),
-('user', 10, 1778028133),
-('user', 11, 1778028133),
-('coordinator', 12, 1778028133),
-('user', 13, 1778028133),
-('user', 14, 1778028133),
-('user', 15, 1778028133),
-('coordinator', 16, 1778028133),
-('user', 17, 1778028133),
-('user', 18, 1778028133),
-('user', 19, 1778028133);
+INSERT INTO `auth_assignment` (item_name, user_id, created_at) VALUES
+('admin', 1, 1714876800), ('admin', 2, 1714876800), ('admin', 3, 1714876800),
+('coordinator', 14, 1714876800), ('coordinator', 34, 1714876800), ('coordinator', 54, 1714876800),
+('coordinator', 74, 1714876800), ('coordinator', 94, 1714876800), ('coordinator', 114, 1714876800),
+('coordinator', 134, 1714876800), ('coordinator', 139, 1714876800), ('coordinator', 144, 1714876800),
+('coordinator', 149, 1714876800), ('coordinator', 154, 1714876800);
+
+-- Dynamic role assignment for everyone else
+INSERT INTO `auth_assignment` (item_name, user_id, created_at)
+SELECT 'user', id, 1714876800 FROM `user` 
+WHERE id NOT IN (SELECT CAST(user_id AS UNSIGNED) FROM auth_assignment);
 
 -- --------------------------------------------------------
 -- SASPRI-K
 -- --------------------------------------------------------
 
 INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, cooperative_name, number_of_groups, number_of_active_members, livestock_type, total_livestock_count, breeding_livestock_count, productive_heifer_count, request_status, valid_certificate_id) VALUES
-(1, 2, 265, 'Baiturrahman', 'Jl. Syiah Kuala No. 10', 'Koperasi Sejahtera', 5, 50, 'Sapi Potong', 200, 100, 50, 'approved', 1),
-(2, 6, 1, 'Bakongan', 'Jl. Bakongan No. 1', 'Koperasi Bakongan Jaya', 3, 30, 'Sapi Potong', 120, 60, 30, 'approved', 4),
-(3, 8, 2, 'Kluet Utara', 'Jl. Kluet Utara No. 5', 'Koperasi Kluet Mandiri', 4, 45, 'Sapi Potong', 180, 90, 45, 'approved', 5),
-(4, 12, 3, 'Bakongan Timur', 'Jl. Bakongan Timur No. 10', 'Koperasi Bakongan Timur', 2, 25, 'Sapi Potong', 100, 50, 25, 'approved', 6),
-(5, 16, 4, 'Bakongan Barat', 'Jl. Bakongan Barat No. 5', 'Koperasi Bakongan Barat', 3, 35, 'Sapi Potong', 140, 70, 35, 'approved', 8);
-
-INSERT INTO saspri_k_documents (id, url, type, saspri_k_id) VALUES
-(1, 'https://example.com/docs/ktp_wali1.pdf', 'ktp', 1),
-(2, 'https://example.com/docs/legalitas_koperasi1.pdf', 'legalitas', 1),
-(3, 'https://example.com/docs/ktp_wali2.pdf', 'ktp', 2),
-(4, 'https://example.com/docs/ktp_wali3.pdf', 'ktp', 3),
-(5, 'https://example.com/docs/ktp_wali4.pdf', 'ktp', 4),
-(6, 'https://example.com/docs/ktp_wali5.pdf', 'ktp', 5);
+(1, 14, 265, 'Baiturrahman', 'Jl. Merdeka No. 1', 'Koperasi Baiturrahman', 5, 50, 'Sapi', 200, 100, 50, 'approved', 1),
+(2, 34, 1, 'Bakongan', 'Jl. Merdeka No. 2', 'Koperasi Bakongan', 3, 30, 'Sapi', 120, 60, 30, 'approved', 2),
+(3, 54, 2, 'Kluet Utara', 'Jl. Merdeka No. 3', 'Koperasi Kluet', 4, 45, 'Sapi', 180, 90, 45, 'approved', 3),
+(4, 74, 3, 'Bakongan Timur', 'Jl. Merdeka No. 4', 'Koperasi Bakongan Timur', 2, 25, 'Sapi', 100, 50, 25, 'approved', 4),
+(5, 94, 4, 'Bakongan Barat', 'Jl. Merdeka No. 5', 'Koperasi Bakongan Barat', 3, 35, 'Sapi', 140, 70, 35, 'approved', 5),
+(6, 114, 5, 'Kluet Selatan', 'Jl. Merdeka No. 6', 'Koperasi Kluet Selatan', 4, 40, 'Sapi', 160, 80, 40, 'approved', 6),
+(7, 134, 6, 'Meukek', 'Jl. Merdeka No. 7', 'Koperasi Meukek', 2, 20, 'Sapi', 80, 40, 20, 'approved', 13),
+(8, 139, 7, 'Samatiga', 'Jl. Merdeka No. 8', 'Koperasi Samatiga', 2, 18, 'Sapi', 72, 36, 18, 'approved', 14),
+(9, 144, 8, 'Bubon', 'Jl. Merdeka No. 9', 'Koperasi Bubon', 2, 22, 'Sapi', 88, 44, 22, 'approved', 15),
+(10, 149, 9, 'Arongan', 'Jl. Merdeka No. 10', 'Koperasi Arongan', 2, 21, 'Sapi', 84, 42, 21, 'approved', 16),
+(11, 154, 10, 'Woyla', 'Jl. Merdeka No. 11', 'Koperasi Woyla', 3, 28, 'Sapi', 112, 56, 28, 'approved', 17);
 
 -- --------------------------------------------------------
--- Certifications
+-- Certifications (Historical)
+-- 3 Natalia A/AB/B, 2 Weania BC/C, 1 Natalia A
 -- --------------------------------------------------------
 
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, submitted_at, status, level, code, issued_at, total_score, grade, next_certification_due_date, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date) VALUES
-(1, 1, 1, 'level_up', '2024-01-01 10:00:00', 'completed', 'natalia', 'CERT/2024/002', '2024-01-05 10:00:00', 80, 'b', '2026-01-05 10:00:00', NULL, NULL, NULL, NULL),
-(2, 1, 1, 'level_up', '2026-05-01 10:00:00', 'self_review', 'weania', 'CERT/2026/002', NULL, 0, NULL, NULL, '2026-05-08 10:00:00', '2026-05-22 10:00:00', NULL, NULL),
-(3, 2, 1, 'level_up', '2024-05-01 10:00:00', 'completed', 'natalia', 'CERT/2024/001', '2024-05-05 14:00:00', 85, 'a', '2026-05-05 14:00:00', NULL, NULL, NULL, NULL),
-(4, 3, 1, 'level_up', '2024-01-01 10:00:00', 'completed', 'weania', 'CERT/2024/003', '2024-01-05 10:00:00', 75, 'c', '2025-06-05 10:00:00', NULL, NULL, NULL, NULL),
-(5, 3, 1, 'renewal', '2026-05-05 10:00:00', 'pending_self_team_formation', 'weania', NULL, NULL, 0, NULL, NULL, '2026-05-12 10:00:00', NULL, NULL, NULL),
-(6, 4, 1, 'level_up', '2024-01-01 10:00:00', 'completed', 'natalia', 'CERT/2024/004', '2024-01-05 10:00:00', 82, 'b', '2026-01-05 10:00:00', NULL, NULL, NULL, NULL),
-(7, 4, 1, 'level_up', '2026-05-01 10:00:00', 'pending_peer_team_formation', 'weania', NULL, NULL, 0, NULL, NULL, '2026-05-08 10:00:00', '2026-05-22 10:00:00', '2026-05-29 10:00:00', NULL),
-(8, 5, 1, 'level_up', '2024-01-01 10:00:00', 'completed', 'weania', 'CERT/2024/005', '2024-01-05 10:00:00', 88, 'a', '2026-01-05 10:00:00', NULL, NULL, NULL, NULL),
-(9, 5, 1, 'level_up', '2026-05-01 10:00:00', 'peer_review', 'prematura', NULL, NULL, 0, NULL, NULL, '2026-05-08 10:00:00', '2026-05-22 10:00:00', '2026-05-29 10:00:00', '2026-06-12 10:00:00');
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
+(1, 1, 1, 'level_up', 'completed', 'natalia', 95, 'a', '2023-01-01', '2023-01-10', '2025-01-10'),
+(2, 2, 1, 'level_up', 'completed', 'natalia', 82, 'b', '2023-01-01', '2023-01-10', '2025-01-10'),
+(3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', '2023-01-01', '2023-01-10', '2025-01-10'),
+(4, 4, 1, 'level_up', 'completed', 'weania', 55, 'bc', '2023-01-01', '2023-01-10', '2024-01-10'),
+(5, 5, 1, 'level_up', 'completed', 'weania', 45, 'c', '2023-01-01', '2023-01-10', '2024-01-10'),
+(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', '2023-01-01', '2023-01-10', '2025-01-10');
+
+-- --------------------------------------------------------
+-- Ongoing Certifications
+-- --------------------------------------------------------
+
+-- SaspriK 1: Natalia A -> Level Up -> Weania (pending_self_team_formation)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date) VALUES
+(7, 1, 1, 'level_up', 'pending_self_team_formation', 'weania', '2026-05-01 10:00:00', '2026-05-08 10:00:00');
+
+-- SaspriK 2: Natalia B -> Level Up -> Weania (self_review)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date) VALUES
+(8, 2, 1, 'level_up', 'self_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+
+-- SaspriK 3: Natalia AB -> Level Up -> Weania (pending_peer_team_formation)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date) VALUES
+(9, 3, 1, 'level_up', 'pending_peer_team_formation', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-08 10:00:00');
+
+-- SaspriK 4: Weania BC -> Renewal -> Weania (peer_review)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date) VALUES
+(10, 4, 1, 'renewal', 'peer_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+
+-- SaspriK 5: Weania C -> Renewal -> Weania (external_review)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date, external_review_due_date) VALUES
+(11, 5, 1, 'renewal', 'external_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+
+-- SaspriK 6: Natalia A -> Level Up -> Weania (completed)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
+(12, 6, 1, 'level_up', 'completed', 'weania', 88, 'ab', '2026-05-01 10:00:00', '2026-05-10 10:00:00', '2028-05-10 10:00:00');
+
+-- Initial Valid Certs for Additionals (SASPRI-K 7-11)
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
+(13, 7, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
+(14, 8, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
+(15, 9, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
+(16, 10, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
+(17, 11, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10');
 
 -- --------------------------------------------------------
 -- Team Members
 -- --------------------------------------------------------
 
-INSERT INTO self_team_members (id, certification_id, user_id, status, role) VALUES
-(1, 2, 3, 'approved', 'leader'),
-(2, 2, 4, 'approved', 'member'),
-(3, 2, 5, 'approved', 'member'),
-(4, 4, 9, 'approved', 'leader'),
-(5, 4, 10, 'approved', 'member'),
-(6, 4, 11, 'approved', 'member'),
-(7, 5, 9, 'pending', 'member'),
-(8, 5, 10, 'pending', 'leader'),
-(9, 5, 11, 'pending', 'member'),
-(10, 7, 13, 'approved', 'leader'),
-(11, 7, 14, 'approved', 'member'),
-(12, 7, 15, 'approved', 'member'),
-(13, 9, 17, 'approved', 'leader'),
-(14, 9, 18, 'approved', 'member'),
-(15, 9, 19, 'approved', 'member');
+-- Self Teams
+-- Rep 1 (pending formation): 2 approved, 1 pending
+INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+(7, 15, 'approved', 'leader'), (7, 16, 'approved', 'member'), (7, 17, 'pending', 'member');
 
-INSERT INTO peer_team_members (id, certification_id, user_id, status, role) VALUES
-(1, 4, 1, 'approved', 'facilitator'),
-(2, 4, 2, 'approved', 'leader'),
-(3, 4, 6, 'approved', 'member'),
-(4, 7, 1, 'pending', 'facilitator'),
-(5, 7, 2, 'pending', 'leader'),
-(6, 7, 6, 'pending', 'member'),
-(7, 9, 1, 'approved', 'facilitator'),
-(8, 9, 8, 'approved', 'leader'),
-(9, 9, 12, 'approved', 'member');
+-- Rep 2 (self review): 3 approved
+INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+(8, 35, 'approved', 'leader'), (8, 36, 'approved', 'member'), (8, 37, 'approved', 'member');
+
+-- Rep 3 (pending peer): Self approved, Peer mixed
+INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+(9, 55, 'approved', 'leader'), (9, 56, 'approved', 'member'), (9, 57, 'approved', 'member');
+
+INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+(9, 1, 'approved', 'facilitator'), (9, 34, 'pending', 'leader'), (9, 14, 'rejected', 'member');
+
+-- Rep 4 (peer review): All approved
+INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+(10, 75, 'approved', 'leader'), (10, 76, 'approved', 'member'), (10, 77, 'approved', 'member');
+
+INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+(10, 2, 'approved', 'facilitator'), (10, 14, 'approved', 'leader'), (10, 34, 'approved', 'member');
+
+-- Rep 5 (external review): All approved
+INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+(11, 95, 'approved', 'leader'), (11, 96, 'approved', 'member'), (11, 97, 'approved', 'member');
+
+INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+(11, 3, 'approved', 'facilitator'), (11, 14, 'approved', 'leader'), (11, 54, 'approved', 'member');
 
 -- --------------------------------------------------------
 -- Indicator Scores
 -- --------------------------------------------------------
 
-INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, evidence_url) VALUES
--- Certification 2 (Self Review In Progress - Draft)
-(2, 1, 100, '/uploads/evidence/2/self_1.pdf'),
-(2, 2, 75, '/uploads/evidence/2/self_2.pdf'),
-(2, 3, 50, '/uploads/evidence/2/self_3.pdf'),
-(2, 4, 100, NULL),
-(2, 5, 25, NULL),
--- Certification 7 (Pending Peer Team Formation - Passed Self Review)
-(7, 1, 100, '/uploads/evidence/7/self_1.pdf'),
-(7, 2, 100, '/uploads/evidence/7/self_2.pdf'),
-(7, 3, 75, '/uploads/evidence/7/self_3.pdf'),
-(7, 4, 50, '/uploads/evidence/7/self_4.pdf'),
-(7, 5, 100, '/uploads/evidence/7/self_5.pdf'),
-(7, 6, 75, '/uploads/evidence/7/self_6.pdf'),
-(7, 7, 25, '/uploads/evidence/7/self_7.pdf'),
-(7, 8, 100, '/uploads/evidence/7/self_8.pdf'),
-(7, 9, 50, '/uploads/evidence/7/self_9.pdf'),
-(7, 10, 100, '/uploads/evidence/7/self_10.pdf'),
-(7, 11, 75, NULL),
-(7, 12, 100, NULL),
-(7, 13, 25, NULL),
-(7, 14, 50, NULL),
-(7, 15, 100, NULL),
--- Certification 9 (Peer Review In Progress - Passed Self Review)
-(9, 1, 75, '/uploads/evidence/9/self_1.pdf'),
-(9, 2, 50, '/uploads/evidence/9/self_2.pdf'),
-(9, 3, 100, '/uploads/evidence/9/self_3.pdf'),
-(9, 4, 100, '/uploads/evidence/9/self_4.pdf'),
-(9, 5, 25, '/uploads/evidence/9/self_5.pdf'),
-(9, 6, 75, '/uploads/evidence/9/self_6.pdf'),
-(9, 7, 50, '/uploads/evidence/9/self_7.pdf'),
-(9, 8, 100, '/uploads/evidence/9/self_8.pdf'),
-(9, 9, 100, '/uploads/evidence/9/self_9.pdf'),
-(9, 10, 25, '/uploads/evidence/9/self_10.pdf'),
-(9, 11, 50, NULL),
-(9, 12, 75, NULL),
-(9, 13, 100, NULL),
-(9, 14, 100, NULL),
-(9, 15, 25, NULL);
+-- Rep 2 (self_review): partial self
+INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score) VALUES
+(8, 1, 100), (8, 2, 75), (8, 3, 50);
+
+-- Rep 3 (pending_peer): full self
+INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score)
+SELECT 9, id, 100 FROM indicators LIMIT 42;
+
+-- Rep 4 (peer_review): full self, partial peer
+INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
+SELECT 10, id, 100, CASE WHEN id <= 5 THEN 100 ELSE NULL END, CASE WHEN id <= 5 THEN 'identical' ELSE NULL END FROM indicators LIMIT 42;
+
+-- Rep 5 (external_review): full self, full peer
+INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
+SELECT 11, id, 75, 100, 'different' FROM indicators LIMIT 42;
 
 SET FOREIGN_KEY_CHECKS = 1;
