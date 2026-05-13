@@ -201,18 +201,41 @@ INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
 
 -- Rep 2 (self_review): partial self
 INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score) VALUES
-(8, 1, 100), (8, 2, 75), (8, 3, 50);
+(8, 1, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100)), 
+(8, 2, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100)), 
+(8, 3, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100));
 
 -- Rep 3 (pending_peer): full self
 INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score)
-SELECT 9, id, 100 FROM indicators LIMIT 42;
+SELECT 9, id, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) FROM indicators LIMIT 42;
 
 -- Rep 4 (peer_review): full self, partial peer
 INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
-SELECT 10, id, 100, CASE WHEN id <= 5 THEN 100 ELSE NULL END, CASE WHEN id <= 5 THEN 'identical' ELSE NULL END FROM indicators LIMIT 42;
+SELECT 10, id, s, p, 
+    CASE 
+        WHEN p IS NULL THEN NULL 
+        WHEN s = p THEN 'identical' 
+        ELSE ELT(FLOOR(1 + RAND() * 2), 'different', 'agreed') 
+    END
+FROM (
+    SELECT id, 
+           ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as s,
+           CASE WHEN id <= 5 THEN ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) ELSE NULL END as p
+    FROM indicators LIMIT 42
+) as tmp;
 
 -- Rep 5 (external_review): full self, full peer
 INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
-SELECT 11, id, 75, 100, 'different' FROM indicators LIMIT 42;
+SELECT 11, id, s, p, 
+    CASE 
+        WHEN s = p THEN 'identical' 
+        ELSE ELT(FLOOR(1 + RAND() * 2), 'different', 'agreed') 
+    END
+FROM (
+    SELECT id, 
+           ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as s,
+           ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as p
+    FROM indicators LIMIT 42
+) as tmp;
 
 SET FOREIGN_KEY_CHECKS = 1;
