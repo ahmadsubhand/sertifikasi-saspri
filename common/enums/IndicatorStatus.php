@@ -11,9 +11,9 @@ class IndicatorStatus
     public static function list()
     {
         return [
-            self::IDENTICAL => 'Identical',
-            self::AGREED => 'Agreed',
-            self::DIFFERENT => 'Different',
+            self::IDENTICAL => 'Sama',
+            self::AGREED => 'Sepakat',
+            self::DIFFERENT => 'Berbeda',
         ];
     }
 

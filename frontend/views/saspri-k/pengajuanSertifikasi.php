@@ -5,6 +5,10 @@
 /** @var \common\models\District $district */
 /** @var \common\models\SelfTeamMember[] $self_team_members */
 
+use common\enums\ApprovalStatus;
+use common\enums\CertificateLevel;
+use common\enums\CertificationPurpose;
+use common\enums\TeamRole;
 use yii\helpers\Html;
 
 ?>
@@ -67,8 +71,8 @@ use yii\helpers\Html;
         <h2>Informasi Sertifikasi</h2>
         <p>
             SASPRI-K: <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)<br>
-            Tingkat: <strong><?= Html::encode(ucfirst($certification->level)) ?></strong><br>
-            Tujuan: <strong><?= Html::encode($certification->purpose === 'level_up' ? 'Level Up' : 'Renewal') ?></strong>
+            Tingkat: <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong><br>
+            Tujuan: <strong><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></strong>
         </p>
 
         <hr>
@@ -115,7 +119,7 @@ use yii\helpers\Html;
                     <td>
                         <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'user_id' => $member->user->id], 'post') ?>
                         <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
-                            <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
+                            <?php foreach (TeamRole::list() as $value => $label): ?>
                             <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
                                 <?= $label ?>
                             </option>
@@ -125,7 +129,7 @@ use yii\helpers\Html;
                     </td>
                     <td>
                         <span class="badge bg-<?= $member->status === 'approved' ? 'success' : ($member->status === 'pending' ? 'warning' : 'danger') ?>">
-                            <?= ucfirst($member->status) ?>
+                            <?= ApprovalStatus::list()[$member->status] ?>
                         </span>
                     </td>
                     <td>

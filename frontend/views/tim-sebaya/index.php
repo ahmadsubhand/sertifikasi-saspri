@@ -1,5 +1,10 @@
 <?php
 
+use common\enums\ApprovalStatus;
+use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
+use common\enums\CertificationStatus;
+use common\enums\TeamRole;
 use yii\helpers\Html;
 
 /** @var \common\models\PeerTeamMember[] $peer_team_member_request */
@@ -33,9 +38,9 @@ use yii\helpers\Html;
                     </td>
                     <td><?= $member->certification->saspriK->address ?>
                     </td>
-                    <td><?= ucfirst($member->certification->level) ?></td>
-                    <td><?= ucfirst($member->role) ?></td>
-                    <td><?= ucfirst($member->status) ?></td>
+                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
+                    <td><?= TeamRole::list()[$member->role] ?></td>
+                    <td><?= ApprovalStatus::list()[$member->status] ?></td>
                     <td><?=
                             $member->certification->peer_team_due_date
                             ? date('Y-m-d', strtotime($member->certification->peer_team_due_date))
@@ -77,8 +82,8 @@ use yii\helpers\Html;
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
-                    <td><?= ucfirst($member->certification->level) ?></td>
-                    <td><?= $member->certification->status ?></td>
+                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
+                    <td><?= CertificationStatus::list()[$member->certification->status] ?></td>
                     <td><?=
                         $member->certification->peer_review_due_date
                         ? date('Y-m-d', strtotime($member->certification->peer_review_due_date))
@@ -115,7 +120,7 @@ use yii\helpers\Html;
                 <tr>
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
-                    <td><?= ucfirst($member->certification->level) ?></td>
+                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
                     <td><?=
                         $member->certification->submitted_at
                         ? date('Y-m-d', strtotime($member->certification->submitted_at))
@@ -126,7 +131,7 @@ use yii\helpers\Html;
                         ? date('Y-m-d', strtotime($member->certification->issued_at))
                         : '-'
                     ?></td>
-                    <td><?= ucfirst($member->certification->grade ?: '-') ?></td>
+                    <td><?= CertificateGrade::list()[$member->certification->grade] ?: '-' ?></td>
                     <td>
                         <button class="btn btn-primary">Lihat</button>
                     </td>

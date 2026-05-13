@@ -1,5 +1,6 @@
 <?php
 
+use common\enums\CertificateGrade;
 use yii\helpers\Html;
 
 /** @var \common\models\Certification[] $certifications */
@@ -34,7 +35,7 @@ $this->title = 'Penerbitan Sertifikasi';
                         ? date('Y-m-d', strtotime($certification->external_review_due_date)) 
                         : '-' 
                     ?></td>
-                    <td><?= Html::encode(ucfirst($certification->grade)) ?></td>
+                    <td><?= Html::encode(CertificateGrade::list()[$certification->grade] ?? '-') ?></td>
                     <td>
                         <a href="<?= \yii\helpers\Url::to(['external-review', 'certification_id' => $certification->id]) ?>" class="btn btn-primary">
                             Nilai

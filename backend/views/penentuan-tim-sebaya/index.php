@@ -1,5 +1,6 @@
 <?php
 
+use common\enums\CertificateLevel;
 use yii\helpers\Html;
 
 /** @var \common\models\Certification[] $certifications */
@@ -28,7 +29,7 @@ $this->title = 'Permintaan Pembentukan Tim Sebaya';
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= Html::encode(ucfirst($certification->saspriK->region_name)) ?></td>
                     <td><?= Html::encode($certification->saspriK->address) ?></td>
-                    <td><?= Html::encode(ucfirst($certification->level)) ?></td>
+                    <td><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></td>
                     <td><?= 
                         $certification->peer_team_due_date 
                         ? date('Y-m-d', strtotime($certification->peer_team_due_date)) 

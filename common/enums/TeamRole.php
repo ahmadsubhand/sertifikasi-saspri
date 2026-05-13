@@ -11,9 +11,9 @@ class TeamRole
     public static function list()
     {
         return [
-            self::LEADER => 'Leader',
-            self::MEMBER => 'Member',
-            self::FACILITATOR => 'Facilitator',
+            self::LEADER => 'Ketua',
+            self::MEMBER => 'Anggota',
+            self::FACILITATOR => 'Pendamping',
         ];
     }
 

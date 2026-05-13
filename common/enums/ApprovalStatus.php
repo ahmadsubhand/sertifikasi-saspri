@@ -11,9 +11,9 @@ class ApprovalStatus
     public static function list()
     {
         return [
-            self::PENDING => 'Pending',
-            self::APPROVED => 'Approved',
-            self::REJECTED => 'Rejected',
+            self::PENDING => 'Menunggu',
+            self::APPROVED => 'Disetujui',
+            self::REJECTED => 'Ditolak',
         ];
     }
 

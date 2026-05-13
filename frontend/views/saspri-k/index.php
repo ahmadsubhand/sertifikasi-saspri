@@ -1,5 +1,7 @@
 <?php
 
+use common\enums\CertificateLevel;
+
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\Certification $valid_certificate */
 /** @var \common\models\Certification[] $completed_certifications */
@@ -101,7 +103,7 @@
                 <div class="d-flex flex-row gap-2">
                     <div>Level Sertifikat</div>
                     <div>:</div>
-                    <div><?=  $valid_certificate->level ?></div>
+                    <div><?=  CertificateLevel::list()[$valid_certificate->level] ?? '-' ?></div>
                 </div>
                 <div class="d-flex flex-row gap-2">
                     <div>Nomor Sertifikat</div>
@@ -132,7 +134,7 @@
                     <th scope="row"><?= $index + 1 ?></th>
                     <td><?= $certification->code ?: '-' ?>
                     </td>
-                    <td><?= ucfirst($certification->level) ?></td>
+                    <td><?= CertificateLevel::list()[$certification->level] ?? '-' ?></td>
                     <td><?= $certification->issued_at ? date('Y-m-d', strtotime($certification->issued_at)) : '-' ?>
                     </td>
                     <td>

@@ -5,6 +5,9 @@
 /** @var \common\models\District $district */
 /** @var \common\models\PeerTeamMember[] $peer_team_members */
 
+use common\enums\ApprovalStatus;
+use common\enums\CertificateLevel;
+use common\enums\CertificationPurpose;
 use common\enums\UserRole;
 use yii\helpers\Html;
 
@@ -69,8 +72,8 @@ $this->title = 'Pembentukan Tim Sebaya';
         <h2>Informasi Sertifikasi</h2>
         <p>
             SASPRI-K: <strong><?= Html::encode($saspri_k->cooperative_name) ?></strong> (<?= Html::encode($saspri_k->region_name) ?>)<br>
-            Tingkat: <strong><?= Html::encode(ucfirst($certification->level)) ?></strong><br>
-            Tujuan: <strong><?= Html::encode(ucfirst($certification->purpose)) ?></strong>
+            Tingkat: <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong><br>
+            Tujuan: <strong><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></strong>
         </p>
 
         <hr>
@@ -142,7 +145,7 @@ $this->title = 'Pembentukan Tim Sebaya';
                     </td>
                     <td>
                         <span class="badge bg-<?= $member->status === 'approved' ? 'success' : ($member->status === 'pending' ? 'warning' : 'danger') ?>">
-                            <?= ucfirst($member->status) ?>
+                            <?= ApprovalStatus::list()[$member->status] ?? ucfirst($member->status) ?>
                         </span>
                     </td>
                     <td>

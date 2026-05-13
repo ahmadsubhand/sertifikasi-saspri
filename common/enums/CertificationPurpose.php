@@ -10,8 +10,8 @@ class CertificationPurpose
     public static function list()
     {
         return [
-            self::LEVEL_UP => 'Level Up',
-            self::RENEWAL => 'Renewal',
+            self::LEVEL_UP => 'Naik Tingkat',
+            self::RENEWAL => 'Pengulangan',
         ];
     }
 

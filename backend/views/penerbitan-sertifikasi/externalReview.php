@@ -1,5 +1,6 @@
 <?php
 
+use common\enums\CertificateLevel;
 use common\enums\IndicatorStatus;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -44,7 +45,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <div class="text-muted d-flex align-items-center gap-2 mb-2">
         <span class="badge bg-primary">Admin Nasional</span>
         <div>
-            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(ucfirst($certification->level)) ?>
+            Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
         </div>
     </div>
 

@@ -11,8 +11,8 @@ class UserRole
     public static function list()
     {
         return [
-            self::USER => 'User',
-            self::COORDINATOR => 'Coordinator',
+            self::USER => 'Anggota',
+            self::COORDINATOR => 'Wali',
             self::ADMIN => 'Admin',
         ];
     }
