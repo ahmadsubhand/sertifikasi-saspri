@@ -20,13 +20,15 @@ $subGroupResults = [];
 
 foreach ($current_child_group as $subGroup) {
     $subGroupSum = 0;
+    $indicatorCount = count($subGroup->indicators);
 
     foreach ($subGroup->indicators as $indicator) {
         $score = $indicator->indicatorScores[0]->peer_team_score ?? 0;
         $subGroupSum += $score;
     }
 
-    $subGroupWeighted = $subGroupSum * ($subGroup->weight / 100);
+    $subGroupAverage = $indicatorCount > 0 ? ($subGroupSum / $indicatorCount) : 0;
+    $subGroupWeighted = $subGroupAverage * ($subGroup->weight / 100);
     $subGroupResults[$subGroup->id] = [
         'sum' => $subGroupSum,
         'weighted' => $subGroupWeighted
@@ -256,13 +258,16 @@ $this->registerJs(<<<JS
 
         var subgroupId = $(this).data('subgroup-id');
         var subGroupSum = 0;
+        var scoreSelects = $('.score-select[data-subgroup-id="' + subgroupId + '"]');
+        var indicatorCount = scoreSelects.length;
         
-        $('.score-select[data-subgroup-id="' + subgroupId + '"]').each(function() {
+        scoreSelects.each(function() {
             subGroupSum += parseFloat($(this).val()) || 0;
         });
         
         var subGroupWeight = parseFloat($('#subgroup-weighted-' + subgroupId).data('weight')) || 0;
-        var subGroupWeighted = subGroupSum * (subGroupWeight / 100);
+        var subGroupAverage = indicatorCount > 0 ? (subGroupSum / indicatorCount) : 0;
+        var subGroupWeighted = subGroupAverage * (subGroupWeight / 100);
         
         $('#subgroup-weighted-' + subgroupId).text(subGroupWeighted.toFixed(2));
         

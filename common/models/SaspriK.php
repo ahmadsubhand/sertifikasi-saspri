@@ -190,7 +190,7 @@ class SaspriK extends \yii\db\ActiveRecord
         }
 
         $certification = new Certification();
-        if ($valid_certificate->grade === CertificateGrade::C || $valid_certificate->grade === CertificateGrade::D) {
+        if ($valid_certificate->grade === CertificateGrade::BC || $valid_certificate->grade === CertificateGrade::C) {
             $certification->purpose = CertificationPurpose::RENEWAL;
             $certification->level = $valid_certificate->level;
         } else {

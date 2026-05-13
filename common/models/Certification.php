@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\enums\ApprovalStatus;
+use common\enums\CertificateGrade;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\helpers\UserHelper;
@@ -389,5 +390,55 @@ class Certification extends \yii\db\ActiveRecord
                 'certification_id' => $this->id,
                 'indicator_id' => $indicator_id,
             ]);
+    }
+
+    public function calculatePeerReviewTotalScore(): float
+    {
+        $total_score = 0;
+        $root_groups = $this->assessment->getAllRootGroups();
+
+        foreach ($root_groups as $root_group) {
+            $group_total_weighted_sum = 0;
+            $sub_groups = $this->assessment->getCurrentChildGroups($root_group, $this->id);
+
+            foreach ($sub_groups as $sub_group) {
+                $sub_group_sum = 0;
+                $indicator_count = count($sub_group->indicators);
+                
+                foreach ($sub_group->indicators as $indicator) {
+                    $score_model = $indicator->indicatorScores[0] ?? null;
+                    $sub_group_sum += $score_model ? ($score_model->peer_team_score ?? 0) : 0;
+                }
+
+                $sub_group_average = $indicator_count > 0 ? ($sub_group_sum / $indicator_count) : 0;
+                $group_total_weighted_sum += $sub_group_average * ($sub_group->weight / 100);
+            }
+            $total_score += $group_total_weighted_sum * ($root_group->weight / 100);
+        }
+
+        return $total_score;
+    }
+
+    public function calculateGrade(float $score): string
+    {
+        if ($score >= 90) {
+            return CertificateGrade::A;
+        } elseif ($score >= 75) {
+            return CertificateGrade::AB;
+        } elseif ($score >= 60) {
+            return CertificateGrade::B;
+        } elseif ($score >= 50) {
+            return CertificateGrade::BC;
+        } else {
+            return CertificateGrade::C;
+        }
+    }
+
+    public function updateTemporaryTotalScoresAndGrade(): self
+    {
+        $score = $this->calculatePeerReviewTotalScore();
+        $this->total_score = (int) round($score);
+        $this->grade = $this->calculateGrade($score);
+        return $this;
     }
 }
