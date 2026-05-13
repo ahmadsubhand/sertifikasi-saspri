@@ -16,6 +16,7 @@ use yii\web\UploadedFile;
  * @property int $certification_id
  * @property int|null $self_team_score
  * @property int|null $peer_team_score
+ * @property int|null $final_score
  * @property string|null $status
  * @property string|null $evidence_url
  *
@@ -38,9 +39,9 @@ class IndicatorScore extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['self_team_score', 'peer_team_score', 'status', 'evidence_url'], 'default', 'value' => null],
+            [['self_team_score', 'peer_team_score', 'final_score', 'status', 'evidence_url'], 'default', 'value' => null],
             [['indicator_id', 'certification_id'], 'required'],
-            [['indicator_id', 'certification_id', 'self_team_score', 'peer_team_score'], 'integer'],
+            [['indicator_id', 'certification_id', 'self_team_score', 'peer_team_score', 'final_score'], 'integer'],
             [['status', 'evidence_url'], 'string', 'max' => 255],
             [['indicator_id', 'certification_id'], 'unique', 'targetAttribute' => ['indicator_id', 'certification_id']],
             [['certification_id'], 'exist', 'skipOnError' => true, 'targetClass' => Certification::class, 'targetAttribute' => ['certification_id' => 'id']],
@@ -59,6 +60,7 @@ class IndicatorScore extends \yii\db\ActiveRecord
             'certification_id' => 'Certification ID',
             'self_team_score' => 'Self Team Score',
             'peer_team_score' => 'Peer Team Score',
+            'final_score' => 'Final Score',
             'status' => 'Status',
             'evidence_url' => 'Evidence Url',
         ];
@@ -105,6 +107,18 @@ class IndicatorScore extends \yii\db\ActiveRecord
             );
         }
         $this->peer_team_score = $value;
+        return $this;
+    }
+
+    public function fillFinalScore(int $score)
+    {
+        $value = (int) $score;
+        if ($value < 0 || $value > 100) {
+            throw new BadRequestHttpException(
+                'Terdapat penilaian yang di luar rentang 0-100'
+            );
+        }
+        $this->final_score = $value;
         return $this;
     }
 

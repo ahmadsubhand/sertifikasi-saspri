@@ -258,6 +258,24 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function submitExternalReview(): Certification
+    {
+        $existing_scores = $this->indicatorScores;
+
+        foreach ($existing_scores as $existing_score) {
+            if (!$existing_score->final_score) {
+                throw new BadRequestHttpException(
+                    'Seluruh indikator wajib diberikan penilaian final sebelum finalisasi'
+                );
+            }
+        }
+
+        $this->status = CertificationStatus::COMPLETED;
+        $this->external_review_due_date = date('Y-m-d H:i:s');
+        $this->issued_at = date('Y-m-d H:i:s');
+        return $this;
+    }
+
     public function addSelfTeamMembers(array $user_ids)
     {
         foreach ($user_ids as $user_id) {
@@ -380,6 +398,24 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
+    public function saveExternalReviewScores(array $indicator_scores)
+    {
+        try {
+            foreach ($indicator_scores as $indicator_id => $indicator_score) {
+                $indicator_score_model = $this->findOrCreateIndicatorScore($indicator_id);
+                $indicator_score_model->fillFinalScore($indicator_score['final_score'] ?? 0)
+                    ->save(false);
+            }
+    
+            return $this;
+        } catch (Exception $error) {
+            if ($error instanceof BadRequestHttpException) {
+                throw new BadRequestHttpException($error->getMessage());
+            }
+            throw $error;
+        }
+    }
+
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore 
     {
         return $this->getIndicatorScores()
@@ -419,6 +455,33 @@ class Certification extends \yii\db\ActiveRecord
         return $total_score;
     }
 
+    public function calculateExternalReviewTotalScore(): float
+    {
+        $total_score = 0;
+        $root_groups = $this->assessment->getAllRootGroups();
+
+        foreach ($root_groups as $root_group) {
+            $group_total_weighted_sum = 0;
+            $sub_groups = $this->assessment->getCurrentChildGroups($root_group, $this->id);
+
+            foreach ($sub_groups as $sub_group) {
+                $sub_group_sum = 0;
+                $indicator_count = count($sub_group->indicators);
+                
+                foreach ($sub_group->indicators as $indicator) {
+                    $score_model = $indicator->indicatorScores[0] ?? null;
+                    $sub_group_sum += $score_model ? ($score_model->final_score ?? 0) : 0;
+                }
+
+                $sub_group_average = $indicator_count > 0 ? ($sub_group_sum / $indicator_count) : 0;
+                $group_total_weighted_sum += $sub_group_average * ($sub_group->weight / 100);
+            }
+            $total_score += $group_total_weighted_sum * ($root_group->weight / 100);
+        }
+
+        return $total_score;
+    }
+
     public function calculateGrade(float $score): string
     {
         if ($score >= 90) {
@@ -439,6 +502,34 @@ class Certification extends \yii\db\ActiveRecord
         $score = $this->calculatePeerReviewTotalScore();
         $this->total_score = (int) round($score);
         $this->grade = $this->calculateGrade($score);
+        return $this;
+    }
+
+    public function updateFinalTotalScoresAndGrade(): self
+    {
+        $score = $this->calculateExternalReviewTotalScore();
+        $this->total_score = (int) round($score);
+        $this->grade = $this->calculateGrade($score);
+        $this->generateCertificationCodeAndDueDate();
+        return $this;
+    }
+
+    public function generateCertificationCodeAndDueDate(): self
+    {
+        $issuedAt = $this->issued_at ? strtotime($this->issued_at) : time();
+        $year = date('Y', $issuedAt);
+        $districtCode = $this->saspriK->district->code ?? '0000';
+        $levelCode = strtoupper($this->level);
+        
+        $this->code = sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
+
+        $interval = 2;
+        if ($this->grade === CertificateGrade::A || $this->grade === CertificateGrade::BC) {
+            $interval = 1;
+        }
+
+        $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", $issuedAt));
+        
         return $this;
     }
 }

@@ -24,6 +24,7 @@ class m260504_045531_create_indicator_scores_table extends Migration
             'self_team_score' => $this->integer(),
             'peer_team_score' => $this->integer(), // need interval?
             'status' => $this->string(),
+            'final_score' => $this->integer(),
             'evidence_url' => $this->string(),
         ]);
 
