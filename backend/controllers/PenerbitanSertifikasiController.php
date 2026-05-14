@@ -2,7 +2,6 @@
 
 namespace backend\controllers;
 
-use common\controllers\AssessmentReviewTrait;
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
 use common\models\Certification;
@@ -18,8 +17,6 @@ use yii\web\UnprocessableEntityHttpException;
 
 class PenerbitanSertifikasiController extends Controller
 {
-    use AssessmentReviewTrait;
-
     public function behaviors()
     {
         return [

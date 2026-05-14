@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use common\controllers\AssessmentReviewTrait;
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
@@ -23,8 +22,6 @@ use yii\web\UnprocessableEntityHttpException;
 
 class TimSebayaController extends Controller
 {
-    use AssessmentReviewTrait;
-
     public function behaviors()
     {
         return [
