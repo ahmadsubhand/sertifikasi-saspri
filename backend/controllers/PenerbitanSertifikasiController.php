@@ -6,6 +6,9 @@ use common\enums\CertificationStatus;
 use common\enums\UserRole;
 use common\helpers\TeamHelper;
 use common\models\Certification;
+use common\models\PeerTeamMember;
+use common\models\SaspriK;
+use common\models\SelfTeamMember;
 use Exception;
 use Yii;
 use yii\filters\AccessControl;
@@ -150,6 +153,21 @@ class PenerbitanSertifikasiController extends Controller
             }
             throw $error;
         }
+    }
+
+    public function actionDetail($case_id)
+    {
+        $cert = Certification::find()->andWhere(['id' => $case_id])->asArray()->one();
+        $saspri_k = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
+        $self_team = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        $peer_team = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        return $this->render('detail', [
+            'id' => $case_id,
+            'saspri' => $saspri_k,
+            'cert' => $cert,
+            'self_team' => $self_team,
+            'peer_team' => $peer_team,
+        ]);
     }
 
     protected function findCertificationOrFail(int $certification_id): Certification

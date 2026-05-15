@@ -7,6 +7,7 @@ use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\helpers\UserHelper;
 use common\models\Certification;
+use common\models\PeerTeamMember;
 use common\models\SaspriK;
 use common\models\SelfTeamMember;
 use common\models\User;
@@ -29,26 +30,26 @@ class SaspriKController extends Controller
     public function behaviors()
     {
         return [
-          'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-              [
-                'allow' => true,
-                'roles' => [UserRole::COORDINATOR],
-              ]
-            ]
-          ],
-          'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => [
-              'tambah-anggota' => ['post'],
-              'hapus-anggota' => ['delete'],
-              'tambah-anggota-tim-mandiri' => ['post'],
-              'hapus-anggota-tim-mandiri' => ['delete'],
-              'ubah-peran-anggota-tim-mandiri' => ['post'],
-              'ajukan-sertifikasi' => ['post'],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::COORDINATOR],
+                    ]
+                ]
             ],
-          ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'tambah-anggota' => ['post'],
+                    'hapus-anggota' => ['delete'],
+                    'tambah-anggota-tim-mandiri' => ['post'],
+                    'hapus-anggota-tim-mandiri' => ['delete'],
+                    'ubah-peran-anggota-tim-mandiri' => ['post'],
+                    'ajukan-sertifikasi' => ['post'],
+                ],
+            ],
         ];
     }
 
@@ -56,10 +57,12 @@ class SaspriKController extends Controller
     {
         try {
             $saspri_k = $this->findSaspriKAsCoordinator();
+            // find alternatives pls
+            $saspri_k_arr = SaspriK::find()->andWhere(['coordinator_id' => Yii::$app->user->id])->asArray()->one();
 
             return $this->render('index', [
-                'saspri_k' => $saspri_k,
-                'valid_certificate' => $saspri_k->validCertificate,
+                'saspri_k' => $saspri_k_arr,
+                'valid_certificate' => $saspri_k->validCertificateAsArray,
                 'completed_certifications' => $saspri_k->getCertifications()
                     ->where(['status' => CertificationStatus::COMPLETED])
                     ->all(),
@@ -112,7 +115,7 @@ class SaspriKController extends Controller
 
                 Yii::$app->session->setFlash(
                     'success',
-                    implode(', ', $valid_users) .' berhasil ditambahkan ke SASPRI-K ' . $saspri_k->region_name
+                    implode(', ', $valid_users) . ' berhasil ditambahkan ke SASPRI-K ' . $saspri_k->region_name
                 );
                 return $this->redirect(['index']);
             }
@@ -190,7 +193,7 @@ class SaspriKController extends Controller
     {
         try {
             Yii::$app->response->format = Response::FORMAT_JSON;
-    
+
             $saspri_k = $this->findSaspriKAsCoordinator();
             $certification = $saspri_k->onGoingCertification;
             $users = $this->getAvailableSelfTeamMembersQuery($saspri_k, $certification)
@@ -198,7 +201,7 @@ class SaspriKController extends Controller
                 ->limit(10)
                 ->asArray()
                 ->all();
-    
+
             return $users;
         } catch (Exception $error) {
             if ($error instanceof ForbiddenHttpException) {
@@ -231,7 +234,7 @@ class SaspriKController extends Controller
                 $certification->save(false); // untuk mendapatkan id jika sertifikasi baru diajukan
                 $certification->addSelfTeamMembers($array_user_ids);
 
-                Yii::$app->session->setFlash('success', implode(', ', $valid_users) .' berhasil ditambahkan ke Tim Mandiri');
+                Yii::$app->session->setFlash('success', implode(', ', $valid_users) . ' berhasil ditambahkan ke Tim Mandiri');
             }
 
             return $this->redirect(['pengajuan-sertifikasi']);
@@ -271,7 +274,7 @@ class SaspriKController extends Controller
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
                 } else if (
-                    $error instanceof NotFoundHttpException || 
+                    $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {
                     Yii::$app->session->setFlash('error', $error->getMessage());
@@ -301,7 +304,7 @@ class SaspriKController extends Controller
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
                 } else if (
-                    $error instanceof NotFoundHttpException || 
+                    $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException ||
                     $error instanceof BadRequestHttpException
                 ) {
@@ -346,6 +349,22 @@ class SaspriKController extends Controller
         }
     }
 
+    public function actionDetail($case_id)
+    {
+        $cert = Certification::find()->andWhere(['id' => $case_id])->asArray()->one();
+        $sasprik = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
+        $selfTeam = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        $peerTeam = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        return $this->render('detail', [
+            'id' => $case_id,
+            'saspri' => $sasprik,
+            'cert' => $cert,
+            'selfTeam' => $selfTeam,
+            'peerTeam' => $peerTeam,
+        ]);
+    }
+
+
     private function findSaspriKAsCoordinator()
     {
         $saspri_k = User::findOne(['id' => Yii::$app->user->id])
@@ -386,7 +405,7 @@ class SaspriKController extends Controller
         }
     }
 
-    private function ensureSelfTeamCanBeModified(Certification $certification) 
+    private function ensureSelfTeamCanBeModified(Certification $certification)
     {
         if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
             throw new UnprocessableEntityHttpException(
@@ -399,9 +418,9 @@ class SaspriKController extends Controller
     {
         $existing_member_ids = $certification
             ? $certification->getSelfTeamMembers()
-                ->select('user_id')
-                ->column()
-                : [];
+            ->select('user_id')
+            ->column()
+            : [];
 
         return $saspri_k->getUsers()
             ->where(['!=', 'id', $saspri_k->coordinator_id])

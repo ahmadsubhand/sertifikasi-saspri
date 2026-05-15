@@ -8,6 +8,8 @@ use common\enums\UserRole;
 use common\enums\TeamRole;
 use common\helpers\TeamHelper;
 use common\models\Certification;
+use common\models\PeerTeamMember;
+use common\models\SaspriK;
 use common\models\SelfTeamMember;
 use Exception;
 use Yii;
@@ -25,24 +27,24 @@ class TimMandiriController extends Controller
     public function behaviors()
     {
         return [
-          'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-              [
-                'allow' => true,
-                'roles' => [UserRole::USER],
-              ]
-            ]
-          ],
-          'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => [
-              'setuju' => ['post'],
-              'tolak' => ['post'],
-              'simpan-sementara-self-review' => ['post'],
-              'finalisasi-self-review' => ['post'],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::USER],
+                    ]
+                ]
             ],
-          ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'setuju' => ['post'],
+                    'tolak' => ['post'],
+                    'simpan-sementara-self-review' => ['post'],
+                    'finalisasi-self-review' => ['post'],
+                ],
+            ],
         ];
     }
 
@@ -92,7 +94,7 @@ class TimMandiriController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if (
                     $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException 
+                    $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
                 }
@@ -114,7 +116,7 @@ class TimMandiriController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if (
                     $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException 
+                    $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
                 }
@@ -169,7 +171,7 @@ class TimMandiriController extends Controller
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
             return $this->redirect([
-                'self-review', 
+                'self-review',
                 'certification_id' => $certification_id,
                 'page' => $targetPage,
             ]);
@@ -178,8 +180,8 @@ class TimMandiriController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof BadRequestHttpException) {
                     return $this->redirect([
-                        'self-review', 
-                        'certification_id' => $certification_id, 
+                        'self-review',
+                        'certification_id' => $certification_id,
                         'page' => $page
                     ]);
                 } else if (
@@ -213,13 +215,13 @@ class TimMandiriController extends Controller
                 if (
                     $error instanceof BadRequestHttpException ||
                     (
-                        $error instanceof UnprocessableEntityHttpException && 
+                        $error instanceof UnprocessableEntityHttpException &&
                         str_contains($error->getMessage(), 'ketua')
                     )
                 ) {
                     return $this->redirect([
-                        'self-review', 
-                        'certification_id' => $certification_id, 
+                        'self-review',
+                        'certification_id' => $certification_id,
                         'page' => 1
                     ]);
                 } else if (
@@ -232,6 +234,22 @@ class TimMandiriController extends Controller
             }
             throw $error;
         }
+    }
+
+    // cekin, butuh proteksi dari user lain mungkin
+    public function actionDetail($case_id)
+    {
+        $cert = Certification::find()->andWhere(['id' => $case_id])->asArray()->one();
+        $saspri_k = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
+        $self_team = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        $peer_team = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
+        return $this->render('detail', [
+            'id' => $case_id,
+            'saspri' => $saspri_k,
+            'cert' => $cert,
+            'self_team' => $self_team,
+            'peer_team' => $peer_team,
+        ]);
     }
 
     private function findPendingSelfTeamMemberOrFail(int $self_team_member_id): SelfTeamMember
@@ -284,5 +302,5 @@ class TimMandiriController extends Controller
             );
         }
         return $certification;
-    }    
+    }
 }

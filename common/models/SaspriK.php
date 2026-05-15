@@ -40,6 +40,7 @@ use yii\web\UnprocessableEntityHttpException;
  * @property SaspriKDocument[] $saspriKDocuments
  * @property User[] $users
  * @property Certification $validCertificate
+ * @property Certification $validCertificateAsArray
  * @property Certification|null $onGoingCertification
  */
 class SaspriK extends \yii\db\ActiveRecord
@@ -169,6 +170,10 @@ class SaspriK extends \yii\db\ActiveRecord
     public function getValidCertificate()
     {
         return $this->hasOne(Certification::class, ['id' => 'valid_certificate_id']);
+    }
+    public function getValidCertificateAsArray()
+    {
+        return $this->getValidCertificate()->asArray();
     }
 
     public function getOnGoingCertification(): ActiveQuery

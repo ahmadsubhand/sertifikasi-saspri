@@ -18,6 +18,15 @@ class CertificateLevel
             self::MATURA => 'Matura',
         ];
     }
+    public static function next()
+    {
+        return [
+            self::NATALIA => 'Weania',
+            self::WEANIA => 'Prematura',
+            self::PREMATURA => 'Matura',
+            self::MATURA => 'Matura',
+        ];
+    }
 
     public static function values()
     {

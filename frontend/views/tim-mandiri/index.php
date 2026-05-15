@@ -1,143 +1,168 @@
 <?php
 
+
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /** @var \common\models\SelfTeamMember[] $self_team_member_request */
 /** @var \common\models\SelfTeamMember[] $self_team_member_uncompleted */
 /** @var \common\models\SelfTeamMember[] $self_team_member_completed */
 ?>
 
-<div class="d-flex flex-column align-items-start gap-3">
-    <h1>Tim Mandiri</h1>
+<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+  <div class="">
+    <h3 class="fw-bold">Kegiatan Tim Mandiri</h3>
+  </div>
 
-    <div class="card p-3 d-flex flex-column gap-2">
-        <h2>Permintaan Partisipasi Tim Mandiri</h2>
-        <table class="table align-middle text-center">
-            <thead>
-                <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Wilayah</th>
-                    <th scope="col">Alamat Sekretaris</th>
-                    <th scope="col">Tingkatan</th>
-                    <th scope="col">Peran</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Tenggat Waktu Konfirmasi</th>
-                    <th scope="col">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($self_team_member_request as $index => $member): ?>
-                <tr>
-                    <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->region_name) ?>
-                    </td>
-                    <td><?= $member->certification->saspriK->address ?>
-                    </td>
-                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
-                    <td><?= TeamRole::list()[$member->role] ?></td>
-                    <td><?= ApprovalStatus::list()[$member->status] ?></td>
-                    <td><?=
-                            $member->certification->self_review_due_date
-                            ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
-                            : '-'
-                    ?></td>
-                    <td>
-                        <?= Html::a('Setuju', ['setuju', 'self_team_member_id' => $member->id], [
-                            'class' => 'btn btn-success',
-                            'data-method' => 'post',
-                        ]) ?>
-                        <?= Html::a('Tolak', ['tolak', 'self_team_member_id' => $member->id], [
-                            'class' => 'btn btn-danger',
-                            'data-method' => 'post',
-                            'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Mandiri ini?',
-                        ]) ?>
-                        <button class="btn btn-primary">Lihat</button>
-                    </td>
-                </tr>
-                <?php endforeach ?>
-            </tbody>
-        </table>
+  <div>
+    <div class="d-flex align-items-center mb-2">
+      <p class=" fw-bold h5">Permintaan Partisipasi Tim Mandiri </p>
+      <a href="#collapse-party" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
+        <i class="fa-solid fa-chevron-up"></i>
+      </a>
     </div>
-
-    <div class="card p-3 d-flex flex-column gap-2">
-        <h2>Sertifikasi Berjalan</h2>
-        <table class="table align-middle text-center">
-            <thead>
-                <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Wilayah</th>
-                    <th scope="col">Tingkatan</th>
-                    <th scope="col">Tahapan</th>
-                    <th scope="col">Tenggat Waktu Penilaian</th>
-                    <th scope="col">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($self_team_member_uncompleted as $index => $member): ?>
-                <tr>
-                    <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
-                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
-                    <td><?= CertificationStatus::list()[$member->certification->status] ?></td>
-                    <td><?=
-                        $member->certification->self_review_due_date
-                        ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
-                        : '-'
-                    ?></td>
-                    <td>
-                        <a class="btn btn-primary"
-                            href="<?= \yii\helpers\Url::to(['tim-mandiri/self-review', 'certification_id' => $member->certification->id]) ?>">
-                            Nilai
-                        </a>
-                    </td>
-                </tr>
-                <?php endforeach ?>
-            </tbody>
+    <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
+      <div class="collapse show px-4" id="collapse-party">
+        <table class="table self-request text-center">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Nama SASPRI-K</th>
+              <th scope="col">Alamat Sekretariat</th>
+              <th scope="col">Tingkatan</th>
+              <th scope="col">Peran</th>
+              <th scope="col">Status</th>
+              <th scope="col">Tenggat Waktu <br>Konfirmasi</th>
+              <th scope="col">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($self_team_member_request as $key => $member) : ?>
+              <tr>
+                <td scope="row"><?php echo (int)$key + 1 ?></th>
+                <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
+                <td><?= Html::encode($member->certification->saspriK->address) ?></td>
+                <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
+                <td><?= Html::encode(TeamRole::list()[$member->role]) ?></td>
+                <td><?= Html::encode(ApprovalStatus::list()[$member->status]) ?></td>
+                <td><?= Html::encode($member->certification->self_review_due_date
+                      ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
+                      : '-') ?>
+                </td>
+                <td>
+                  <?= $this->render("/component/_btn_opt", [
+                    'yes' => ['setuju', 'self_team_member_id' => $member->id],
+                    'no' => ['tolak', 'self_team_member_id' => $member->id],
+                    'look' => ['/tim-mandiri/detail', 'case_id' => $member->certification->id],
+                  ]); ?>
+                </td>
+              </tr>
+            <?php endforeach ?>
+          </tbody>
         </table>
+      </div>
     </div>
-
-    <div class="card p-3 d-flex flex-column gap-2">
-        <h2>Riwayat Sertifikasi</h2>
-        <table class="table align-middle text-center">
-            <thead>
-                <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Wilayah</th>
-                    <th scope="col">Tingkatan</th>
-                    <th scope="col">Tanggal Pengajuan</th>
-                    <th scope="col">Tanggal Penerbitan</th>
-                    <th scope="col">Predikat</th>
-                    <th scope="col">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($self_team_member_completed as $index => $member): ?>
-                <tr>
-                    <th scope="row"><?= $index + 1 ?></th>
-                    <td><?= ucfirst($member->certification->saspriK->region_name) ?></td>
-                    <td><?= CertificateLevel::list()[$member->certification->level] ?></td>
-                    <td><?=
-                        $member->certification->submitted_at
-                        ? date('Y-m-d', strtotime($member->certification->submitted_at))
-                        : '-'
-                    ?></td>
-                    <td><?=
-                        $member->certification->issued_at
-                        ? date('Y-m-d', strtotime($member->certification->issued_at))
-                        : '-'
-                    ?></td>
-                    <td><?= CertificateGrade::list()[$member->certification->grade] ?: '-' ?></td>
-                    <td>
-                        <button class="btn btn-primary">Lihat</button>
-                    </td>
-                </tr>
-                <?php endforeach ?>
-            </tbody>
+  </div>
+  <br>
+  <div>
+    <div class="d-flex align-items-center mb-2">
+      <p class=" fw-bold h5">Sertifikasi Berjalan </p>
+      <a href="#collapse-running" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
+        <i class="fa-solid fa-chevron-up"></i>
+      </a>
+    </div>
+    <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
+      <div class="collapse show px-4" id="collapse-running">
+        <table class="table self-request text-center">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Nama SASPRI-K</th>
+              <th scope="col">Alamat Sekretariat</th>
+              <th scope="col">Tingkatan</th>
+              <th scope="col">Tenggat Waktu <br>Penilaian</th>
+              <th scope="col">Tahapan</th>
+              <th scope="col">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($self_team_member_uncompleted as $key => $member) : ?>
+              <tr>
+                <td scope="row"><?php echo (int)$key + 1 ?></th>
+                <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
+                <td><?= Html::encode($member->certification->saspriK->address) ?></td>
+                <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
+                <td><?= Html::encode($member->certification->self_review_due_date
+                      ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
+                      : '-') ?>
+                </td>
+                <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
+                <td>
+                  <?php if (str_contains(strtolower(CertificationStatus::list()[$member->certification->status]), 'self')) : ?>
+                    <a href="<?php echo Url::to(['tim-mandiri/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-edit"></i></a>
+                  <?php else:  ?>
+                    <a href="<?php echo Url::to(['tim-mandiri/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
+                  <?php endif  ?>
+                </td>
+              </tr>
+            <?php endforeach ?>
+          </tbody>
         </table>
+      </div>
     </div>
+  </div>
+  <br>
+  <div>
+    <div class="d-flex align-items-center mb-2">
+      <p class=" fw-bold h5">Riwayat Sertifikasi</p>
+      <a href="#collapse-history" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
+        <i class="fa-solid fa-chevron-up"></i>
+      </a>
+    </div>
+    <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
+      <div class="collapse show px-4" id="collapse-history">
+        <table class="table self-request text-center">
+          <thead>
+            <tr>
+              <th scope="col">No</th>
+              <th scope="col">Nama SASPRI-K</th>
+              <th scope="col">Alamat Sekretariat</th>
+              <th scope="col">Tingkatan</th>
+              <th scope="col">Tanggal Pengajuan</th>
+              <th scope="col">Tanggal Penerbitan</th>
+              <th scope="col">Predikat</th>
+              <th scope="col">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($self_team_member_completed as $key => $member) : ?>
+              <tr>
+                <td scope="row"><?php echo (int)$key + 1 ?></th>
+                <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
+                <td><?= Html::encode($member->certification->saspriK->address) ?></td>
+                <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
+                <td><?= Html::encode($member->certification->submitted_at
+                      ? date('Y-m-d', strtotime($member->certification->submitted_at))
+                      : '-') ?>
+                </td>
+                <td><?= Html::encode($member->certification->issued_at
+                      ? date('Y-m-d', strtotime($member->certification->issued_at))
+                      : '-') ?>
+                </td>
+                <td><?= CertificateGrade::list()[$member->certification->grade] ?: '-' ?></td>
+                <td>
+                  <a href="<?php echo Url::to(['tim-mandiri/detail', 'id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
+                </td>
+              </tr>
+            <?php endforeach ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>

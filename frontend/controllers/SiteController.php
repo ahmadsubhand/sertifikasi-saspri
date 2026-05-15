@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\enums\UserRole;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -91,7 +92,14 @@ class SiteController extends Controller
 
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+
+            if(yii::$app->user->can(UserRole::COORDINATOR)){
+                return $this->redirect('/saspri-k');
+            } else if(yii::$app->user->can(UserRole::USER)){
+                return $this->redirect('/tim-sebaya');
+            } else{
+                return $this->goBack();
+            }
         }
 
         $model->password = '';

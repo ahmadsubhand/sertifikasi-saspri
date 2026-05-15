@@ -58,7 +58,7 @@ class District extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Regency::class, ['id' => 'regency_id']);
     }
-
+    
     /**
      * Gets query for [[SaspriKs]].
      *
