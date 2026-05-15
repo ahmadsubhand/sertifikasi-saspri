@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /** @var yii\web\View $this */
 /** @var common\models\Certification $certification */
 /** @var common\models\IndicatorGroup $current_root_group */
-/** @var common\models\IndicatorGroup[] $current_child_group */
+/** @var common\models\IndicatorGroup[] $current_child_groups */
 /** @var int $page */
 /** @var int $total_pages */
 
@@ -18,7 +18,7 @@ $this->title = 'Penerbitan Sertifikasi - Penilaian Final';
 $groupTotalScore = 0;
 $subGroupResults = [];
 
-foreach ($current_child_group as $subGroup) {
+foreach ($current_child_groups as $subGroup) {
     $subGroupSum = 0;
     $indicatorCount = count($subGroup->indicators);
 
@@ -71,7 +71,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($current_child_group as $subGroup): ?>
+                    <?php foreach ($current_child_groups as $subGroup): ?>
                         <tr class="table-light">
                             <th scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
                             <td colspan="5" class="fw-bold">

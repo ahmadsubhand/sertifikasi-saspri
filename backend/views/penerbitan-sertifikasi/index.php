@@ -35,7 +35,7 @@ $this->title = 'Penerbitan Sertifikasi';
                         ? date('Y-m-d', strtotime($certification->external_review_due_date)) 
                         : '-' 
                     ?></td>
-                    <td><?= Html::encode(CertificateGrade::list()[$certification->grade] ?? '-') ?></td>
+                    <td><?= Html::encode($certification->grade ? CertificateGrade::list()[$certification->grade] : '-') ?></td>
                     <td>
                         <a href="<?= \yii\helpers\Url::to(['external-review', 'certification_id' => $certification->id]) ?>" class="btn btn-primary">
                             Nilai

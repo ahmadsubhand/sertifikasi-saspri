@@ -22,6 +22,7 @@ class m260504_042603_create_certifications_table extends Migration
         $this->createTable('certifications', [
             'id' => $this->primaryKey(),
             'saspri_k_id' => $this->integer()->notNull(),
+            'assessment_id' => $this->integer()->notNull(),
 
             // Berkaitan dengan proses sertifikasi
             'purpose' => $this->string()->notNull(),
@@ -57,6 +58,23 @@ class m260504_042603_create_certifications_table extends Migration
             'certifications',
             'saspri_k_id',
             'saspri_k',
+            'id',
+            'CASCADE'
+        );
+
+        // creates index for column `assessment_id`
+        $this->createIndex(
+            'idx-certifications-assessment_id',
+            'certifications',
+            'assessment_id'
+        );
+
+        // add foreign key for table `assessments`
+        $this->addForeignKey(
+            'fk-certifications-assessment_id',
+            'certifications',
+            'assessment_id',
+            'assessments',
             'id',
             'CASCADE'
         );
@@ -117,6 +135,18 @@ class m260504_042603_create_certifications_table extends Migration
         $this->dropCheck(
             'chk-certifications-grade',
             'certifications',
+        );
+
+        // drops foreign key for table `assessments`
+        $this->dropForeignKey(
+            'fk-certifications-assessment_id',
+            'certifications'
+        );
+
+        // drops index for column `assessment_id`
+        $this->dropIndex(
+            'idx-certifications-assessment_id',
+            'certifications'
         );
 
         // drops foreign key for table `saspri_k`

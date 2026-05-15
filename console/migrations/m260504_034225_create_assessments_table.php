@@ -6,7 +6,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `assessments`.
  */
-class m260504_234637_create_assessments_table extends Migration
+class m260504_034225_create_assessments_table extends Migration
 {
     /**
      * {@inheritdoc}

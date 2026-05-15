@@ -1,19 +1,26 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- --------------------------------------------------------
+-- Assessments
+-- --------------------------------------------------------
+
+INSERT INTO assessments (id, title, active_at_level, level, created_at, updated_at, released_at) VALUES
+(1, '20260212 Instrument Sertifikasi SASPRI-K 2026', 'weania', 'weania', '2026-05-07 10:00:00', '2026-05-07 10:00:00', '2026-05-07 10:00:00');
+
+-- --------------------------------------------------------
 -- Indicator Groups
 -- --------------------------------------------------------
 
-INSERT INTO indicator_groups (id, parent_group_id, code, label, `order`, weight) VALUES
-(1, NULL, 'A', 'Tata Kelola Manajemen', 1, 45),
-(2, 1, 'A1', 'Sistem dan Budaya Organisasi (legalitas)', 1, 30),
-(3, 1, 'A2', 'Amanat dalam Berorganisasi (aktivitas)', 2, 70),
-(4, NULL, 'B', 'Kinerja Bisnis Kolektif', 2, 35),
-(5, 4, 'B1', 'Solidaritas Membangun Usaha Peternakan Kolektif', 1, 60),
-(6, 4, 'B2', 'Pengembangan Usaha Bisnis Kolektif', 2, 40),
-(7, NULL, 'C', 'KEPEMILIKAN ASSET & PENERAPAN IPTEK', 3, 20),
-(8, 7, 'C1', 'Realisasi Pemanfaatan IPTEK', 1, 65),
-(9, 7, 'C2', 'Intensifikasi IPTEK pengurus SASPRI-K Untuk Peningkatan Daya Saing', 2, 35);
+INSERT INTO indicator_groups (id, assessment_id, parent_group_id, code, label, `order`, weight) VALUES
+(1, 1, NULL, 'A', 'Tata Kelola Manajemen', 1, 45),
+(2, NULL, 1, 'A1', 'Sistem dan Budaya Organisasi (legalitas)', 1, 30),
+(3, NULL, 1, 'A2', 'Amanat dalam Berorganisasi (aktivitas)', 2, 70),
+(4, 1, NULL, 'B', 'Kinerja Bisnis Kolektif', 2, 35),
+(5, NULL, 4, 'B1', 'Solidaritas Membangun Usaha Peternakan Kolektif', 1, 60),
+(6, NULL, 4, 'B2', 'Pengembangan Usaha Bisnis Kolektif', 2, 40),
+(7, 1, NULL, 'C', 'KEPEMILIKAN ASSET & PENERAPAN IPTEK', 3, 20),
+(8, NULL, 7, 'C1', 'Realisasi Pemanfaatan IPTEK', 1, 65),
+(9, NULL, 7, 'C2', 'Intensifikasi IPTEK pengurus SASPRI-K Untuk Peningkatan Daya Saing', 2, 35);
 
 -- --------------------------------------------------------
 -- Indicators
@@ -284,23 +291,5 @@ INSERT INTO indicator_options (indicator_id, code, label, `order`, weight) VALUE
 (42, 'B', '41-60%', 2, 50),
 (42, 'C', '61-80%', 3, 75),
 (42, 'D', '>80%', 4, 100);
-
--- --------------------------------------------------------
--- Assessments
--- --------------------------------------------------------
-
-INSERT INTO assessments (id, title, active_at_level, level, created_at, updated_at, released_at) VALUES
-(1, '20260212 Instrument Sertifikasi SASPRI-K 2026', 'weania', 'weania', '2026-05-07 10:00:00', '2026-05-07 10:00:00', '2026-05-07 10:00:00');
-
--- --------------------------------------------------------
--- Assessment Indicator Relations
--- --------------------------------------------------------
-
-INSERT INTO assessment_indicator_relations (assessment_id, indicator_id) VALUES
-(1, 1), (1, 2), (1, 3), (1, 4), (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 10),
-(1, 11), (1, 12), (1, 13), (1, 14), (1, 15), (1, 16), (1, 17), (1, 18), (1, 19), (1, 20),
-(1, 21), (1, 22), (1, 23), (1, 24), (1, 25), (1, 26), (1, 27), (1, 28), (1, 29), (1, 30),
-(1, 31), (1, 32), (1, 33), (1, 34), (1, 35), (1, 36), (1, 37), (1, 38), (1, 39), (1, 40),
-(1, 41), (1, 42);
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -18,9 +18,8 @@ use yii\web\BadRequestHttpException;
  * @property string $updated_at
  * @property string|null $released_at
  *
- * @property AssessmentIndicatorRelation[] $assessmentIndicatorRelations
  * @property Certification[] $certifications
- * @property Indicator[] $indicators
+ * @property IndicatorGroup[] $indicatorGroups
  */
 class Assessment extends \yii\db\ActiveRecord
 {
@@ -63,16 +62,6 @@ class Assessment extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[AssessmentIndicatorRelations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAssessmentIndicatorRelations()
-    {
-        return $this->hasMany(AssessmentIndicatorRelation::class, ['assessment_id' => 'id']);
-    }
-
-    /**
      * Gets query for [[Certifications]].
      *
      * @return \yii\db\ActiveQuery
@@ -83,31 +72,25 @@ class Assessment extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Indicators]].
+     * Gets query for [[IndicatorGroups]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getIndicators()
+    public function getIndicatorGroups()
     {
-        return $this->hasMany(Indicator::class, ['id' => 'indicator_id'])->viaTable('assessment_indicator_relations', ['assessment_id' => 'id']);
+        return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id']);
     }
 
     /**
-     * @return IndicatorGroup[]
+     * Gets query for [[IndicatorGroups]].
+     *
+     * @return \yii\db\ActiveQuery
      */
-    public function getAllRootGroups()
+    public function getRootGroups()
     {
-        $indicator_group_ids = array_unique(array_map(
-            fn ($indicator) => $indicator->indicatorGroup->parent_group_id,
-            $this->indicators,
-        ));
-
-        $indicator_groups = IndicatorGroup::find()
-            ->where(['id' => $indicator_group_ids])
-            ->orderBy(['order' => SORT_ASC])
-            ->all();
-
-        return $indicator_groups;
+        return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id'])
+            ->where(['assessment_id' => $this->id])
+            ->orderBy(['order' => SORT_ASC]);
     }
 
     /**

@@ -128,18 +128,17 @@ class TimSebayaController extends Controller
         try {
             $member = $this->checkPeerReviewPermission($certification_id);
             $certification = $this->findCertificationOrFail($certification_id);
-
-            $root_groups = $certification->assessment->getAllRootGroups();
-            $current_root_group = $certification->assessment
-                ->getCurrentRootGroupOrFail($page, $root_groups);
-            $current_child_group = $certification->assessment
-                ->getCurrentChildGroups($current_root_group, $certification_id);
+            [
+                'root_groups' => $root_groups,
+                'current_root_group' => $current_root_group,
+                'current_child_groups' => $current_child_groups
+            ] = TeamHelper::getAllIndicators($certification, $page);
 
             return $this->render('peerReview', [
                 'is_leader' => $member->role === TeamRole::LEADER,
                 'certification' => $certification,
                 'current_root_group' => $current_root_group,
-                'current_child_group' => $current_child_group,
+                'current_child_groups' => $current_child_groups,
                 'page' => $page,
                 'total_pages' => count($root_groups),
             ]);

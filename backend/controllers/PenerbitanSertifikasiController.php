@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
+use common\helpers\TeamHelper;
 use common\models\Certification;
 use Exception;
 use Yii;
@@ -59,16 +60,16 @@ class PenerbitanSertifikasiController extends Controller
         try {
             $certification = $this->findCertificationOrFail($certification_id);
 
-            $root_groups = $certification->assessment->getAllRootGroups();
-            $current_root_group = $certification->assessment
-                ->getCurrentRootGroupOrFail($page, $root_groups);
-            $current_child_group = $certification->assessment
-                ->getCurrentChildGroups($current_root_group, $certification_id);
+            [
+                'root_groups' => $root_groups,
+                'current_root_group' => $current_root_group,
+                'current_child_groups' => $current_child_groups
+            ] = TeamHelper::getAllIndicators($certification, $page);
 
             return $this->render('externalReview', [
                 'certification' => $certification,
                 'current_root_group' => $current_root_group,
-                'current_child_group' => $current_child_group,
+                'current_child_groups' => $current_child_groups,
                 'page' => $page,
                 'total_pages' => count($root_groups),
             ]);

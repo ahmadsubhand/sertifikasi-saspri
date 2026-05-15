@@ -17,6 +17,7 @@ class m260504_034250_create_indicator_groups_table extends Migration
     {
         $this->createTable('indicator_groups', [
             'id' => $this->primaryKey(),
+            'assessment_id' => $this->integer(),
             'parent_group_id' => $this->integer(),
             'code' => $this->string()->notNull(),
             'label' => $this->string()->notNull(),
@@ -40,6 +41,23 @@ class m260504_034250_create_indicator_groups_table extends Migration
             'id',
             'CASCADE'
         );
+
+        // creates index for column `assessment_id`
+        $this->createIndex(
+            'idx-indicator_groups-assessment_id',
+            'indicator_groups',
+            'assessment_id'
+        );
+
+        // add foreign key for table `assessments`
+        $this->addForeignKey(
+            'fk-assessments-assessment_id',
+            'indicator_groups',
+            'assessment_id',
+            'assessments',
+            'id',
+            'CASCADE'
+        );
     }
 
     /**
@@ -47,6 +65,18 @@ class m260504_034250_create_indicator_groups_table extends Migration
      */
     public function safeDown()
     {
+        // drop foreign key for table `assessments`
+        $this->dropForeignKey(
+            'fk-assessments-assessment_id',
+            'indicator_groups',
+        );
+
+        // drop index for column `assessment_id`
+        $this->dropIndex(
+            'idx-assessments-assessment_id',
+            'assessments',
+        );
+
         // drops foreign key for table `indicator_groups`
         $this->dropForeignKey(
             'fk-indicator_groups-parent_group_id',

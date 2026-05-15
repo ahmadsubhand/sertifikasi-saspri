@@ -11,8 +11,6 @@ namespace common\models;
  * @property string $label
  * @property int $order
  *
- * @property AssessmentIndicatorRelation[] $assessmentIndicatorRelations
- * @property Assessment[] $assessments
  * @property Certification[] $certifications
  * @property IndicatorGroup $indicatorGroup
  * @property IndicatorOption[] $indicatorOptions
@@ -53,26 +51,6 @@ class Indicator extends \yii\db\ActiveRecord
             'label' => 'Label',
             'order' => 'Order',
         ];
-    }
-
-    /**
-     * Gets query for [[AssessmentIndicatorRelations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAssessmentIndicatorRelations()
-    {
-        return $this->hasMany(AssessmentIndicatorRelation::class, ['indicator_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Assessments]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAssessments()
-    {
-        return $this->hasMany(Assessment::class, ['id' => 'assessment_id'])->viaTable('assessment_indicator_relations', ['indicator_id' => 'id']);
     }
 
     /**

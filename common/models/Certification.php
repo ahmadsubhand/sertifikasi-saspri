@@ -431,7 +431,7 @@ class Certification extends \yii\db\ActiveRecord
     public function calculatePeerReviewTotalScore(): float
     {
         $total_score = 0;
-        $root_groups = $this->assessment->getAllRootGroups();
+        $root_groups = $this->assessment;
 
         foreach ($root_groups as $root_group) {
             $group_total_weighted_sum = 0;
