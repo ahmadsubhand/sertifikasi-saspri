@@ -4,7 +4,6 @@ namespace common\models;
 
 use ErrorException;
 use Exception;
-use yii\db\ActiveQuery;
 use yii\web\BadRequestHttpException;
 
 /**
@@ -20,6 +19,7 @@ use yii\web\BadRequestHttpException;
  *
  * @property Certification[] $certifications
  * @property IndicatorGroup[] $indicatorGroups
+ * @property IndicatorGroup[] $rootGroups
  */
 class Assessment extends \yii\db\ActiveRecord
 {
@@ -89,7 +89,7 @@ class Assessment extends \yii\db\ActiveRecord
     public function getRootGroups()
     {
         return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id'])
-            ->where(['assessment_id' => $this->id])
+            ->where(['parent_group_id' => null])
             ->orderBy(['order' => SORT_ASC]);
     }
 
@@ -106,39 +106,5 @@ class Assessment extends \yii\db\ActiveRecord
             }
             throw $error;
         }
-    }
-
-    /**
-     * @return IndicatorGroup[]
-     */
-    public function getCurrentChildGroups(IndicatorGroup $root_indicator_group, int $certification_id)
-    {
-        $indicator_groups = $root_indicator_group->getIndicatorGroups()
-            ->orderBy(['order' => SORT_ASC])
-            ->with([
-                'indicators' => function (ActiveQuery $query) use ($certification_id) {
-                    $query->orderBy(['order' => SORT_ASC])
-                        ->with([
-                            'indicatorOptions',
-                            'indicatorScores' => function (ActiveQuery $query) use ($certification_id) {
-                                $query->where(['certification_id' => $certification_id]);
-                            },
-                        ]);
-                },
-            ])
-            ->all();
-
-        // Kalau pakai ini malah menyusahkan type di frontend, jadi lepas saja tidak snake case
-        // foreach ($indicator_groups as &$group) {
-        //     foreach ($group['indicators'] as &$indicator) {
-        //         $indicator['indicator_options'] = $indicator['indicatorOptions'] ?? [];
-        //         unset($indicator['indicatorOptions']);
-
-        //         $indicator['indicator_scores'] = $indicator['indicatorScores'][0] ?? [];
-        //         unset($indicator['indicatorScores']);
-        //     }
-        // }
-
-        return $indicator_groups;
     }
 }

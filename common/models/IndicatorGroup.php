@@ -19,6 +19,7 @@ use yii\db\ActiveQuery;
  * @property IndicatorGroup[] $indicatorGroups
  * @property Indicator[] $indicators
  * @property IndicatorGroup $parentGroup
+ * @property IndicatorGroup[] $childGroups
  */
 class IndicatorGroup extends \yii\db\ActiveRecord
 {
@@ -104,18 +105,42 @@ class IndicatorGroup extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getChildGroups(int $certification_id)
+    public function getChildGroupsWithScore(int $certification_id)
     {
         return $this->hasMany(IndicatorGroup::class, ['parent_group_id' => 'id'])
             ->alias('ig')
+            ->orderBy(['ig.order' => SORT_ASC])
             ->with([
-                'indicators.indicatorOptions' => function (ActiveQuery $query) {
-                    $query->alias('io')->orderBy(['io.order' => SORT_ASC]);
-                }, 
-                'indicators.indicatorScores' => function (ActiveQuery $query) use ($certification_id) {
-                    $query->alias('is')->where(['is.certification_id' => $certification_id]);
+                'indicators' => function (ActiveQuery $query) use ($certification_id) {
+                    $query->alias('i')
+                        ->orderBy(['i.order' => SORT_ASC])
+                        ->with([
+                            'indicatorOptions' => function (ActiveQuery $query) {
+                                $query->alias('io')->orderBy(['io.order' => SORT_ASC]);
+                            },
+                            'indicatorScores' => function (ActiveQuery $query) use ($certification_id) {
+                                $query->alias('is')->where(['is.certification_id' => $certification_id]);
+                            },
+                        ]);
                 },
-            ])
-            ->orderBy(['ig.order' => SORT_ASC]);
+            ]);
+    }
+
+    public function getChildGroups()
+    {
+        return $this->hasMany(IndicatorGroup::class, ['parent_group_id' => 'id'])
+            ->alias('ig')
+            ->orderBy(['ig.order' => SORT_ASC])
+            ->with([
+                'indicators' => function (ActiveQuery $query) {
+                    $query->alias('i')
+                        ->orderBy(['i.order' => SORT_ASC])
+                        ->with([
+                            'indicatorOptions' => function (ActiveQuery $query) {
+                                $query->alias('io')->orderBy(['io.order' => SORT_ASC]);
+                            },
+                        ]);
+                },
+            ]);
     }
 }

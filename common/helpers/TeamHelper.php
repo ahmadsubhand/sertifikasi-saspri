@@ -20,12 +20,11 @@ class TeamHelper
 
     public static function getAllIndicators(Certification $certification, int $page)
     {
-        /** @var IndicatorGroup[] $root_groups */
-        $root_groups = $certification->assessment->getRootGroups()->all();
+        $root_groups = $certification->assessment->rootGroups;
         $current_root_group = $certification->assessment
             ->getCurrentRootGroupOrFail($page, $root_groups);
         /** @var IndicatorGroup[] $current_child_groups */
-        $current_child_groups = $current_root_group->getChildGroups($certification->id)->all();
+        $current_child_groups = $current_root_group->getChildGroupsWithScore($certification->id)->all();
 
         return [
            'root_groups' => $root_groups,

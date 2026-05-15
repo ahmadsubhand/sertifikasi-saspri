@@ -13,14 +13,14 @@ INSERT INTO assessments (id, title, active_at_level, level, created_at, updated_
 
 INSERT INTO indicator_groups (id, assessment_id, parent_group_id, code, label, `order`, weight) VALUES
 (1, 1, NULL, 'A', 'Tata Kelola Manajemen', 1, 45),
-(2, NULL, 1, 'A1', 'Sistem dan Budaya Organisasi (legalitas)', 1, 30),
-(3, NULL, 1, 'A2', 'Amanat dalam Berorganisasi (aktivitas)', 2, 70),
+(2, 1, 1, 'A1', 'Sistem dan Budaya Organisasi (legalitas)', 1, 30),
+(3, 1, 1, 'A2', 'Amanat dalam Berorganisasi (aktivitas)', 2, 70),
 (4, 1, NULL, 'B', 'Kinerja Bisnis Kolektif', 2, 35),
-(5, NULL, 4, 'B1', 'Solidaritas Membangun Usaha Peternakan Kolektif', 1, 60),
-(6, NULL, 4, 'B2', 'Pengembangan Usaha Bisnis Kolektif', 2, 40),
+(5, 1, 4, 'B1', 'Solidaritas Membangun Usaha Peternakan Kolektif', 1, 60),
+(6, 1, 4, 'B2', 'Pengembangan Usaha Bisnis Kolektif', 2, 40),
 (7, 1, NULL, 'C', 'KEPEMILIKAN ASSET & PENERAPAN IPTEK', 3, 20),
-(8, NULL, 7, 'C1', 'Realisasi Pemanfaatan IPTEK', 1, 65),
-(9, NULL, 7, 'C2', 'Intensifikasi IPTEK pengurus SASPRI-K Untuk Peningkatan Daya Saing', 2, 35);
+(8, 1, 7, 'C1', 'Realisasi Pemanfaatan IPTEK', 1, 65),
+(9, 1, 7, 'C2', 'Intensifikasi IPTEK pengurus SASPRI-K Untuk Peningkatan Daya Saing', 2, 35);
 
 -- --------------------------------------------------------
 -- Indicators
