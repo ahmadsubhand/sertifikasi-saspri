@@ -20,6 +20,7 @@ use yii\web\BadRequestHttpException;
  * @property Certification[] $certifications
  * @property IndicatorGroup[] $indicatorGroups
  * @property IndicatorGroup[] $rootGroups
+ * @property IndicatorGroup[] $childGroups
  */
 class Assessment extends \yii\db\ActiveRecord
 {
@@ -91,6 +92,26 @@ class Assessment extends \yii\db\ActiveRecord
         return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id'])
             ->where(['parent_group_id' => null])
             ->orderBy(['order' => SORT_ASC]);
+    }
+
+    /**
+     * Gets query for [[IndicatorGroups]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChildGroups()
+    {
+        return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id'])
+            ->alias('child')
+            ->innerJoin(
+                ['parent' => IndicatorGroup::tableName()],
+                'parent.id = child.parent_group_id'
+            )
+            ->where(['not', ['child.parent_group_id' => null]])
+            ->orderBy([
+                'parent.order' => SORT_ASC,
+                'child.order' => SORT_ASC,
+            ]);
     }
 
     /**

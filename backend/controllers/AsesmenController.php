@@ -11,9 +11,11 @@ use Exception;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class AsesmenController extends Controller
 {
@@ -35,9 +37,9 @@ class AsesmenController extends Controller
                     'simpan-group' => ['post'],
                     'simpan-indikator' => ['post'],
                     'simpan-opsi' => ['post'],
-                    'hapus-group' => ['post'],
-                    'hapus-indikator' => ['post'],
-                    'hapus-opsi' => ['post'],
+                    'hapus-group' => ['delete'],
+                    'hapus-indikator' => ['delete'],
+                    'hapus-opsi' => ['delete'],
                 ],
             ],
         ];
@@ -58,9 +60,14 @@ class AsesmenController extends Controller
             $root_groups = $assessment->getRootGroups()
                 ->with('childGroups')
                 ->all();
+            $root_groups_only = $assessment->rootGroups;
+            $child_groups_only = $assessment->childGroups;
+
             return $this->render('kelola', [
                 'assessment' => $assessment,
-                'root_groups' => $root_groups
+                'root_groups' => $root_groups,
+                'root_groups_only' => $root_groups_only,
+                'child_groups_only' => $child_groups_only,
             ]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -73,80 +80,182 @@ class AsesmenController extends Controller
         }
     }
 
-    public function actionSimpanGroup(int $assessment_id, ?int $indicator_group_id = null)
+    public function actionSimpanGrup(int $assessment_id, ?int $indicator_group_id = null)
     {
-        $model = $indicator_group_id ? $this->findGroupOrFail($indicator_group_id) : new IndicatorGroup();
+        try {
+            $model = $indicator_group_id ? $this->findGroupOrFail($indicator_group_id) : new IndicatorGroup();
 
-        $model->assessment_id = $assessment_id;
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Group berhasil disimpan');
-        } else {
-            Yii::$app->session->setFlash('error', 'Gagal menyimpan group: ' . implode(', ', $model->getFirstErrors()));
+            // Mengecek parent atau child langsung dari model db,
+            // bukan dari model yang sudah disisipkan input user ($model->load)
+            $IndicatorGroup = Yii::$app->request->post('IndicatorGroup');
+            $parent_group_id = $IndicatorGroup['parent_group_id'];
+            if ($model->parent_group_id) {
+                if (!$parent_group_id) {
+                    throw new BadRequestHttpException('Subgrup wajib memilih grup utama');
+                } else {
+                    $indicator_group = Assessment::findOne($assessment_id)
+                        ->getRootGroups()
+                        ->where(['id' => $parent_group_id])
+                        ->exists();
+                    if (!$indicator_group) {
+                        throw new NotFoundHttpException(
+                            'Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid'
+                        );
+                    }
+                }
+            } else if (!$model->parent_group_id && $parent_group_id) {
+                throw new BadRequestHttpException('Grup utama tidak dapat dipindahkan ke dalam grup lain');
+            }
+    
+            $model->assessment_id = $assessment_id;
+            $model->load(Yii::$app->request->post());
+            $this->validateWeight($IndicatorGroup['weight']);
+            $this->checkGroupWeight($model);
+            $model->save();
+            
+            Yii::$app->session->setFlash('success', 'Grup berhasil disimpan');
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+                }
+            }
+            throw $error;
         }
 
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
     }
 
     public function actionSimpanIndikator(int $assessment_id, ?int $indicator_id = null)
     {
-        $model = $indicator_id ? $this->findIndicatorOrFail($indicator_id) : new Indicator();
+        try {
+            $model = $indicator_id ? $this->findIndicatorOrFail($indicator_id) : new Indicator();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $indicator_group_id = Yii::$app->request->post('Indicator')['indicator_group_id'];
+            if (!$indicator_group_id) {
+                throw new BadRequestHttpException('Indikator wajib memilih subgrup');
+            }
+            $indicator_group = Assessment::findOne($assessment_id)
+                ->getChildGroups()
+                ->where(['id' => $indicator_group_id])
+                ->exists();
+            if (!$indicator_group) {
+                throw new NotFoundHttpException(
+                    'Subgrup yang dipilih tidak ditemukan atau bukan subgrup yang valid'
+                );
+            }
+
+            $model->load(Yii::$app->request->post());
+            $model->save();
+            
             Yii::$app->session->setFlash('success', 'Indikator berhasil disimpan');
-        } else {
-            Yii::$app->session->setFlash('error', 'Gagal menyimpan indikator: ' . implode(', ', $model->getFirstErrors()));
-        }
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
 
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof NotFoundHttpException
+                ) {
+                    return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+                }
+            }
+            throw $error;
+        }
     }
 
     public function actionSimpanOpsi(int $assessment_id, ?int $indicator_option_id = null)
     {
-        $model = $indicator_option_id ? $this->findOptionOrFail($indicator_option_id) : new IndicatorOption();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        try {
+            $this->validateWeight(Yii::$app->request->post('IndicatorOption')['weight']);
+    
+            $model = $indicator_option_id ? $this->findOptionOrFail($indicator_option_id) : new IndicatorOption();
+            $model->load(Yii::$app->request->post());
+            $model->save();
+    
             Yii::$app->session->setFlash('success', 'Opsi berhasil disimpan');
-        } else {
-            Yii::$app->session->setFlash('error', 'Gagal menyimpan opsi: ' . implode(', ', $model->getFirstErrors()));
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof NotFoundHttpException
+                ) {
+                    return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+                }
+            }
+            throw $error;
         }
-
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
     }
 
-    public function actionHapusGroup(int $indicator_group_id)
+    public function actionHapusGrup(int $indicator_group_id)
     {
-        $model = $this->findGroupOrFail($indicator_group_id);
+        try {
+            $model = $this->findGroupOrFail($indicator_group_id);
         
-        $assessment_id = $model->assessment_id;
-        if ($model->delete()) {
-            Yii::$app->session->setFlash('success', 'Group berhasil dihapus');
-        }
+            $assessment_id = $model->assessment_id;
+            $model->delete();
 
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+            Yii::$app->session->setFlash('success', 'Grup berhasil dihapus');
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
     }
 
     public function actionHapusIndikator(int $indicator_id)
     {
-        $model = $this->findIndicatorOrFail($indicator_id);
-
-        $assessment_id = $model->indicatorGroup->assessment_id;
-        if ($model->delete()) {
+        try {
+            $model = $this->findIndicatorOrFail($indicator_id);
+    
+            $assessment_id = $model->indicatorGroup->assessment_id;
+            $model->delete();
+            
             Yii::$app->session->setFlash('success', 'Indikator berhasil dihapus');
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
         }
-
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
     }
 
     public function actionHapusOpsi(int $indicator_option_id)
     {
-        $model = $this->findOptionOrFail($indicator_option_id);
-
-        $assessment_id = $model->indicator->indicatorGroup->assessment_id;
-        if ($model->delete()) {
+        try {
+            $model = $this->findOptionOrFail($indicator_option_id);
+    
+            $assessment_id = $model->indicator->indicatorGroup->assessment_id;
+            $model->delete();
+    
             Yii::$app->session->setFlash('success', 'Opsi berhasil dihapus');
+            return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
         }
-
-        return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
     }
 
     private function findAssessmentOrFail(int $assessment_id)
@@ -183,5 +292,29 @@ class AsesmenController extends Controller
             throw new NotFoundHttpException('Opsi tidak ditemukan');
         }
         return $option;
+    }
+
+    private function checkGroupWeight(IndicatorGroup $new_indicator_group)
+    {
+        $remaining_weight = $new_indicator_group->countRemainingWeight();
+        if ($remaining_weight < 0) {
+            throw new UnprocessableEntityHttpException(
+                'Total bobot grup sudah melebihi 100'
+            );
+        }
+    }
+
+    private function validateWeight(int|string $weight)
+    {   
+        if (
+            filter_var(
+                $weight,
+                FILTER_VALIDATE_INT
+            ) === false ||
+            $weight <= 0 ||
+            $weight >= 100
+        ) {
+            throw new BadRequestHttpException('Bobot harus bilangan bulat positif kurang dari 100');
+        }
     }
 }

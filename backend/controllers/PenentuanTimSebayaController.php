@@ -62,13 +62,11 @@ class PenentuanTimSebayaController extends Controller
   {
     try {
       $certification = $this->findCertificationOrFail($certification_id);
-      $latest_cert = Certification::find()->andWhere(['saspri_k_id' => $certification->saspri_k_id, 'status' => CertificationStatus::COMPLETED])
-        ->orderBy(['issued_at' => SORT_DESC])->one();
       return $this->render('pembentukanTimSebaya', [
         'saspri_k' => $certification->saspriK,
         'district' => $certification->saspriK->district,
         'certification' => $certification,
-        'latest_certificate' => $latest_cert,
+        'valid_certificate' => $certification->saspriK->validCertificate,
         'peer_team_members' => $certification
           ->getPeerTeamMembers()
           ->with([
@@ -247,7 +245,7 @@ class PenentuanTimSebayaController extends Controller
     }
   }
 
-  private function findCertificationOrFail(int $id)
+  private function findCertificationOrFail(int $id): Certification
   {
     $certification = Certification::find()->andWhere(['id' => $id])->one();
     if (!$certification) {

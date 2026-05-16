@@ -143,4 +143,23 @@ class IndicatorGroup extends \yii\db\ActiveRecord
                 },
             ]);
     }
+
+    public function countRemainingWeight()
+    {
+        $assessment = $this->assessment;
+        $query = $assessment->getRootGroups();
+        if ($this->parent_group_id) {
+            $query = $assessment->getChildGroups()->andWhere(['parent_group_id' => $this->parent_group_id]);
+        }
+        /** @var IndicatorGroup[] $indicator_groups */
+        $indicator_groups = $query->andWhere(['!=', 'id', $this->id])->all();
+        $indicator_groups[] = $this;
+        
+        $total_weight = 0;
+        foreach ($indicator_groups as $group) {
+            $total_weight += $group->weight;
+        }
+        $MAX_TOTAL_WEIGHT = 100;
+        return $MAX_TOTAL_WEIGHT - $total_weight;
+    }
 }

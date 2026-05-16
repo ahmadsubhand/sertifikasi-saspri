@@ -3,9 +3,12 @@
 /** @var yii\web\View $this */
 /** @var common\models\Assessment $assessment */
 /** @var common\models\IndicatorGroup[] $root_groups */
+/** @var common\models\IndicatorGroup[] $root_groups_only */
+/** @var common\models\IndicatorGroup[] $child_groups_only */
 
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
+use yii\helpers\ArrayHelper;
 
 $this->title = 'Kelola Asesmen: ' . $assessment->title;
 $this->params['breadcrumbs'][] = ['label' => 'Asesmen', 'url' => ['index']];
@@ -14,6 +17,14 @@ $this->params['breadcrumbs'][] = $this->title;
 $group_model = new \common\models\IndicatorGroup();
 $indicator_model = new \common\models\Indicator();
 $option_model = new \common\models\IndicatorOption();
+
+$root_group_list = ArrayHelper::map($root_groups_only, 'id', function ($model) {
+    return '[' . $model->code . '] ' . $model->label;
+});
+
+$child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model) {
+    return '[' . $model->code . '] ' . $model->label;
+});
 
 ?>
 
@@ -31,11 +42,11 @@ $option_model = new \common\models\IndicatorOption();
                 <h5 class="mb-0">[<?= Html::encode($root->code) ?>] <?= Html::encode($root->label) ?></h5>
                 <div class="btn-group btn-group-sm">
                     <button class="btn btn-light" onclick='edit_group(<?= json_encode($root->attributes) ?>)'>Edit</button>
-                    <?= Html::a('Hapus', ['hapus-group', 'indicator_group_id' => $root->id], [
+                    <?= Html::a('Hapus', ['hapus-grup', 'indicator_group_id' => $root->id], [
                         'class' => 'btn btn-danger',
                         'data' => [
                             'confirm' => 'Apakah Anda yakin ingin menghapus group ini beserta seluruh isinya?',
-                            'method' => 'post',
+                            'method' => 'delete',
                         ],
                     ]) ?>
                 </div>
@@ -83,11 +94,11 @@ $option_model = new \common\models\IndicatorOption();
                             <span class="fw-bold">[<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?></span>
                             <div class="btn-group btn-group-sm">
                                 <button class="btn btn-light" onclick='edit_group(<?= json_encode($child->attributes) ?>)'>Edit</button>
-                                <?= Html::a('Hapus', ['hapus-group', 'indicator_group_id' => $child->id], [
+                                <?= Html::a('Hapus', ['hapus-grup', 'indicator_group_id' => $child->id], [
                                     'class' => 'btn btn-danger',
                                     'data' => [
-                                        'confirm' => 'Apakah Anda yakin ingin menghapus child group ini beserta seluruh isinya?',
-                                        'method' => 'post',
+                                        'confirm' => 'Apakah Anda yakin ingin menghapus subgroup ini beserta seluruh isinya?',
+                                        'method' => 'delete',
                                     ],
                                 ]) ?>
                             </div>
@@ -145,13 +156,18 @@ $option_model = new \common\models\IndicatorOption();
 <div class="modal fade" id="modal_group" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <?php $form = ActiveForm::begin(['id' => 'form_group', 'action' => ['simpan-group', 'assessment_id' => $assessment->id]]); ?>
+            <?php $form = ActiveForm::begin(['id' => 'form_group', 'action' => ['simpan-grup', 'assessment_id' => $assessment->id]]); ?>
             <div class="modal-header">
                 <h5 class="modal-title" id="modal_group_title">Tambah Group</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <?= $form->field($group_model, 'parent_group_id')->hiddenInput(['id' => 'group_parent_id'])->label(false) ?>
+                <div id="parent_group_select_container">
+                    <?= $form->field($group_model, 'parent_group_id')->dropDownList($root_group_list, [
+                        'id' => 'group_parent_id',
+                        'prompt' => '-- Group Utama --'
+                    ]) ?>
+                </div>
                 <?= $form->field($group_model, 'code')->textInput(['id' => 'group_code']) ?>
                 <?= $form->field($group_model, 'label')->textInput(['id' => 'group_label']) ?>
                 <div class="row">
@@ -178,7 +194,10 @@ $option_model = new \common\models\IndicatorOption();
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <?= $form->field($indicator_model, 'indicator_group_id')->hiddenInput(['id' => 'indicator_group_id'])->label(false) ?>
+                <?= $form->field($indicator_model, 'indicator_group_id')->dropDownList($child_group_list, [
+                    'id' => 'indicator_group_id',
+                    'prompt' => '-- Pilih Subgrup --'
+                ]) ?>
                 <?= $form->field($indicator_model, 'code')->textInput(['id' => 'indicator_code']) ?>
                 <?= $form->field($indicator_model, 'label')->textarea(['rows' => 3, 'id' => 'indicator_label']) ?>
                 <?= $form->field($indicator_model, 'order')->textInput(['type' => 'number', 'id' => 'indicator_order']) ?>
@@ -222,9 +241,21 @@ $option_model = new \common\models\IndicatorOption();
 <script>
 function tambah_group(parent_id) {
     const form = document.getElementById('form_group');
-    form.action = '<?= \yii\helpers\Url::to(['simpan-group', 'assessment_id' => $assessment->id]) ?>';
+    form.action = '<?= \yii\helpers\Url::to(['simpan-grup', 'assessment_id' => $assessment->id]) ?>';
     document.getElementById('modal_group_title').innerText = parent_id ? 'Tambah Subgrup' : 'Tambah Grup';
+    
+    const container = document.getElementById('parent_group_select_container');
+    container.style.display = 'block';
+    
     document.getElementById('group_parent_id').value = parent_id || '';
+    
+    // Reset dropdown: show all options
+    const dropdown = document.getElementById('group_parent_id');
+    for (let i = 0; i < dropdown.options.length; i++) {
+        dropdown.options[i].disabled = false;
+        dropdown.options[i].style.display = 'block';
+    }
+
     document.getElementById('group_code').value = '';
     document.getElementById('group_label').value = '';
     document.getElementById('group_order').value = '1';
@@ -234,9 +265,33 @@ function tambah_group(parent_id) {
 
 function edit_group(data) {
     const form = document.getElementById('form_group');
-    form.action = '<?= \yii\helpers\Url::to(['simpan-group', 'assessment_id' => $assessment->id]) ?>&indicator_group_id=' + data.id;
+    form.action = '<?= \yii\helpers\Url::to(['simpan-grup', 'assessment_id' => $assessment->id]) ?>&indicator_group_id=' + data.id;
     document.getElementById('modal_group_title').innerText = 'Edit Group';
-    document.getElementById('group_parent_id').value = data.parent_group_id || '';
+    
+    const dropdown = document.getElementById('group_parent_id');
+    const container = document.getElementById('parent_group_select_container');
+    
+    // Root group (Level 1) has no parent (parent_group_id is null)
+    // Locked: cannot move root group to another parent
+    // COMMENTED FOR BACKEND TESTING
+    // if (data.parent_group_id === null) {
+    //     container.style.display = 'none';
+    // } else {
+        container.style.display = 'block';
+        dropdown.value = data.parent_group_id || '';
+    // }
+
+    // Disable self to prevent circular reference
+    for (let i = 0; i < dropdown.options.length; i++) {
+        if (dropdown.options[i].value == data.id) {
+            dropdown.options[i].disabled = true;
+            dropdown.options[i].style.display = 'none';
+        } else {
+            dropdown.options[i].disabled = false;
+            dropdown.options[i].style.display = 'block';
+        }
+    }
+
     document.getElementById('group_code').value = data.code;
     document.getElementById('group_label').value = data.label;
     document.getElementById('group_order').value = data.order;
@@ -286,6 +341,11 @@ function edit_opsi(data) {
     document.getElementById('option_code').value = data.code;
     document.getElementById('option_label').value = data.label;
     document.getElementById('option_order').value = data.order;
+    document.getElementById('option_weight').value = data.weight;
+    new bootstrap.Modal(document.getElementById('modal_opsi')).show();
+}
+</script>
+n_order').value = data.order;
     document.getElementById('option_weight').value = data.weight;
     new bootstrap.Modal(document.getElementById('modal_opsi')).show();
 }

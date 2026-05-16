@@ -1,7 +1,7 @@
 <?php
 
 /** @var \common\models\Certification $certification */
-/** @var \common\models\Certification $latest_certification */
+/** @var \common\models\Certification $valid_certificate */
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\District $district */
 /** @var \common\models\PeerTeamMember[] $peer_team_members */
@@ -91,7 +91,7 @@ $shingles = [
       <?php foreach ($certIndex as $key => $dat) : ?>
         <?php echo $this->render('/component/_idline', [
           'label' => $certLabel[$key],
-          'data' => $latest_certificate[$dat] ?? '-',
+          'data' => $valid_certificate[$dat] ?? '-',
           'shingles' => ''
         ]); ?>
       <?php endforeach ?>

@@ -16,7 +16,7 @@ use yii\bootstrap5\Html;
                 'class' => 'btn btn-danger',
                 'data' => [
                     'confirm' => 'Apakah Anda yakin ingin menghapus indikator ini?',
-                    'method' => 'post',
+                    'method' => 'delete',
                 ],
             ]) ?>
         </div>
@@ -52,7 +52,7 @@ use yii\bootstrap5\Html;
                                     'class' => 'btn btn-outline-danger py-0',
                                     'data' => [
                                         'confirm' => 'Yakin hapus opsi?',
-                                        'method' => 'post',
+                                        'method' => 'delete',
                                     ],
                                 ]) ?>
                             </div>

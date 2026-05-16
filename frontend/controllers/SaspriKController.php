@@ -57,12 +57,10 @@ class SaspriKController extends Controller
     {
         try {
             $saspri_k = $this->findSaspriKAsCoordinator();
-            // find alternatives pls
-            $saspri_k_arr = SaspriK::find()->andWhere(['coordinator_id' => Yii::$app->user->id])->asArray()->one();
 
             return $this->render('index', [
-                'saspri_k' => $saspri_k_arr,
-                'valid_certificate' => $saspri_k->validCertificateAsArray,
+                'saspri_k' => $saspri_k,
+                'valid_certificate' => $saspri_k->validCertificate,
                 'completed_certifications' => $saspri_k->getCertifications()
                     ->where(['status' => CertificationStatus::COMPLETED])
                     ->all(),
