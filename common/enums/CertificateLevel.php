@@ -4,10 +4,10 @@ namespace common\enums;
 
 class CertificateLevel
 {
-    const NATALIA = 'natalia';
-    const WEANIA = 'weania';
-    const PREMATURA = 'prematura';
-    const MATURA = 'matura';
+    public const NATALIA = 'natalia';
+    public const WEANIA = 'weania';
+    public const PREMATURA = 'prematura';
+    public const MATURA = 'matura';
 
     public static function list()
     {

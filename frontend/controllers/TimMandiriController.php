@@ -184,7 +184,7 @@ class TimMandiriController extends Controller
                         'certification_id' => $certification_id,
                         'page' => $page
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof ForbiddenHttpException ||
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
@@ -224,7 +224,7 @@ class TimMandiriController extends Controller
                         'certification_id' => $certification_id,
                         'page' => 1
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof ForbiddenHttpException ||
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException

@@ -431,11 +431,11 @@ class Certification extends \yii\db\ActiveRecord
     public function calculatePeerReviewTotalScore(): float
     {
         $total_score = 0;
-        $root_groups = $this->assessment;
+        $root_groups = $this->assessment->rootGroups;
 
         foreach ($root_groups as $root_group) {
             $group_total_weighted_sum = 0;
-            $sub_groups = $this->assessment->getCurrentChildGroups($root_group, $this->id);
+            $sub_groups = $root_group->childGroups;
 
             foreach ($sub_groups as $sub_group) {
                 $sub_group_sum = 0;
@@ -458,18 +458,19 @@ class Certification extends \yii\db\ActiveRecord
     public function calculateExternalReviewTotalScore(): float
     {
         $total_score = 0;
-        $root_groups = $this->assessment->getAllRootGroups();
+        $root_groups = $this->assessment->rootGroups;
 
         foreach ($root_groups as $root_group) {
             $group_total_weighted_sum = 0;
-            $sub_groups = $this->assessment->getCurrentChildGroups($root_group, $this->id);
+            $sub_groups = $root_group->childGroups;
 
             foreach ($sub_groups as $sub_group) {
                 $sub_group_sum = 0;
                 $indicator_count = count($sub_group->indicators);
                 
                 foreach ($sub_group->indicators as $indicator) {
-                    $score_model = $indicator->indicatorScores[0] ?? null;
+                    /** @var IndicatorScore|null $score_model */
+                    $score_model = $indicator->getIndicatorScores()->where(['certification_id' => $this->id])->one();
                     $sub_group_sum += $score_model ? ($score_model->final_score ?? 0) : 0;
                 }
 

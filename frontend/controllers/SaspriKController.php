@@ -122,7 +122,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if ($error instanceof BadRequestHttpException) {
+                } elseif ($error instanceof BadRequestHttpException) {
                     return $this->redirect(['index']);
                 }
             }
@@ -147,7 +147,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if ($error instanceof NotFoundHttpException) {
+                } elseif ($error instanceof NotFoundHttpException) {
                     return $this->redirect(['index']);
                 }
             }
@@ -179,7 +179,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if ($error instanceof UnprocessableEntityHttpException) {
+                } elseif ($error instanceof UnprocessableEntityHttpException) {
                     return $this->redirect(['index']);
                 }
             }
@@ -241,12 +241,12 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if ($error instanceof UnprocessableEntityHttpException) {
+                } elseif ($error instanceof UnprocessableEntityHttpException) {
                     if (str_contains($error->getMessage(), 'Tim Mandiri')) {
                         return $this->redirect(['pengajuan-sertifikasi']);
                     }
                     return $this->redirect(['index']);
-                } else if ($error instanceof BadRequestHttpException) {
+                } elseif ($error instanceof BadRequestHttpException) {
                     return $this->redirect(['pengajuan-sertifikasi']);
                 }
             }
@@ -271,7 +271,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if (
+                } elseif (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {
@@ -301,7 +301,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if (
+                } elseif (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException ||
                     $error instanceof BadRequestHttpException
@@ -334,9 +334,9 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if ($error instanceof NotFoundHttpException) {
+                } elseif ($error instanceof NotFoundHttpException) {
                     return $this->redirect(['index']);
-                } else if (
+                } elseif (
                     $error instanceof ConflictHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {

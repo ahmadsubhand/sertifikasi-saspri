@@ -100,7 +100,7 @@ class PenerbitanSertifikasiController extends Controller
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
             return $this->redirect([
-                'external-review', 
+                'external-review',
                 'certification_id' => $certification_id,
                 'page' => $targetPage,
             ]);
@@ -109,11 +109,11 @@ class PenerbitanSertifikasiController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof BadRequestHttpException) {
                     return $this->redirect([
-                        'external-review', 
-                        'certification_id' => $certification_id, 
+                        'external-review',
+                        'certification_id' => $certification_id,
                         'page' => $page
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {
@@ -127,11 +127,12 @@ class PenerbitanSertifikasiController extends Controller
     public function actionFinalisasiPenerbitanSertifikasi(int $certification_id)
     {
         try {
-            $this->findCertificationOrFail($certification_id)
+            $certification = $this->findCertificationOrFail($certification_id)
                 ->saveExternalReviewScores(Yii::$app->request->post('indicator_scores', []))
                 ->submitExternalReview()
-                ->updateFinalTotalScoresAndGrade()
-                ->save(false);
+                ->updateFinalTotalScoresAndGrade();
+            $certification->saspriK->link('validCertificate', $certification);
+            $certification->save(false);
 
             Yii::$app->session->setFlash('success', 'Penerbitan Sertifikasi berhasil difinalisasi');
             return $this->redirect(['index']);
@@ -140,11 +141,11 @@ class PenerbitanSertifikasiController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof BadRequestHttpException) {
                     return $this->redirect([
-                        'external-review', 
-                        'certification_id' => $certification_id, 
+                        'external-review',
+                        'certification_id' => $certification_id,
                         'page' => 1
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {

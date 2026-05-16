@@ -94,7 +94,7 @@ class TimSebayaController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if (
                     $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException 
+                    $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
                 }
@@ -116,7 +116,7 @@ class TimSebayaController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if (
                     $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException 
+                    $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
                 }
@@ -170,7 +170,7 @@ class TimSebayaController extends Controller
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
             return $this->redirect([
-                'peer-review', 
+                'peer-review',
                 'certification_id' => $certification_id,
                 'page' => $targetPage,
             ]);
@@ -179,11 +179,11 @@ class TimSebayaController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof BadRequestHttpException) {
                     return $this->redirect([
-                        'peer-review', 
-                        'certification_id' => $certification_id, 
+                        'peer-review',
+                        'certification_id' => $certification_id,
                         'page' => $page
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof ForbiddenHttpException ||
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
@@ -215,16 +215,16 @@ class TimSebayaController extends Controller
                 if (
                     $error instanceof BadRequestHttpException ||
                     (
-                        $error instanceof UnprocessableEntityHttpException && 
+                        $error instanceof UnprocessableEntityHttpException &&
                         str_contains($error->getMessage(), 'ketua')
                     )
                 ) {
                     return $this->redirect([
-                        'peer-review', 
-                        'certification_id' => $certification_id, 
+                        'peer-review',
+                        'certification_id' => $certification_id,
                         'page' => 1
                     ]);
-                } else if (
+                } elseif (
                     $error instanceof ForbiddenHttpException ||
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
@@ -243,7 +243,7 @@ class TimSebayaController extends Controller
         $saspri_k = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
         $self_team = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
         $peer_team = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
-        
+
         return $this->render('detail', [
             'id' => $case_id,
             'saspri' => $saspri_k,
@@ -303,5 +303,5 @@ class TimSebayaController extends Controller
             );
         }
         return $certification;
-    }    
+    }
 }
