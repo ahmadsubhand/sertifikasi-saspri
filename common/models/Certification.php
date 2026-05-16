@@ -255,6 +255,10 @@ class Certification extends \yii\db\ActiveRecord
         $this->status = CertificationStatus::EXTERNAL_REVIEW;
         $this->peer_review_due_date = date('Y-m-d H:i:s');
         $this->external_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
+
+        $score = $this->calculateTotalScore('peer_team_score');
+        $this->total_score = (int) round($score);
+        $this->grade = $this->calculateGrade($score);
         return $this;
     }
 
@@ -273,6 +277,11 @@ class Certification extends \yii\db\ActiveRecord
         $this->status = CertificationStatus::COMPLETED;
         $this->external_review_due_date = date('Y-m-d H:i:s');
         $this->issued_at = date('Y-m-d H:i:s');
+
+        $score = $this->calculateTotalScore('final_score');
+        $this->total_score = (int) round($score);
+        $this->grade = $this->calculateGrade($score);
+        $this->generateCertificationCodeAndDueDate();
         return $this;
     }
 
@@ -295,7 +304,7 @@ class Certification extends \yii\db\ActiveRecord
             $member->user_id = $user_id;
             $member->certification_id = $this->id;
             $member->status = ApprovalStatus::PENDING;
-            
+
             if (UserHelper::isUserAnAdmin($user_id)) {
                 $member->role = TeamRole::FACILITATOR;
             } else {
@@ -339,7 +348,7 @@ class Certification extends \yii\db\ActiveRecord
                 $saspriKIds[] = $member->user->saspri_k_id;
                 if ($member->role === TeamRole::LEADER) {
                     $leaderCount++;
-                } else if ($member->role === TeamRole::MEMBER) {
+                } elseif ($member->role === TeamRole::MEMBER) {
                     $memberCount++;
                 }
             }
@@ -347,7 +356,7 @@ class Certification extends \yii\db\ActiveRecord
 
         if ($facilitatorCount !== 1 || $leaderCount !== 1 || $memberCount < 1) {
             throw new UnprocessableEntityHttpException(
-                'Anggota yang menyetujui bergabung di Tim sebaya harus terdiri dari minimal 2 orang ' . 
+                'Anggota yang menyetujui bergabung di Tim sebaya harus terdiri dari minimal 2 orang ' .
                 '(salah sartu bertindak sebagai ketua) dari SASPRI-K lainnya dan 1 pendamping dari SASPRI-N'
             );
         }
@@ -369,7 +378,7 @@ class Certification extends \yii\db\ActiveRecord
                     ->handleEvidenceUpload($this->id)
                     ->save(false);
             }
-    
+
             return $this;
         } catch (Exception $error) {
             if ($error instanceof BadRequestHttpException) {
@@ -388,7 +397,7 @@ class Certification extends \yii\db\ActiveRecord
                     ->fillPeerTeamStatus($indicator_score['status'] ?? null)
                     ->save(false);
             }
-    
+
             return $this;
         } catch (Exception $error) {
             if ($error instanceof BadRequestHttpException) {
@@ -406,7 +415,7 @@ class Certification extends \yii\db\ActiveRecord
                 $indicator_score_model->fillFinalScore($indicator_score['final_score'] ?? 0)
                     ->save(false);
             }
-    
+
             return $this;
         } catch (Exception $error) {
             if ($error instanceof BadRequestHttpException) {
@@ -416,7 +425,7 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
-    protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore 
+    protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore
     {
         return $this->getIndicatorScores()
             ->where([
@@ -428,7 +437,7 @@ class Certification extends \yii\db\ActiveRecord
             ]);
     }
 
-    public function calculatePeerReviewTotalScore(): float
+    protected function calculateTotalScore(string $property_name_of_indicator_score): float
     {
         $total_score = 0;
         $root_groups = $this->assessment->rootGroups;
@@ -440,38 +449,11 @@ class Certification extends \yii\db\ActiveRecord
             foreach ($sub_groups as $sub_group) {
                 $sub_group_sum = 0;
                 $indicator_count = count($sub_group->indicators);
-                
-                foreach ($sub_group->indicators as $indicator) {
-                    $score_model = $indicator->indicatorScores[0] ?? null;
-                    $sub_group_sum += $score_model ? ($score_model->peer_team_score ?? 0) : 0;
-                }
 
-                $sub_group_average = $indicator_count > 0 ? ($sub_group_sum / $indicator_count) : 0;
-                $group_total_weighted_sum += $sub_group_average * ($sub_group->weight / 100);
-            }
-            $total_score += $group_total_weighted_sum * ($root_group->weight / 100);
-        }
-
-        return $total_score;
-    }
-
-    public function calculateExternalReviewTotalScore(): float
-    {
-        $total_score = 0;
-        $root_groups = $this->assessment->rootGroups;
-
-        foreach ($root_groups as $root_group) {
-            $group_total_weighted_sum = 0;
-            $sub_groups = $root_group->childGroups;
-
-            foreach ($sub_groups as $sub_group) {
-                $sub_group_sum = 0;
-                $indicator_count = count($sub_group->indicators);
-                
                 foreach ($sub_group->indicators as $indicator) {
                     /** @var IndicatorScore|null $score_model */
                     $score_model = $indicator->getIndicatorScores()->where(['certification_id' => $this->id])->one();
-                    $sub_group_sum += $score_model ? ($score_model->final_score ?? 0) : 0;
+                    $sub_group_sum += $score_model ? ($score_model->$property_name_of_indicator_score ?? 0) : 0;
                 }
 
                 $sub_group_average = $indicator_count > 0 ? ($sub_group_sum / $indicator_count) : 0;
@@ -483,7 +465,7 @@ class Certification extends \yii\db\ActiveRecord
         return $total_score;
     }
 
-    public function calculateGrade(float $score): string
+    protected function calculateGrade(float $score): string
     {
         if ($score >= 90) {
             return CertificateGrade::A;
@@ -498,30 +480,12 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
-    public function updateTemporaryTotalScoresAndGrade(): self
+    protected function generateCertificationCodeAndDueDate(): self
     {
-        $score = $this->calculatePeerReviewTotalScore();
-        $this->total_score = (int) round($score);
-        $this->grade = $this->calculateGrade($score);
-        return $this;
-    }
-
-    public function updateFinalTotalScoresAndGrade(): self
-    {
-        $score = $this->calculateExternalReviewTotalScore();
-        $this->total_score = (int) round($score);
-        $this->grade = $this->calculateGrade($score);
-        $this->generateCertificationCodeAndDueDate();
-        return $this;
-    }
-
-    public function generateCertificationCodeAndDueDate(): self
-    {
-        $issuedAt = $this->issued_at ? strtotime($this->issued_at) : time();
-        $year = date('Y', $issuedAt);
+        $year = date('Y', $this->issued_at);
         $districtCode = $this->saspriK->district->code ?? '0000';
         $levelCode = strtoupper($this->level);
-        
+
         $this->code = sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
 
         $interval = 2;
@@ -529,8 +493,8 @@ class Certification extends \yii\db\ActiveRecord
             $interval = 1;
         }
 
-        $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", $issuedAt));
-        
+        $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", $this->issued_at));
+
         return $this;
     }
 }

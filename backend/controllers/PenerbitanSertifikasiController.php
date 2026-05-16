@@ -129,8 +129,7 @@ class PenerbitanSertifikasiController extends Controller
         try {
             $certification = $this->findCertificationOrFail($certification_id)
                 ->saveExternalReviewScores(Yii::$app->request->post('indicator_scores', []))
-                ->submitExternalReview()
-                ->updateFinalTotalScoresAndGrade();
+                ->submitExternalReview();
             $certification->saspriK->link('validCertificate', $certification);
             $certification->save(false);
 
