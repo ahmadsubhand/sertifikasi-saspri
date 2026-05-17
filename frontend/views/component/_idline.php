@@ -1,43 +1,50 @@
 <?php
 
+use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
 use common\models\District;
 use common\models\User;
-
 
 /** @var string $label */
 /** @var string|null $shingles */
 /** @var string|int $data */
 
 switch (true) {
-  case str_contains(strtolower($label), 'wali'):
-    $data = User::findOne(['id' => $data])->username;
-    break;
+    case str_contains(strtolower($label), 'wali'):
+        $data = User::findOne(['id' => $data])->username;
+        break;
 
-  case str_contains($label, 'SASPRI-'):
-    $tmp = District::find()->andWhere(['id' => $data])->one();
-    if (str_contains($label, 'SASPRI-KK')) {
-      $data = $tmp->regency->name;
-    } else if (str_contains($label, 'SASPRI-P')) {
-      $data = $tmp->regency->province->name;
-    } else {
-      $data = $tmp->name;
-    }
-    break;
+    case str_contains($label, 'SASPRI-'):
+        $tmp = District::find()->andWhere(['id' => $data])->one();
+        if (str_contains($label, 'SASPRI-KK')) {
+            $data = $tmp->regency->name;
+        } elseif (str_contains($label, 'SASPRI-P')) {
+            $data = $tmp->regency->province->name;
+        } else {
+            $data = $tmp->name;
+        }
+        break;
 
-  case str_contains($label, 'Level'):
-    $data = ucwords($data);
-    break;
+    case str_contains($label, 'Level'):
+        $data = CertificateLevel::list()[$data];
+        break;
 
-  case str_contains($label, 'Pred'):
-    $data = strtoupper($data);
-    break;
+    case str_contains($label, 'Pred'):
+        $data = CertificateGrade::list()[$data];
+        break;
 
-  case str_contains($label, 'Tanggal'):
-    $data = date('d-m-Y', strtotime($data)) ?? '-';
-    break;
+    case str_contains($label, 'Tanggal'):
+        $data = $data
+            ? (
+                is_numeric($data)
+                ? date('d-m-Y', $data)
+                : date('d-m-Y', strtotime($data))
+            )
+            : '-';
+        break;
 
-  default:
-    break;
+    default:
+        break;
 }
 ?>
 

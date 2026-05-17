@@ -26,35 +26,36 @@ class PenentuanTimSebayaController extends Controller
     public function behaviors()
     {
         return [
-          'access' => [
+            'access' => [
             'class' => AccessControl::class,
             'rules' => [
-              [
-                'allow' => true,
-                'roles' => [UserRole::ADMIN],
-              ],
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::ADMIN],
+                ],
             ],
-          ],
-          'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => [
-              'tambah-anggota-tim-sebaya' => ['post'],
-              'hapus-anggota-tim-sebaya' => ['delete'],
-              'ubah-peran-anggota-tim-sebaya' => ['post'],
-              'ajukan-peer-review' => ['post'],
             ],
-          ],
+                'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'tambah-anggota-tim-sebaya' => ['post'],
+                    'hapus-anggota-tim-sebaya' => ['delete'],
+                    'ubah-peran-anggota-tim-sebaya' => ['post'],
+                    'ajukan-peer-review' => ['post'],
+                ],
+            ],
         ];
     }
 
     public function actionIndex()
     {
         $certifications = Certification::find()
-          ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
-          ->with(['saspriK'])
-          ->all();
+            ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
+            ->orderBy(['peer_team_due_date' => SORT_ASC])
+            ->with(['saspriK'])
+            ->all();
         return $this->render('index', [
-          'certifications' => $certifications,
+            'certifications' => $certifications,
         ]);
     }
 
@@ -70,9 +71,9 @@ class PenentuanTimSebayaController extends Controller
               'peer_team_members' => $certification
                 ->getPeerTeamMembers()
                 ->with([
-                  'user' => function (ActiveQuery $query) {
-                      $query->select(['id', 'username']);
-                  }
+                    'user' => function (ActiveQuery $query) {
+                        $query->with('saspriK');
+                    }
                 ])
                 ->all(),
             ]);

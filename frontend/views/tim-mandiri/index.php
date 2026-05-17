@@ -50,8 +50,8 @@ use yii\helpers\Url;
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
                 <td><?= Html::encode(TeamRole::list()[$member->role]) ?></td>
                 <td><?= Html::encode(ApprovalStatus::list()[$member->status]) ?></td>
-                <td><?= Html::encode($member->certification->self_review_due_date
-                      ? date('Y-m-d', strtotime($member->certification->self_review_due_date))
+                <td><?= Html::encode($member->certification->self_team_due_date
+                      ? date('Y-m-d', strtotime($member->certification->self_team_due_date))
                       : '-') ?>
                 </td>
                 <td>
@@ -146,8 +146,8 @@ use yii\helpers\Url;
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
-                <td><?= Html::encode($member->certification->submitted_at
-                      ? date('Y-m-d', strtotime($member->certification->submitted_at))
+                <td><?= Html::encode($member->certification->created_at
+                      ? date('Y-m-d', $member->certification->created_at)
                       : '-') ?>
                 </td>
                 <td><?= Html::encode($member->certification->issued_at
@@ -156,7 +156,7 @@ use yii\helpers\Url;
                 </td>
                 <td><?= CertificateGrade::list()[$member->certification->grade] ?: '-' ?></td>
                 <td>
-                  <a href="<?php echo Url::to(['tim-mandiri/detail', 'id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
+                  <a href="<?php echo Url::to(['tim-mandiri/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
                 </td>
               </tr>
             <?php endforeach ?>

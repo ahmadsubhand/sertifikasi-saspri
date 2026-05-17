@@ -20,4 +20,10 @@ class UserHelper
     {
         return array_unique(array_filter(array_map('trim', explode(',', $user_ids))));
     }
+
+    public static $basicSelect = [
+        'id',
+        'username',
+        'phone_number',
+    ];
 }

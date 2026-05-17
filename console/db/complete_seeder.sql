@@ -117,49 +117,49 @@ INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, coo
 -- 3 Natalia A/AB/B, 2 Weania BC/C, 1 Natalia A
 -- --------------------------------------------------------
 
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
-(1, 1, 1, 'level_up', 'completed', 'natalia', 95, 'a', '2023-01-01', '2023-01-10', '2025-01-10'),
-(2, 2, 1, 'level_up', 'completed', 'natalia', 82, 'b', '2023-01-01', '2023-01-10', '2025-01-10'),
-(3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', '2023-01-01', '2023-01-10', '2025-01-10'),
-(4, 4, 1, 'level_up', 'completed', 'weania', 55, 'bc', '2023-01-01', '2023-01-10', '2024-01-10'),
-(5, 5, 1, 'level_up', 'completed', 'weania', 45, 'c', '2023-01-01', '2023-01-10', '2024-01-10'),
-(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', '2023-01-01', '2023-01-10', '2025-01-10');
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+(1, 1, 1, 'level_up', 'completed', 'natalia', 95, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(2, 2, 1, 'level_up', 'completed', 'natalia', 82, 'b', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(4, 4, 1, 'level_up', 'completed', 'weania', 55, 'bc', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
+(5, 5, 1, 'level_up', 'completed', 'weania', 45, 'c', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
+(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10');
 
 -- --------------------------------------------------------
 -- Ongoing Certifications
 -- --------------------------------------------------------
 
 -- SaspriK 1: Natalia A -> Level Up -> Weania (pending_self_team_formation)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date) VALUES
-(7, 1, 1, 'level_up', 'pending_self_team_formation', 'weania', '2026-05-01 10:00:00', '2026-05-08 10:00:00');
+INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
+(7, 1, 1, 'level_up', 'pending_self_team_formation', 'weania', 1777639200, 1777639200);
 
 -- SaspriK 2: Natalia B -> Level Up -> Weania (self_review)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date) VALUES
-(8, 2, 1, 'level_up', 'self_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
+(8, 2, 1, 'level_up', 'self_review', 'weania', 1777639200, 1777639200);
 
 -- SaspriK 3: Natalia AB -> Level Up -> Weania (pending_peer_team_formation)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date) VALUES
-(9, 3, 1, 'level_up', 'pending_peer_team_formation', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-08 10:00:00');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
+(9, 3, 1, 'level_up', 'pending_peer_team_formation', 'weania', 1777639200, 1777639200);
 
 -- SaspriK 4: Weania BC -> Renewal -> Weania (peer_review)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date) VALUES
-(10, 4, 1, 'renewal', 'peer_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
+(10, 4, 1, 'renewal', 'peer_review', 'weania', 1777639200, 1777639200);
 
 -- SaspriK 5: Weania C -> Renewal -> Weania (external_review)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, submitted_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date, external_review_due_date) VALUES
-(11, 5, 1, 'renewal', 'external_review', 'weania', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-01 10:00:00', '2026-05-15 10:00:00');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
+(11, 5, 1, 'renewal', 'external_review', 'weania', 1777639200, 1777639200);
 
 -- SaspriK 6: Natalia A -> Level Up -> Weania (completed)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
-(12, 6, 1, 'level_up', 'completed', 'weania', 88, 'ab', '2026-05-01 10:00:00', '2026-05-10 10:00:00', '2028-05-10 10:00:00');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+(12, 6, 1, 'level_up', 'completed', 'weania', 88, 'ab', 1777639200, 1778416800, '2026-05-10 10:00:00', '2028-05-10 10:00:00');
 
 -- Initial Valid Certs for Additionals (SASPRI-K 7-11)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, submitted_at, issued_at, next_certification_due_date) VALUES
-(13, 7, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
-(14, 8, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
-(15, 9, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
-(16, 10, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10'),
-(17, 11, 1, 'level_up', 'completed', 'natalia', 90, 'a', '2024-01-01', '2024-01-10', '2026-01-10');
+INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+(13, 7, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(14, 8, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(15, 9, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(16, 10, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(17, 11, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10');
 
 -- --------------------------------------------------------
 -- Team Members

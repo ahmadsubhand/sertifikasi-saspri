@@ -7,12 +7,12 @@ use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\helpers\TeamHelper;
+use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\PeerTeamMember;
-use common\models\SaspriK;
-use common\models\SelfTeamMember;
 use Exception;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
@@ -51,27 +51,30 @@ class TimSebayaController extends Controller
     public function actionIndex()
     {
         $base_query = PeerTeamMember::find()
-            ->joinWith('certification')
+            ->joinWith('certification c')
             ->where(['peer_team_members.user_id' => Yii::$app->user->id])
             ->with('certification.saspriK');
 
         $peer_team_member_request = (clone $base_query)
-            ->andWhere(['certifications.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
+            ->andWhere(['c.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
+            ->orderBy(['peer_team_due_date' => SORT_ASC])
             ->all();
 
         $peer_team_member_uncompleted = (clone $base_query)
             ->andWhere([
                 'not in',
-                'certifications.status',
+                'c.status',
                 [
                     CertificationStatus::PENDING_PEER_TEAM_FORMATION,
                     CertificationStatus::COMPLETED,
                 ]
             ])
+            ->orderBy(['c.updated_at' => SORT_DESC])
             ->all();
 
         $peer_team_member_completed = (clone $base_query)
-            ->andWhere(['certifications.status' => CertificationStatus::COMPLETED])
+            ->andWhere(['c.status' => CertificationStatus::COMPLETED])
+            ->orderBy(['c.issued_at' => SORT_DESC])
             ->all();
 
         return $this->render('index', [
@@ -235,21 +238,58 @@ class TimSebayaController extends Controller
         }
     }
 
-    // cekin, butuh proteksi dari user lain mungkin
-    public function actionDetail($case_id)
+    public function actionDetail(int $case_id)
     {
-        $cert = Certification::find()->andWhere(['id' => $case_id])->asArray()->one();
-        $saspri_k = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
-        $self_team = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
-        $peer_team = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
-
-        return $this->render('detail', [
-            'id' => $case_id,
-            'saspri' => $saspri_k,
-            'cert' => $cert,
-            'self_team' => $self_team,
-            'peer_team' => $peer_team,
-        ]);
+        try {
+            $cert = Certification::findOne(['id' => $case_id]);
+            if ($cert->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
+                $this->checkPeerReviewPermission($case_id);
+            } else {
+                $member = PeerTeamMember::find()
+                    ->where([
+                        'certification_id' => $case_id,
+                        'user_id' => Yii::$app->user->id,
+                    ])
+                    ->exists();
+                if (!$member) {
+                    throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Sebaya');
+                }
+            }
+            $saspri_k = $cert->saspriK;
+            $self_team = $cert->getSelfTeamMembers()
+                ->with([
+                    'user' => function (ActiveQuery $query) {
+                        $query->select(UserHelper::$basicSelect);
+                    },
+                ])
+                ->all();
+            $peer_team = $cert->getPeerTeamMembers()
+                ->with([
+                    'user' => function (ActiveQuery $query) {
+                        $query->select(UserHelper::$basicSelect);
+                    },
+                ])
+                ->all();
+    
+            return $this->render('detail', [
+                'id' => $case_id,
+                'saspri' => $saspri_k,
+                'cert' => $cert,
+                'self_team' => $self_team,
+                'peer_team' => $peer_team,
+            ]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof ForbiddenHttpException ||
+                    $error instanceof NotFoundHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
     }
 
     private function findPendingPeerTeamMemberOrFail(int $peer_team_member_id): PeerTeamMember

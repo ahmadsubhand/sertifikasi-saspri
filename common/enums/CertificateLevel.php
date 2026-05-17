@@ -9,6 +9,16 @@ class CertificateLevel
     public const PREMATURA = 'prematura';
     public const MATURA = 'matura';
 
+    public static function prev()
+    {
+        return [
+            self::NATALIA => self::list()[self::NATALIA],
+            self::WEANIA => self::list()[self::NATALIA],
+            self::PREMATURA => self::list()[self::WEANIA],
+            self::MATURA => self::list()[self::PREMATURA],
+        ];
+    }
+
     public static function list()
     {
         return [
@@ -18,13 +28,14 @@ class CertificateLevel
             self::MATURA => 'Matura',
         ];
     }
+
     public static function next()
     {
         return [
-            self::NATALIA => 'Weania',
-            self::WEANIA => 'Prematura',
-            self::PREMATURA => 'Matura',
-            self::MATURA => 'Matura',
+            self::NATALIA => self::list()[self::WEANIA],
+            self::WEANIA => self::list()[self::PREMATURA],
+            self::PREMATURA => self::list()[self::MATURA],
+            self::MATURA => self::list()[self::MATURA],
         ];
     }
 

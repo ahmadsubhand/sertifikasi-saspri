@@ -1,6 +1,7 @@
 <?php
 
 use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -51,7 +52,7 @@ $certLabel = [
 $certIndex = [
   'level',
   'code',
-  'submitted_at',
+  'created_at',
   'issued_at',
   'grade',
 ];
@@ -126,11 +127,11 @@ $shingles = [
             <?php foreach ($completed_certifications as $key => $value) : ?>
               <tr>
                 <td scope="row"><?php echo (int)$key + 1 ?></th>
-                <td><?= Html::encode($value->level) ?></td>
-                <td><?= Html::encode($value->submitted_at) ? date('d-m-Y', strtotime($value->submitted_at))
-                      : '-'  ?></td>
-                <td><?= Html::encode($value->issued_at) ? date('d-m-Y', strtotime($value->issued_at))
-                      : '-'  ?></td>
+                <td><?= Html::encode(CertificateLevel::list()[$value->level]) ?></td>
+                <td><?= Html::encode($value->created_at ? date('d-m-Y', $value->created_at)
+                      : '-')  ?></td>
+                <td><?= Html::encode($value->issued_at ? date('d-m-Y', strtotime($value->issued_at))
+                      : '-')  ?></td>
                 <td><?= Html::encode(CertificationStatus::list()[$value->status]) ?></td>
                 <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
                 <td>

@@ -8,6 +8,7 @@ use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\helpers\UserHelper;
 use Exception;
+use yii\behaviors\TimestampBehavior;
 use yii\web\BadRequestHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
@@ -18,8 +19,9 @@ use function PHPUnit\Framework\once;
  *
  * @property int $id
  * @property int $saspri_k_id
+ * @property int $created_at
+ * @property int $updated_at
  * @property string $purpose
- * @property string $submitted_at
  * @property string $status
  * @property string|null $self_team_due_date
  * @property string|null $self_review_due_date
@@ -59,14 +61,24 @@ class Certification extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
             // [['self_team_due_date', 'self_review_due_date', 'peer_team_due_date', 'peer_review_due_date', 'external_review_due_date', 'issued_at', 'grade', 'next_certification_due_date', 'rejection_reason'], 'default', 'value' => null],
             // [['is_rejected'], 'default', 'value' => 0],
-            [['saspri_k_id', 'purpose', 'level', 'assessment_id'], 'required'],
-            [['saspri_k_id', 'total_score', 'is_rejected', 'assessment_id'], 'integer'],
-            [['submitted_at', 'self_team_due_date', 'self_review_due_date', 'peer_team_due_date', 'peer_review_due_date', 'external_review_due_date', 'issued_at', 'next_certification_due_date'], 'safe'],
+            [['saspri_k_id', 'purpose', 'level', 'assessment_id', 'created_at', 'updated_at'], 'required'],
+            [['saspri_k_id', 'total_score', 'is_rejected', 'assessment_id', 'created_at', 'updated_at'], 'integer'],
+            [['self_team_due_date', 'self_review_due_date', 'peer_team_due_date', 'peer_review_due_date', 'external_review_due_date', 'issued_at', 'next_certification_due_date'], 'safe'],
             [['purpose', 'status', 'level', 'code', 'grade', 'rejection_reason'], 'string', 'max' => 255],
             [['assessment_id'], 'exist', 'skipOnError' => true, 'targetClass' => Assessment::class, 'targetAttribute' => ['assessment_id' => 'id']],
             [['saspri_k_id'], 'exist', 'skipOnError' => true, 'targetClass' => SaspriK::class, 'targetAttribute' => ['saspri_k_id' => 'id']],
@@ -81,8 +93,9 @@ class Certification extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'saspri_k_id' => 'Saspri K ID',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
             'purpose' => 'Purpose',
-            'submitted_at' => 'Submitted At',
             'status' => 'Status',
             'self_team_due_date' => 'Self Team Due Date',
             'self_review_due_date' => 'Self Review Due Date',
@@ -281,7 +294,9 @@ class Certification extends \yii\db\ActiveRecord
         $score = $this->calculateTotalScore('final_score');
         $this->total_score = (int) round($score);
         $this->grade = $this->calculateGrade($score);
-        $this->generateCertificationCodeAndDueDate();
+        $this->code = $this->generateCertificationCode();
+        $this->next_certification_due_date = $this->calculateNextCertificationDueDate();
+
         return $this;
     }
 
@@ -480,21 +495,19 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
-    protected function generateCertificationCodeAndDueDate(): self
+    protected function generateCertificationCode()
     {
-        $year = date('Y', $this->issued_at);
+        $year = date('Y', strtotime($this->issued_at));
         $districtCode = $this->saspriK->district->code ?? '0000';
         $levelCode = strtoupper($this->level);
 
-        $this->code = sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
+        return sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
+    }
 
-        $interval = 2;
-        if ($this->grade === CertificateGrade::A || $this->grade === CertificateGrade::BC) {
-            $interval = 1;
-        }
-
-        $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", $this->issued_at));
-
-        return $this;
+    protected function calculateNextCertificationDueDate()
+    {
+        $interval = (($this->grade === CertificateGrade::A) || ($this->grade === CertificateGrade::BC))
+            ? 1 : 2;
+        return date('Y-m-d H:i:s', strtotime("+$interval year", strtotime($this->issued_at)));
     }
 }

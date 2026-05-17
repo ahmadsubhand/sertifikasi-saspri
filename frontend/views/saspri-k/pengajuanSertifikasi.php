@@ -14,7 +14,6 @@ use yii\helpers\Url;
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\District $district */
 /** @var \common\models\SelfTeamMember[] $self_team_members */
-
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">

@@ -2,6 +2,7 @@
 
 use common\models\SelfTeamMember;
 use common\enums\CertificateLevel;
+use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
@@ -14,13 +15,6 @@ use yii\helpers\Html;
  */
 
 $member_id = $self_team[array_search(Yii::$app->user->id, array_column($self_team, 'user_id'))]->id;
-
-$statToProc = [
-  'weania' => 'Weania ke Natalia',
-  'natalia' => 'Natalia ke Prematura',
-  'prematura' => 'Prematura ke Matura',
-  'matura' => 'Matura'
-];
 $label = [
   'SASPRI-K',
   'SASPRI-KK',
@@ -103,7 +97,14 @@ $shingles = [
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
         <?php if (str_contains(strtolower($cert['status']), 'pending')) : ?>
           <div class="px-3 text-center">
-            <p class=" fw-bold h5">Sertifikasi <?= $statToProc[$cert['level']] ?> </p>
+            <p class=" fw-bold h5">
+                Sertifikasi
+                <?= 
+                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
+                    ' ke ' .
+                    CertificateLevel::list()[$cert['level']]
+                ?> 
+            </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
             <p class="h6"> <?= Html::encode($cert['self_team_due_date'])
@@ -124,7 +125,14 @@ $shingles = [
           </div>
         <?php elseif (str_contains(strtolower($cert['status']), 'review')) : ?>
           <div class="px-3 text-center">
-            <p class=" fw-bold h5">Sertifikasi <?= $statToProc[$cert['level']] ?> </p>
+            <p class=" fw-bold h5">
+                Sertifikasi 
+                <?= 
+                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
+                    ' ke ' .
+                    CertificateLevel::list()[$cert['level']]
+                ?> 
+            </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
             <p class="h6"> <?= Html::encode($cert['self_review_due_date'])

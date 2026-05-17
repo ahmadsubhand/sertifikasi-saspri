@@ -7,7 +7,6 @@ use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\helpers\UserHelper;
 use common\models\Certification;
-use common\models\PeerTeamMember;
 use common\models\SaspriK;
 use common\models\SelfTeamMember;
 use common\models\User;
@@ -53,8 +52,12 @@ class SaspriKController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex(
+        int $user_limit = 10,
+        int $user_offset = 0,
+        int $certification_limit = 10,
+        int $certification_offset = 0
+    ) {
         try {
             $saspri_k = $this->findSaspriKAsCoordinator();
 
@@ -63,10 +66,16 @@ class SaspriKController extends Controller
                 'valid_certificate' => $saspri_k->validCertificate,
                 'completed_certifications' => $saspri_k->getCertifications()
                     ->where(['status' => CertificationStatus::COMPLETED])
+                    ->orderBy(['updated_at' => SORT_DESC]) // nanti bisa dicustom
+                    ->limit($certification_limit)
+                    ->offset($certification_offset)
                     ->all(),
                 'saspri_k_members' => $saspri_k->getUsers()
                     ->where(['!=', 'id', Yii::$app->user->id])
-                    ->select(['id', 'username'])
+                    ->orderBy(['updated_at' => SORT_DESC]) // nanti bisa dicustom
+                    ->select(UserHelper::$basicSelect)
+                    ->limit($user_limit)
+                    ->offset($user_offset)
                     ->all(),
             ]);
         } catch (Exception $error) {
@@ -347,19 +356,46 @@ class SaspriKController extends Controller
         }
     }
 
-    public function actionDetail($case_id)
+    public function actionDetail(int $case_id)
     {
-        $cert = Certification::find()->andWhere(['id' => $case_id])->asArray()->one();
-        $sasprik = SaspriK::find()->andWhere(['id' => $cert['saspri_k_id']])->asArray()->one();
-        $selfTeam = SelfTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
-        $peerTeam = PeerTeamMember::find()->andWhere(['certification_id' => $cert['id']])->joinWith('user')->all();
-        return $this->render('detail', [
-            'id' => $case_id,
-            'saspri' => $sasprik,
-            'cert' => $cert,
-            'selfTeam' => $selfTeam,
-            'peerTeam' => $peerTeam,
-        ]);
+        try {
+            $sasprik = $this->findSaspriKAsCoordinator();
+            $cert = $sasprik->getCertifications()->where(['id' => $case_id])->one();
+            if (!$cert) {
+                throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
+            }
+            $selfTeam = $cert->getSelfTeamMembers()
+                ->with([
+                    'user' => function (ActiveQuery $query) {
+                        $query->select(UserHelper::$basicSelect);
+                    },
+                ])
+                ->all();
+            $peerTeam = $cert->getPeerTeamMembers()
+                ->with([
+                    'user' => function (ActiveQuery $query) {
+                        $query->select(UserHelper::$basicSelect);
+                    },
+                ])
+                ->all();
+            return $this->render('detail', [
+                'id' => $case_id,
+                'saspri' => $sasprik,
+                'cert' => $cert,
+                'selfTeam' => $selfTeam,
+                'peerTeam' => $peerTeam,
+            ]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                } elseif ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
     }
 
 
