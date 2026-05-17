@@ -81,9 +81,9 @@ $shingles = [
             ]); ?>
           <?php endforeach ?>
           <div class="w-100 d-flex justify-content-between mt-3">
-            <a href="/cert/start" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
+            <a href="<?= Url::to(['#', 'saspri_id' => $saspri_k['id']]) ?>" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
             <!-- possible pjax change only for top-->
-            <a href="/cert/start" class=" btn s-btn-main me-2">Edit data</a>
+            <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a>
           </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ $shingles = [
             ]); ?>
           <?php endforeach ?>
         </div>
-        <a href="/cert/start" class=" btn s-btn-main me-2 w-100 mt-3">Unduh Sertifikat <i class="fa-solid fa-download"></i></a>
+        <a href="<?= Url::to(['#', 'certificate_id' => $valid_certificate['id']]) ?>" class=" btn s-btn-main me-2 w-100 mt-3">Unduh Sertifikat <i class="fa-solid fa-download"></i></a>
       </div>
     </div>
   </div>

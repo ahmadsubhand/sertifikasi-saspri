@@ -6,6 +6,7 @@ use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /** @var int $id
  *  @var common\models\SaspriK $saspri
@@ -95,7 +96,7 @@ $shingles = [
     </div>
     <div class="col-sm-4">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <?php if (str_contains(strtolower($cert['status']), 'pending')) : ?>
+        <?php if ($cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
           <div class="px-3 text-center">
             <p class=" fw-bold h5">
                 Sertifikasi
@@ -156,6 +157,7 @@ $shingles = [
                 'shingles' => ''
               ]); ?>
             <?php endforeach ?>
+            <a href="<?= Url::to(['#', 'certificate_id' => $cert['id']]) ?>" class=" btn s-btn-main me-2 w-100 mt-3">Unduh Sertifikat <i class="fa-solid fa-download"></i></a>
           </div>
         <?php endif ?>
       </div>
