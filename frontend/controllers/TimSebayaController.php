@@ -207,6 +207,8 @@ class TimSebayaController extends Controller
             $this->findCertificationOrFail($certification_id)
                 ->savePeerReviewScores(Yii::$app->request->post('indicator_scores', []))
                 ->submitPeerReview()
+                ->calculateTotalScore('peer_team_score')
+                ->setGrade()
                 ->save(false);
 
             Yii::$app->session->setFlash('success', 'Peer Review berhasil difinalisasi');

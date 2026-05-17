@@ -41,6 +41,7 @@ use yii\web\UnprocessableEntityHttpException;
  * @property User[] $users
  * @property Certification $validCertificate
  * @property Certification|null $onGoingCertification
+ * @property Certification|null $latestCompletedCertification
  */
 class SaspriK extends \yii\db\ActiveRecord
 {
@@ -177,11 +178,23 @@ class SaspriK extends \yii\db\ActiveRecord
             ->andWhere(['!=', 'status', CertificationStatus::COMPLETED]);
     }
 
+    public function getLatestCompletedCertification(): ActiveQuery
+    {
+        return $this->hasOne(Certification::class, ['saspri_k_id' => 'id'])
+            ->andWhere(['status' => CertificationStatus::COMPLETED])
+            ->orderBy(['issued_at' => SORT_DESC]);
+    }
+
     public function createNewCertificationRequest(): Certification
     {
-        $valid_certificate = $this->validCertificate;
+        $last_certification = $this->latestCompletedCertification;
+        if (!$last_certification) {
+            throw new UnprocessableEntityHttpException(
+                'Belum mendaftarkan sertifikasi level pertama (Natalia)'
+            );
+        }
 
-        $next_certification_date = new DateTime($valid_certificate->next_certification_due_date);
+        $next_certification_date = new DateTime($last_certification->next_certification_due_date);
         $today = new DateTime('today');
         if ($next_certification_date > $today) {
             throw new UnprocessableEntityHttpException(
@@ -190,12 +203,12 @@ class SaspriK extends \yii\db\ActiveRecord
         }
 
         $certification = new Certification();
-        if ($valid_certificate->grade === CertificateGrade::BC || $valid_certificate->grade === CertificateGrade::C) {
+        if ($last_certification->grade === CertificateGrade::BC || $last_certification->grade === CertificateGrade::C) {
             $certification->purpose = CertificationPurpose::RENEWAL;
-            $certification->level = $valid_certificate->level;
+            $certification->level = $last_certification->level;
         } else {
             $certification->purpose = CertificationPurpose::LEVEL_UP;
-            switch ($valid_certificate->level) {
+            switch ($last_certification->level) {
                 case CertificateLevel::NATALIA:
                     $certification->level = CertificateLevel::WEANIA;
                     break;

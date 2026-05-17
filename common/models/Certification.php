@@ -266,10 +266,6 @@ class Certification extends \yii\db\ActiveRecord
         $this->status = CertificationStatus::EXTERNAL_REVIEW;
         $this->peer_review_due_date = date('Y-m-d H:i:s');
         $this->external_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
-
-        $score = $this->calculateTotalScore('peer_team_score');
-        $this->total_score = (int) round($score);
-        $this->grade = $this->calculateGrade($score);
         return $this;
     }
 
@@ -288,13 +284,6 @@ class Certification extends \yii\db\ActiveRecord
         $this->status = CertificationStatus::COMPLETED;
         $this->external_review_due_date = date('Y-m-d H:i:s');
         $this->issued_at = date('Y-m-d H:i:s');
-
-        $score = $this->calculateTotalScore('final_score');
-        $this->total_score = (int) round($score);
-        $this->grade = $this->calculateGrade($score);
-        $this->code = $this->generateCertificationCode();
-        $this->next_certification_due_date = $this->calculateNextCertificationDueDate();
-
         return $this;
     }
 
@@ -438,6 +427,18 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
+    public function updateValidCertificate()
+    {
+        if (
+            $this->grade === CertificateGrade::A ||
+            $this->grade === CertificateGrade::AB ||
+            $this->grade === CertificateGrade::B
+        ) {
+            $this->saspriK->link('validCertificate', $this);
+        }
+        return $this;
+    }
+
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore
     {
         return $this->getIndicatorScores()
@@ -450,7 +451,7 @@ class Certification extends \yii\db\ActiveRecord
             ]);
     }
 
-    protected function calculateTotalScore(string $property_name_of_indicator_score): float
+    public function calculateTotalScore(string $property_name_of_indicator_score): self
     {
         $total_score = 0;
         $root_groups = $this->assessment->rootGroups;
@@ -475,37 +476,41 @@ class Certification extends \yii\db\ActiveRecord
             $total_score += $group_total_weighted_sum * ($root_group->weight / 100);
         }
 
-        return $total_score;
+        $this->total_score = (int) round($total_score);
+        return $this;
     }
 
-    protected function calculateGrade(float $score): string
+    public function setGrade(): self
     {
-        if ($score >= 90) {
-            return CertificateGrade::A;
-        } elseif ($score >= 75) {
-            return CertificateGrade::AB;
-        } elseif ($score >= 60) {
-            return CertificateGrade::B;
-        } elseif ($score >= 50) {
-            return CertificateGrade::BC;
+        if ($this->total_score >= 90) {
+            $this->grade = CertificateGrade::A;
+        } elseif ($this->total_score >= 75) {
+            $this->grade = CertificateGrade::AB;
+        } elseif ($this->total_score >= 60) {
+            $this->grade = CertificateGrade::B;
+        } elseif ($this->total_score >= 50) {
+            $this->grade = CertificateGrade::BC;
         } else {
-            return CertificateGrade::C;
+            $this->grade = CertificateGrade::C;
         }
+        return $this;
     }
 
-    protected function generateCertificationCode()
+    public function generateCertificationCode()
     {
         $year = date('Y', strtotime($this->issued_at));
         $districtCode = $this->saspriK->district->code ?? '0000';
         $levelCode = strtoupper($this->level);
 
-        return sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
+        $this->code = sprintf('CERT/%s/%s/%s/%04d', $levelCode, $districtCode, $year, $this->id);
+        return $this;
     }
 
-    protected function calculateNextCertificationDueDate()
+    public function calculateNextCertificationDueDate()
     {
         $interval = (($this->grade === CertificateGrade::A) || ($this->grade === CertificateGrade::BC))
             ? 1 : 2;
-        return date('Y-m-d H:i:s', strtotime("+$interval year", strtotime($this->issued_at)));
+        $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", strtotime($this->issued_at)));
+        return $this;
     }
 }

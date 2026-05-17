@@ -72,7 +72,9 @@ class PenentuanTimSebayaController extends Controller
                 ->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->with('saspriK');
+                        $query->alias('u')
+                            ->with('saspriK')
+                            ->select(['u.id', 'u.username', 'u.saspri_k_id']);
                     }
                 ])
                 ->all(),
