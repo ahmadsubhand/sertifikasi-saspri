@@ -69,6 +69,13 @@ $currentRoute = Yii::$app->controller->getRoute();
         </div>
       </a>
     </div>
+    <div id="collapse-sidenav" class="collapse show">
+      <a href="<?php echo Url::to('/kegiatan-tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
+        <div class=" py-2 px-4 <?= str_contains($currentRoute, 'kegiatan') ? 's-bg-sec' : 's-bg-side' ?>">
+          Kegiatan Tim Sebaya
+        </div>
+      </a>
+    </div>
   </div>
 </aside>
 

@@ -27,24 +27,24 @@ class TimSebayaController extends Controller
     public function behaviors()
     {
         return [
-          'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-              [
-                'allow' => true,
-                'roles' => [UserRole::USER, UserRole::COORDINATOR],
-              ]
-            ]
-          ],
-          'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => [
-              'setuju' => ['post'],
-              'tolak' => ['post'],
-              'simpan-sementara-peer-review' => ['post'],
-              'finalisasi-peer-review' => ['post'],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::USER, UserRole::COORDINATOR],
+                    ]
+                ]
             ],
-          ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'setuju' => ['post'],
+                    'tolak' => ['post'],
+                    'simpan-sementara-peer-review' => ['post'],
+                    'finalisasi-peer-review' => ['post'],
+                ],
+            ],
         ];
     }
 
@@ -69,7 +69,7 @@ class TimSebayaController extends Controller
                     CertificationStatus::COMPLETED,
                 ]
             ])
-            ->orderBy(['c.updated_at' => SORT_DESC])
+            ->orderBy(['c.peer_review_due_date' => SORT_ASC])
             ->all();
 
         $peer_team_member_completed = (clone $base_query)
@@ -295,10 +295,11 @@ class TimSebayaController extends Controller
     private function findPendingPeerTeamMemberOrFail(int $peer_team_member_id): PeerTeamMember
     {
         $member = PeerTeamMember::find()
+            ->alias('ptm')
             ->joinWith('certification')
             ->where([
-                'peer_team_members.id' => $peer_team_member_id,
-                'peer_team_members.user_id' => Yii::$app->user->id,
+                'ptm.id' => $peer_team_member_id,
+                'ptm.user_id' => Yii::$app->user->id,
             ])
             ->one();
 

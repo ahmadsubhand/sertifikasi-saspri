@@ -64,11 +64,11 @@ class PenentuanTimSebayaController extends Controller
         try {
             $certification = $this->findCertificationOrFail($certification_id);
             return $this->render('pembentukanTimSebaya', [
-              'saspri_k' => $certification->saspriK,
-              'district' => $certification->saspriK->district,
-              'certification' => $certification,
-              'valid_certificate' => $certification->saspriK->validCertificate,
-              'peer_team_members' => $certification
+                'saspri_k' => $certification->saspriK,
+                'district' => $certification->saspriK->district,
+                'certification' => $certification,
+                'valid_certificate' => $certification->saspriK->validCertificate,
+                'peer_team_members' => $certification
                 ->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
@@ -98,11 +98,11 @@ class PenentuanTimSebayaController extends Controller
 
             $certification = $this->findCertificationOrFail($certification_id);
             $users = $this->getAvailablePeerTeamMembersQuery($certification)
-              ->andWhere(['like', 'username', $q])
-              ->select(['id', 'username'])
-              ->limit(10)
-              ->asArray()
-              ->all();
+                ->andWhere(['like', 'username', $q])
+                ->select(['id', 'username'])
+                ->limit(10)
+                ->asArray()
+                ->all();
 
             return $users;
         } catch (Exception $error) {
@@ -128,9 +128,9 @@ class PenentuanTimSebayaController extends Controller
 
                 $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
                 $valid_users = $this->getAvailablePeerTeamMembersQuery($certification)
-                  ->andWhere(['id' => $array_user_ids])
-                  ->select('username')
-                  ->column();
+                    ->andWhere(['id' => $array_user_ids])
+                    ->select('username')
+                    ->column();
 
                 if (count($valid_users) !== count($array_user_ids)) {
                     throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di Tim Sebaya saat ini');
@@ -203,7 +203,7 @@ class PenentuanTimSebayaController extends Controller
                     $error instanceof BadRequestHttpException ||
                     (
                         $error instanceof NotFoundHttpException &&
-            str_contains($error->getMessage(), 'anggota')
+                        str_contains($error->getMessage(), 'anggota')
                     )
                 ) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
@@ -261,29 +261,29 @@ class PenentuanTimSebayaController extends Controller
     private function getAvailablePeerTeamMembersQuery(Certification $certification)
     {
         $existing_member_ids = $certification
-          ->getPeerTeamMembers()
-          ->select('user_id')
-          ->column();
+            ->getPeerTeamMembers()
+            ->select('user_id')
+            ->column();
 
         return User::find()
-          ->leftJoin('auth_assignment aa', 'aa.user_id = id')
-          ->andWhere(['not in', 'id', $existing_member_ids])
-          ->andWhere([
-            'or',
-            ['aa.item_name' => UserRole::ADMIN],
-            [
-              'and',
-              ['not', ['saspri_k_id' => null]],
-              ['!=', 'saspri_k_id', $certification->saspri_k_id]
-            ]
-          ]);
+            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
+            ->andWhere(['not in', 'id', $existing_member_ids])
+            ->andWhere([
+                'or',
+                ['aa.item_name' => UserRole::ADMIN],
+                [
+                    'and',
+                    ['not', ['saspri_k_id' => null]],
+                    ['!=', 'saspri_k_id', $certification->saspri_k_id]
+                ]
+            ]);
     }
 
     private function findAMemberOfPeerTeam(int $user_id, Certification $certification): PeerTeamMember
     {
         $member = $certification->getPeerTeamMembers()
-          ->where(['user_id' => $user_id])
-          ->one();
+            ->where(['user_id' => $user_id])
+            ->one();
         if (!$member) {
             throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Sebaya');
         }

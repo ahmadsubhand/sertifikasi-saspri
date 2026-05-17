@@ -69,7 +69,7 @@ class TimMandiriController extends Controller
                     CertificationStatus::COMPLETED,
                 ]
             ])
-            ->orderBy(['c.updated_at' => SORT_DESC])
+            ->orderBy(['c.self_review_due_date' => SORT_DESC])
             ->all();
 
         $self_team_member_completed = (clone $base_query)
@@ -295,10 +295,11 @@ class TimMandiriController extends Controller
     private function findPendingSelfTeamMemberOrFail(int $self_team_member_id): SelfTeamMember
     {
         $member = SelfTeamMember::find()
+            ->alias('stm')
             ->joinWith('certification')
             ->where([
-                'self_team_members.id' => $self_team_member_id,
-                'self_team_members.user_id' => Yii::$app->user->id,
+                'stm.id' => $self_team_member_id,
+                'stm.user_id' => Yii::$app->user->id,
             ])
             ->one();
 

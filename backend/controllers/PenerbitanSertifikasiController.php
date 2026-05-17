@@ -51,6 +51,7 @@ class PenerbitanSertifikasiController extends Controller
     {
         $certifications = Certification::find()
             ->where(['status' => CertificationStatus::EXTERNAL_REVIEW])
+            ->orderBy(['external_review_due_date' => SORT_ASC])
             ->with(['saspriK'])
             ->all();
         return $this->render('index', [
