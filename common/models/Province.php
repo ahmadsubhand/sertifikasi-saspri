@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "provinces".
+ * This is the model class for table "province".
  *
  * @property int $id
  * @property string $name
@@ -18,7 +18,7 @@ class Province extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'provinces';
+        return 'province';
     }
 
     /**

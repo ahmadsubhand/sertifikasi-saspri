@@ -1,6 +1,6 @@
 -- Data berasal dari db/wilayah.sql dari https://github.com/cahyadsn/wilayah dan sudah disesuaikan dengan db
 
-INSERT INTO provinces (id, name, code) VALUES
+INSERT INTO province (id, name, code) VALUES
 (1, 'Aceh', '11'),
 (2, 'Sumatera Utara', '12'),
 (3, 'Sumatera Barat', '13'),
@@ -40,7 +40,7 @@ INSERT INTO provinces (id, name, code) VALUES
 (37, 'Papua Pegunungan', '95'),
 (38, 'Papua Barat Daya', '96');
 
-INSERT INTO regencies (id, province_id, code, name) VALUES
+INSERT INTO regency (id, province_id, code, name) VALUES
 (1, 1, '11.01', 'Kabupaten Aceh Selatan'),
 (2, 1, '11.02', 'Kabupaten Aceh Tenggara'),
 (3, 1, '11.03', 'Kabupaten Aceh Timur'),
@@ -556,7 +556,7 @@ INSERT INTO regencies (id, province_id, code, name) VALUES
 (513, 38, '96.05', 'Kabupaten Maybrat'),
 (514, 38, '96.71', 'Kota Sorong');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (1, 1, '11.01.01', 'Bakongan'),
 (2, 1, '11.01.02', 'Kluet Utara'),
 (3, 1, '11.01.03', 'Kluet Selatan'),
@@ -1558,7 +1558,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (999, 80, '14.05.09', 'Teluk Meranti'),
 (1000, 80, '14.05.10', 'Kuala Kampar');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (1001, 80, '14.05.11', 'Bandar Sei Kijang'),
 (1002, 80, '14.05.12', 'Bandar Petalangan'),
 (1003, 81, '14.06.01', 'Ujung Batu'),
@@ -2560,7 +2560,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (1999, 159, '31.74.09', 'Jagakarsa'),
 (2000, 159, '31.74.10', 'Pesanggrahan');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (2001, 160, '31.75.01', 'Matraman'),
 (2002, 160, '31.75.02', 'Pulogadung'),
 (2003, 160, '31.75.03', 'Jatinegara'),
@@ -3562,7 +3562,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (2999, 206, '33.19.03', 'Jati'),
 (3000, 206, '33.19.04', 'Undaan');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (3001, 206, '33.19.05', 'Mejobo'),
 (3002, 206, '33.19.06', 'Jekulo'),
 (3003, 206, '33.19.07', 'Bae'),
@@ -4564,7 +4564,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (3999, 267, '36.02.07', 'Bojongmanik'),
 (4000, 267, '36.02.08', 'Gunungkencana');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (4001, 267, '36.02.09', 'Banjarsari'),
 (4002, 267, '36.02.10', 'Cileles'),
 (4003, 267, '36.02.11', 'Cimarga'),
@@ -5566,7 +5566,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (4999, 348, '63.06.06', 'Simpur'),
 (5000, 348, '63.06.07', 'Daha Selatan');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (5001, 348, '63.06.08', 'Daha Utara'),
 (5002, 348, '63.06.09', 'Kalumpang'),
 (5003, 348, '63.06.10', 'Loksado'),
@@ -6568,7 +6568,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (5999, 428, '74.06.17', 'Kep. Masaloka Raya'),
 (6000, 428, '74.06.18', 'Rumbia Tengah');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (6001, 428, '74.06.19', 'Poleang Tengah'),
 (6002, 428, '74.06.20', 'Tontonunu'),
 (6003, 428, '74.06.21', 'Lantari Jaya'),
@@ -7570,7 +7570,7 @@ INSERT INTO districts (id, regency_id, code, name) VALUES
 (6999, 503, '95.03.24', 'Pronggoli'),
 (7000, 503, '95.03.25', 'Walma');
 
-INSERT INTO districts (id, regency_id, code, name) VALUES
+INSERT INTO district (id, regency_id, code, name) VALUES
 (7001, 503, '95.03.26', 'Yahuliambut'),
 (7002, 503, '95.03.27', 'Hereapini'),
 (7003, 503, '95.03.28', 'Ubalihi'),

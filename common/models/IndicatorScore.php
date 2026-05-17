@@ -9,7 +9,7 @@ use yii\web\BadRequestHttpException;
 use yii\web\UploadedFile;
 
 /**
- * This is the model class for table "indicator_scores".
+ * This is the model class for table "indicator_score".
  *
  * @property int $id
  * @property int $indicator_id
@@ -30,7 +30,7 @@ class IndicatorScore extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'indicator_scores';
+        return 'indicator_score';
     }
 
     /**

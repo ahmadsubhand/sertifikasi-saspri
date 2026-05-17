@@ -7,19 +7,19 @@ use common\enums\CertificationStatus;
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `certifications`.
+ * Handles the creation of table `certification`.
  * Has foreign keys to the tables:
  *
  * - `saspri_k`
  */
-class m260504_042603_create_certifications_table extends Migration
+class m260504_042603_create_certification_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('certifications', [
+        $this->createTable('certification', [
             'id' => $this->primaryKey(),
             'saspri_k_id' => $this->integer()->notNull(),
             'assessment_id' => $this->integer()->notNull(),
@@ -48,15 +48,15 @@ class m260504_042603_create_certifications_table extends Migration
 
         // creates index for column `saspri_k_id`
         $this->createIndex(
-            'idx-certifications-saspri_k_id',
-            'certifications',
+            'idx-certification-saspri_k_id',
+            'certification',
             'saspri_k_id'
         );
 
         // add foreign key for table `saspri_k`
         $this->addForeignKey(
-            'fk-certifications-saspri_k_id',
-            'certifications',
+            'fk-certification-saspri_k_id',
+            'certification',
             'saspri_k_id',
             'saspri_k',
             'id',
@@ -65,46 +65,46 @@ class m260504_042603_create_certifications_table extends Migration
 
         // creates index for column `assessment_id`
         $this->createIndex(
-            'idx-certifications-assessment_id',
-            'certifications',
+            'idx-certification-assessment_id',
+            'certification',
             'assessment_id'
         );
 
-        // add foreign key for table `assessments`
+        // add foreign key for table `assessment`
         $this->addForeignKey(
-            'fk-certifications-assessment_id',
-            'certifications',
+            'fk-certification-assessment_id',
+            'certification',
             'assessment_id',
-            'assessments',
+            'assessment',
             'id',
             'CASCADE'
         );
 
         // purpose
         $this->addCheck(
-            'chk-certifications-purpose',
-            'certifications',
+            'chk-certification-purpose',
+            'certification',
             "purpose IN ('" . implode("','", CertificationPurpose::values()) . "')"
         );
 
         // status
         $this->addCheck(
-            'chk-certifications-status',
-            'certifications',
+            'chk-certification-status',
+            'certification',
             "status IN ('" . implode("','", CertificationStatus::values()) . "')"
         );
 
         // level
         $this->addCheck(
-            'chk-certifications-level',
-            'certifications',
+            'chk-certification-level',
+            'certification',
             "level IN ('" . implode("','", CertificateLevel::values()) . "')"
         );
 
         // grade (nullable)
         $this->addCheck(
-            'chk-certifications-grade',
-            'certifications',
+            'chk-certification-grade',
+            'certification',
             "grade IS NULL OR grade IN ('" . implode("','", CertificateGrade::values()) . "')"
         );
     }
@@ -116,52 +116,52 @@ class m260504_042603_create_certifications_table extends Migration
     {
         // purpose
         $this->dropCheck(
-            'chk-certifications-purpose',
-            'certifications',
+            'chk-certification-purpose',
+            'certification',
         );
 
         // status
         $this->dropCheck(
-            'chk-certifications-status',
-            'certifications',
+            'chk-certification-status',
+            'certification',
         );
 
         // level
         $this->dropCheck(
-            'chk-certifications-level',
-            'certifications',
+            'chk-certification-level',
+            'certification',
         );
 
         // grade (nullable)
         $this->dropCheck(
-            'chk-certifications-grade',
-            'certifications',
+            'chk-certification-grade',
+            'certification',
         );
 
-        // drops foreign key for table `assessments`
+        // drops foreign key for table `assessment`
         $this->dropForeignKey(
-            'fk-certifications-assessment_id',
-            'certifications'
+            'fk-certification-assessment_id',
+            'certification'
         );
 
         // drops index for column `assessment_id`
         $this->dropIndex(
-            'idx-certifications-assessment_id',
-            'certifications'
+            'idx-certification-assessment_id',
+            'certification'
         );
 
         // drops foreign key for table `saspri_k`
         $this->dropForeignKey(
-            'fk-certifications-saspri_k_id',
-            'certifications'
+            'fk-certification-saspri_k_id',
+            'certification'
         );
 
         // drops index for column `saspri_k_id`
         $this->dropIndex(
-            'idx-certifications-saspri_k_id',
-            'certifications'
+            'idx-certification-saspri_k_id',
+            'certification'
         );
 
-        $this->dropTable('certifications');
+        $this->dropTable('certification');
     }
 }

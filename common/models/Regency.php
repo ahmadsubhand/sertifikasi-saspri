@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "regencies".
+ * This is the model class for table "regency".
  *
  * @property int $id
  * @property int $province_id
@@ -20,7 +20,7 @@ class Regency extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'regencies';
+        return 'regency';
     }
 
     /**

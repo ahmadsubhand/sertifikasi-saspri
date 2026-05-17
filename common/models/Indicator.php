@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "indicators".
+ * This is the model class for table "indicator".
  *
  * @property int $id
  * @property int $indicator_group_id
@@ -23,7 +23,7 @@ class Indicator extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'indicators';
+        return 'indicator';
     }
 
     /**
@@ -60,7 +60,7 @@ class Indicator extends \yii\db\ActiveRecord
      */
     public function getCertifications()
     {
-        return $this->hasMany(Certification::class, ['id' => 'certification_id'])->viaTable('indicator_scores', ['indicator_id' => 'id']);
+        return $this->hasMany(Certification::class, ['id' => 'certification_id'])->viaTable('indicator_score', ['indicator_id' => 'id']);
     }
 
     /**

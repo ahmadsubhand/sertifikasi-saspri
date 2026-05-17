@@ -5,20 +5,20 @@ use common\enums\TeamRole;
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `self_team_members`.
+ * Handles the creation of table `self_team_member`.
  * Has foreign keys to the tables:
  *
- * - `certifications`
+ * - `certification`
  * - `user`
  */
-class m260504_044705_create_self_team_members_table extends Migration
+class m260504_044705_create_self_team_member_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('self_team_members', [
+        $this->createTable('self_team_member', [
             'id' => $this->primaryKey(),
             'certification_id' => $this->integer()->notNull(),
             'user_id' => $this->integer()->notNull(),
@@ -28,56 +28,56 @@ class m260504_044705_create_self_team_members_table extends Migration
 
         // creates index for column `certification_id`
         $this->createIndex(
-            'idx-self_team_members-certification_id',
-            'self_team_members',
+            'idx-self_team_member-certification_id',
+            'self_team_member',
             'certification_id'
         );
 
-        // add foreign key for table `certifications`
+        // add foreign key for table `certification`
         $this->addForeignKey(
-            'fk-self_team_members-certification_id',
-            'self_team_members',
+            'fk-self_team_member-certification_id',
+            'self_team_member',
             'certification_id',
-            'certifications',
+            'certification',
             'id',
             'CASCADE'
         );
 
         // creates index for column `user_id`
         $this->createIndex(
-            'idx-self_team_members-user_id',
-            'self_team_members',
+            'idx-self_team_member-user_id',
+            'self_team_member',
             'user_id'
         );
 
         // add foreign key for table `user`
         $this->addForeignKey(
-            'fk-self_team_members-user_id',
-            'self_team_members',
+            'fk-self_team_member-user_id',
+            'self_team_member',
             'user_id',
             'user',
             'id',
             'CASCADE'
         );
 
-        // self_team_members (status)
+        // self_team_member (status)
         $this->addCheck(
-            'chk-self_team_members-status',
-            'self_team_members',
+            'chk-self_team_member-status',
+            'self_team_member',
             "status IN ('" . implode("','", ApprovalStatus::values()) . "')"
         );
 
-        // self_team_members (role)
+        // self_team_member (role)
         $this->addCheck(
-            'chk-self_team_members-role',
-            'self_team_members',
+            'chk-self_team_member-role',
+            'self_team_member',
             "role IN ('" . implode("','", TeamRole::values()) . "')"
         );
 
         // unique constraint: one user, one certification
         $this->createIndex(
-            'uq-self_team_members-certification-user',
-            'self_team_members',
+            'uq-self_team_member-certification-user',
+            'self_team_member',
             ['certification_id', 'user_id'],
             true
         );
@@ -89,40 +89,40 @@ class m260504_044705_create_self_team_members_table extends Migration
     public function safeDown()
     {
         $this->dropIndex(
-            'uq-self_team_members-certification-user',
-            'self_team_members',
+            'uq-self_team_member-certification-user',
+            'self_team_member',
         );
 
-        // self_team_members (status)
-        $this->dropCheck('chk-self_team_members-status', 'self_team_members');
+        // self_team_member (status)
+        $this->dropCheck('chk-self_team_member-status', 'self_team_member');
 
-        // self_team_members (role)
-        $this->dropCheck('chk-self_team_members-role', 'self_team_members');
+        // self_team_member (role)
+        $this->dropCheck('chk-self_team_member-role', 'self_team_member');
 
-        // drops foreign key for table `certifications`
+        // drops foreign key for table `certification`
         $this->dropForeignKey(
-            'fk-self_team_members-certification_id',
-            'self_team_members'
+            'fk-self_team_member-certification_id',
+            'self_team_member'
         );
 
         // drops index for column `certification_id`
         $this->dropIndex(
-            'idx-self_team_members-certification_id',
-            'self_team_members'
+            'idx-self_team_member-certification_id',
+            'self_team_member'
         );
 
         // drops foreign key for table `user`
         $this->dropForeignKey(
-            'fk-self_team_members-user_id',
-            'self_team_members'
+            'fk-self_team_member-user_id',
+            'self_team_member'
         );
 
         // drops index for column `user_id`
         $this->dropIndex(
-            'idx-self_team_members-user_id',
-            'self_team_members'
+            'idx-self_team_member-user_id',
+            'self_team_member'
         );
 
-        $this->dropTable('self_team_members');
+        $this->dropTable('self_team_member');
     }
 }

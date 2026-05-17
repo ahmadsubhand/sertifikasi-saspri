@@ -3,19 +3,19 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `districts`.
+ * Handles the creation of table `district`.
  * Has foreign keys to the tables:
  *
- * - `regencies`
+ * - `regency`
  */
-class m260504_033822_create_districts_table extends Migration
+class m260504_033822_create_district_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('districts', [
+        $this->createTable('district', [
             'id' => $this->primaryKey(),
             'regency_id' => $this->integer()->notNull(),
             'code' => $this->string()->notNull(),
@@ -24,17 +24,17 @@ class m260504_033822_create_districts_table extends Migration
 
         // creates index for column `regency_id`
         $this->createIndex(
-            'idx-districts-regency_id',
-            'districts',
+            'idx-district-regency_id',
+            'district',
             'regency_id'
         );
 
-        // add foreign key for table `regencies`
+        // add foreign key for table `regency`
         $this->addForeignKey(
-            'fk-districts-regency_id',
-            'districts',
+            'fk-district-regency_id',
+            'district',
             'regency_id',
-            'regencies',
+            'regency',
             'id',
             'CASCADE'
         );
@@ -45,18 +45,18 @@ class m260504_033822_create_districts_table extends Migration
      */
     public function safeDown()
     {
-        // drops foreign key for table `regencies`
+        // drops foreign key for table `regency`
         $this->dropForeignKey(
-            'fk-districts-regency_id',
-            'districts'
+            'fk-district-regency_id',
+            'district'
         );
 
         // drops index for column `regency_id`
         $this->dropIndex(
-            'idx-districts-regency_id',
-            'districts'
+            'idx-district-regency_id',
+            'district'
         );
 
-        $this->dropTable('districts');
+        $this->dropTable('district');
     }
 }

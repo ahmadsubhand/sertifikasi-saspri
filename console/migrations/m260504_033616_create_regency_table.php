@@ -3,19 +3,19 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `regencies`.
+ * Handles the creation of table `regency`.
  * Has foreign keys to the tables:
  *
- * - `provinces`
+ * - `province`
  */
-class m260504_033616_create_regencies_table extends Migration
+class m260504_033616_create_regency_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('regencies', [
+        $this->createTable('regency', [
             'id' => $this->primaryKey(),
             'province_id' => $this->integer()->notNull(),
             'code' => $this->string()->notNull(),
@@ -24,17 +24,17 @@ class m260504_033616_create_regencies_table extends Migration
 
         // creates index for column `province_id`
         $this->createIndex(
-            'idx-regencies-province_id',
-            'regencies',
+            'idx-regency-province_id',
+            'regency',
             'province_id'
         );
 
-        // add foreign key for table `provinces`
+        // add foreign key for table `province`
         $this->addForeignKey(
-            'fk-regencies-province_id',
-            'regencies',
+            'fk-regency-province_id',
+            'regency',
             'province_id',
-            'provinces',
+            'province',
             'id',
             'CASCADE'
         );
@@ -45,18 +45,18 @@ class m260504_033616_create_regencies_table extends Migration
      */
     public function safeDown()
     {
-        // drops foreign key for table `provinces`
+        // drops foreign key for table `province`
         $this->dropForeignKey(
-            'fk-regencies-province_id',
-            'regencies'
+            'fk-regency-province_id',
+            'regency'
         );
 
         // drops index for column `province_id`
         $this->dropIndex(
-            'idx-regencies-province_id',
-            'regencies'
+            'idx-regency-province_id',
+            'regency'
         );
 
-        $this->dropTable('regencies');
+        $this->dropTable('regency');
     }
 }

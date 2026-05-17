@@ -117,7 +117,7 @@ INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, coo
 -- 3 Natalia A/AB/B, 2 Weania BC/C, 1 Natalia A
 -- --------------------------------------------------------
 
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
 (1, 1, 1, 'level_up', 'completed', 'natalia', 95, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
 (2, 2, 1, 'level_up', 'completed', 'natalia', 82, 'b', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
 (3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
@@ -130,31 +130,31 @@ INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, lev
 -- --------------------------------------------------------
 
 -- SaspriK 1: Natalia A -> Level Up -> Weania (pending_self_team_formation)
-INSERT INTO certifications (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
-(7, 1, 1, 'level_up', 'pending_self_team_formation', 'weania', 1777639200, 1777639200);
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at, self_team_due_date) VALUES
+(7, 1, 1, 'level_up', 'pending_self_team_formation', 'weania', 1777639200, 1777639200, '2026-05-17 10:00:00');
 
 -- SaspriK 2: Natalia B -> Level Up -> Weania (self_review)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
-(8, 2, 1, 'level_up', 'self_review', 'weania', 1777639200, 1777639200);
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at, self_team_due_date, self_review_due_date) VALUES
+(8, 2, 1, 'level_up', 'self_review', 'weania', 1777034400, 1777034400, '2026-05-10 10:00:00', '2026-05-24 10:00:00');
 
 -- SaspriK 3: Natalia AB -> Level Up -> Weania (pending_peer_team_formation)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
-(9, 3, 1, 'level_up', 'pending_peer_team_formation', 'weania', 1777639200, 1777639200);
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at, self_team_due_date, self_review_due_date, peer_team_due_date) VALUES
+(9, 3, 1, 'level_up', 'pending_peer_team_formation', 'weania', 1775824800, 1775824800, '2026-04-26 10:00:00', '2026-05-10 10:00:00', '2026-05-17 10:00:00');
 
 -- SaspriK 4: Weania BC -> Renewal -> Weania (peer_review)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
-(10, 4, 1, 'renewal', 'peer_review', 'weania', 1777639200, 1777639200);
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date) VALUES
+(10, 4, 1, 'renewal', 'peer_review', 'weania', 1775220000, 1775220000, '2026-04-19 10:00:00', '2026-05-03 10:00:00', '2026-05-10 10:00:00', '2026-05-24 10:00:00');
 
 -- SaspriK 5: Weania C -> Renewal -> Weania (external_review)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at) VALUES
-(11, 5, 1, 'renewal', 'external_review', 'weania', 1777639200, 1777639200);
+INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, created_at, updated_at, self_team_due_date, self_review_due_date, peer_team_due_date, peer_review_due_date, external_review_due_date) VALUES
+(11, 5, 1, 'renewal', 'external_review', 'weania', 1774010400, 1774010400, '2026-04-05 10:00:00', '2026-04-19 10:00:00', '2026-04-26 10:00:00', '2026-05-10 10:00:00', '2026-05-24 10:00:00');
 
 -- SaspriK 6: Natalia A -> Level Up -> Weania (completed)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+INSERT INTO certification ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
 (12, 6, 1, 'level_up', 'completed', 'weania', 88, 'ab', 1777639200, 1778416800, '2026-05-10 10:00:00', '2028-05-10 10:00:00');
 
 -- Initial Valid Certs for Additionals (SASPRI-K 7-11)
-INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
+INSERT INTO certification ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
 (13, 7, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
 (14, 8, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
 (15, 9, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
@@ -167,32 +167,32 @@ INSERT INTO certifications ( id, saspri_k_id, assessment_id, purpose, status, le
 
 -- Self Teams
 -- Rep 1 (pending formation): 2 approved, 1 pending
-INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO self_team_member (certification_id, user_id, status, role) VALUES
 (7, 15, 'approved', 'leader'), (7, 16, 'approved', 'member'), (7, 17, 'pending', 'member');
 
 -- Rep 2 (self review): 3 approved
-INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO self_team_member (certification_id, user_id, status, role) VALUES
 (8, 35, 'approved', 'leader'), (8, 36, 'approved', 'member'), (8, 37, 'approved', 'member');
 
 -- Rep 3 (pending peer): Self approved, Peer mixed
-INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO self_team_member (certification_id, user_id, status, role) VALUES
 (9, 55, 'approved', 'leader'), (9, 56, 'approved', 'member'), (9, 57, 'approved', 'member');
 
-INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO peer_team_member (certification_id, user_id, status, role) VALUES
 (9, 1, 'approved', 'facilitator'), (9, 34, 'pending', 'leader'), (9, 14, 'rejected', 'member');
 
 -- Rep 4 (peer review): All approved
-INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO self_team_member (certification_id, user_id, status, role) VALUES
 (10, 75, 'approved', 'leader'), (10, 76, 'approved', 'member'), (10, 77, 'approved', 'member');
 
-INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO peer_team_member (certification_id, user_id, status, role) VALUES
 (10, 2, 'approved', 'facilitator'), (10, 14, 'approved', 'leader'), (10, 34, 'approved', 'member');
 
 -- Rep 5 (external review): All approved
-INSERT INTO self_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO self_team_member (certification_id, user_id, status, role) VALUES
 (11, 95, 'approved', 'leader'), (11, 96, 'approved', 'member'), (11, 97, 'approved', 'member');
 
-INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
+INSERT INTO peer_team_member (certification_id, user_id, status, role) VALUES
 (11, 3, 'approved', 'facilitator'), (11, 14, 'approved', 'leader'), (11, 54, 'approved', 'member');
 
 -- --------------------------------------------------------
@@ -200,17 +200,17 @@ INSERT INTO peer_team_members (certification_id, user_id, status, role) VALUES
 -- --------------------------------------------------------
 
 -- Rep 2 (self_review): partial self
-INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score) VALUES
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score) VALUES
 (8, 1, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100)), 
 (8, 2, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100)), 
 (8, 3, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100));
 
 -- Rep 3 (pending_peer): full self
-INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score)
-SELECT 9, id, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) FROM indicators LIMIT 42;
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score)
+SELECT 9, id, ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) FROM indicator LIMIT 42;
 
 -- Rep 4 (peer_review): full self, partial peer
-INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score, peer_team_score, status)
 SELECT 10, id, s, p, 
     CASE 
         WHEN p IS NULL THEN NULL 
@@ -221,11 +221,11 @@ FROM (
     SELECT id, 
            ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as s,
            CASE WHEN id <= 5 THEN ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) ELSE NULL END as p
-    FROM indicators LIMIT 42
+    FROM indicator LIMIT 42
 ) as tmp;
 
 -- Rep 5 (external_review): full self, full peer
-INSERT INTO indicator_scores (certification_id, indicator_id, self_team_score, peer_team_score, status)
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score, peer_team_score, status)
 SELECT 11, id, s, p, 
     CASE 
         WHEN s = p THEN 'identical' 
@@ -235,7 +235,7 @@ FROM (
     SELECT id, 
            ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as s,
            ELT(FLOOR(1 + RAND() * 4), 25, 50, 75, 100) as p
-    FROM indicators LIMIT 42
+    FROM indicator LIMIT 42
 ) as tmp;
 
 SET FOREIGN_KEY_CHECKS = 1;

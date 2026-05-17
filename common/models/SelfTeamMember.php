@@ -7,7 +7,7 @@ use common\enums\TeamRole;
 use yii\web\BadRequestHttpException;
 
 /**
- * This is the model class for table "self_team_members".
+ * This is the model class for table "self_team_member".
  *
  * @property int $id
  * @property int $certification_id
@@ -25,7 +25,7 @@ class SelfTeamMember extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'self_team_members';
+        return 'self_team_member';
     }
 
     /**

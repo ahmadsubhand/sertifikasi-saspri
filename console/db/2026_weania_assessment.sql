@@ -4,14 +4,14 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Assessments
 -- --------------------------------------------------------
 
-INSERT INTO assessments (id, title, active_at_level, level, created_at, updated_at, released_at) VALUES
+INSERT INTO assessment (id, title, active_at_level, level, created_at, updated_at, released_at) VALUES
 (1, '20260212 Instrument Sertifikasi SASPRI-K 2026', 'weania', 'weania', '2026-05-07 10:00:00', '2026-05-07 10:00:00', '2026-05-07 10:00:00');
 
 -- --------------------------------------------------------
 -- Indicator Groups
 -- --------------------------------------------------------
 
-INSERT INTO indicator_groups (id, assessment_id, parent_group_id, code, label, `order`, weight) VALUES
+INSERT INTO indicator_group (id, assessment_id, parent_group_id, code, label, `order`, weight) VALUES
 (1, 1, NULL, 'A', 'Tata Kelola Manajemen', 1, 45),
 (2, 1, 1, 'A1', 'Sistem dan Budaya Organisasi (legalitas)', 1, 30),
 (3, 1, 1, 'A2', 'Amanat dalam Berorganisasi (aktivitas)', 2, 70),
@@ -26,7 +26,7 @@ INSERT INTO indicator_groups (id, assessment_id, parent_group_id, code, label, `
 -- Indicators
 -- --------------------------------------------------------
 
-INSERT INTO indicators (id, indicator_group_id, code, label, `order`) VALUES
+INSERT INTO indicator (id, indicator_group_id, code, label, `order`) VALUES
 -- A1
 (1, 2, '1', 'Struktur organisasi SASPRI-K dengan personil pengurusnya', 1),
 (2, 2, '2', 'Jumlah personil yang menandatangani Pakta Integritas Kewalian', 2),
@@ -80,7 +80,7 @@ INSERT INTO indicators (id, indicator_group_id, code, label, `order`) VALUES
 -- Indicator Options
 -- --------------------------------------------------------
 
-INSERT INTO indicator_options (indicator_id, code, label, `order`, weight) VALUES
+INSERT INTO indicator_option (indicator_id, code, label, `order`, weight) VALUES
 -- Options for Indicator 1 (A1-1)
 (1, 'A', 'Tidak lengkap dan tidak terpampang', 1, 25),
 (1, 'B', 'Lengkap dan tidak terpampang', 2, 50),

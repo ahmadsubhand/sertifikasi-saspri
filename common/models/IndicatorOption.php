@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "indicator_options".
+ * This is the model class for table "indicator_option".
  *
  * @property int $id
  * @property int $indicator_id
@@ -21,7 +21,7 @@ class IndicatorOption extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'indicator_options';
+        return 'indicator_option';
     }
 
     /**

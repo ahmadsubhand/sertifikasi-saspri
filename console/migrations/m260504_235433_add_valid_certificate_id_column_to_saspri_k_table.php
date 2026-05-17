@@ -17,12 +17,12 @@ class m260504_235433_add_valid_certificate_id_column_to_saspri_k_table extends M
     {
         $this->addColumn('saspri_k', 'valid_certificate_id', $this->integer()->notNull()->unique());
 
-        // add foreign key for table `certifications`
+        // add foreign key for table `certification`
         $this->addForeignKey(
             'fk-saspri_k-valid_certificate_id',
             'saspri_k',
             'valid_certificate_id',
-            'certifications',
+            'certification',
             'id',
             'CASCADE'
         );
@@ -33,7 +33,7 @@ class m260504_235433_add_valid_certificate_id_column_to_saspri_k_table extends M
      */
     public function safeDown()
     {
-        // drops foreign key for table `certifications`
+        // drops foreign key for table `certification`
         $this->dropForeignKey(
             'fk-saspri_k-valid_certificate_id',
             'saspri_k'

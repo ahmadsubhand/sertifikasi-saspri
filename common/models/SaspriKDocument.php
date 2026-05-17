@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "saspri_k_documents".
+ * This is the model class for table "saspri_k_document".
  *
  * @property int $id
  * @property string $url
@@ -19,7 +19,7 @@ class SaspriKDocument extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'saspri_k_documents';
+        return 'saspri_k_document';
     }
 
     /**

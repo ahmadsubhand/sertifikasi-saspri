@@ -8,7 +8,7 @@ use common\helpers\UserHelper;
 use yii\web\BadRequestHttpException;
 
 /**
- * This is the model class for table "peer_team_members".
+ * This is the model class for table "peer_team_member".
  *
  * @property int $id
  * @property int $certification_id
@@ -26,7 +26,7 @@ class PeerTeamMember extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'peer_team_members';
+        return 'peer_team_member';
     }
 
     /**

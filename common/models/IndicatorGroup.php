@@ -5,7 +5,7 @@ namespace common\models;
 use yii\db\ActiveQuery;
 
 /**
- * This is the model class for table "indicator_groups".
+ * This is the model class for table "indicator_group".
  *
  * @property int $id
  * @property int|null $assessment_id
@@ -28,7 +28,7 @@ class IndicatorGroup extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'indicator_groups';
+        return 'indicator_group';
     }
 
     /**

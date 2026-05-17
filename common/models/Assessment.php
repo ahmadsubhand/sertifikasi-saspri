@@ -7,7 +7,7 @@ use Exception;
 use yii\web\BadRequestHttpException;
 
 /**
- * This is the model class for table "assessments".
+ * This is the model class for table "assessment".
  *
  * @property int $id
  * @property string $title
@@ -29,7 +29,7 @@ class Assessment extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'assessments';
+        return 'assessment';
     }
 
     /**

@@ -12,10 +12,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\web\BadRequestHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
-use function PHPUnit\Framework\once;
-
 /**
- * This is the model class for table "certifications".
+ * This is the model class for table "certification".
  *
  * @property int $id
  * @property int $saspri_k_id
@@ -55,7 +53,7 @@ class Certification extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'certifications';
+        return 'certification';
     }
 
     /**
@@ -141,7 +139,7 @@ class Certification extends \yii\db\ActiveRecord
      */
     public function getIndicators()
     {
-        return $this->hasMany(Indicator::class, ['id' => 'indicator_id'])->viaTable('indicator_scores', ['certification_id' => 'id']);
+        return $this->hasMany(Indicator::class, ['id' => 'indicator_id'])->viaTable('indicator_score', ['certification_id' => 'id']);
     }
 
     /**
@@ -191,7 +189,7 @@ class Certification extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('peer_team_members', ['certification_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('peer_team_member', ['certification_id' => 'id']);
     }
 
     /**
@@ -201,7 +199,7 @@ class Certification extends \yii\db\ActiveRecord
      */
     public function getUsers0()
     {
-        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('self_team_members', ['certification_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('self_team_member', ['certification_id' => 'id']);
     }
 
     public function submitForSelfReview(): Certification

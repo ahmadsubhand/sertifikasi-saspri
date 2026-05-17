@@ -3,7 +3,7 @@
 namespace common\models;
 
 /**
- * This is the model class for table "districts".
+ * This is the model class for table "district".
  *
  * @property int $id
  * @property int $regency_id
@@ -20,7 +20,7 @@ class District extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'districts';
+        return 'district';
     }
 
     /**

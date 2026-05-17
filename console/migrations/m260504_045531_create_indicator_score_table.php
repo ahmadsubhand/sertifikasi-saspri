@@ -4,20 +4,20 @@ use common\enums\IndicatorStatus;
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `indicator_scores`.
+ * Handles the creation of table `indicator_score`.
  * Has foreign keys to the tables:
  *
- * - `indicators`
- * - `certifications`
+ * - `indicator`
+ * - `certification`
  */
-class m260504_045531_create_indicator_scores_table extends Migration
+class m260504_045531_create_indicator_score_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('indicator_scores', [
+        $this->createTable('indicator_score', [
             'id' => $this->primaryKey(),
             'indicator_id' => $this->integer()->notNull(),
             'certification_id' => $this->integer()->notNull(),
@@ -30,47 +30,47 @@ class m260504_045531_create_indicator_scores_table extends Migration
 
         // creates index for column `indicator_id`
         $this->createIndex(
-            'idx-indicator_scores-indicator_id',
-            'indicator_scores',
+            'idx-indicator_score-indicator_id',
+            'indicator_score',
             'indicator_id'
         );
 
-        // add foreign key for table `indicators`
+        // add foreign key for table `indicator`
         $this->addForeignKey(
-            'fk-indicator_scores-indicator_id',
-            'indicator_scores',
+            'fk-indicator_score-indicator_id',
+            'indicator_score',
             'indicator_id',
-            'indicators',
+            'indicator',
             'id',
             'CASCADE'
         );
 
         // creates index for column `certification_id`
         $this->createIndex(
-            'idx-indicator_scores-certification_id',
-            'indicator_scores',
+            'idx-indicator_score-certification_id',
+            'indicator_score',
             'certification_id'
         );
 
-        // add foreign key for table `certifications`
+        // add foreign key for table `certification`
         $this->addForeignKey(
-            'fk-indicator_scores-certification_id',
-            'indicator_scores',
+            'fk-indicator_score-certification_id',
+            'indicator_score',
             'certification_id',
-            'certifications',
+            'certification',
             'id',
             'CASCADE'
         );
 
         $this->addCheck(
-            'chk-indicator_scores-status',
-            'indicator_scores',
+            'chk-indicator_score-status',
+            'indicator_score',
             "status IN ('" . implode("','", IndicatorStatus::values()) . "')"
         );
 
         $this->createIndex(
-            'uq-indicator_scores-certification',
-            'indicator_scores',
+            'uq-indicator_score-certification',
+            'indicator_score',
             ['indicator_id', 'certification_id'],
             true
         );
@@ -83,36 +83,36 @@ class m260504_045531_create_indicator_scores_table extends Migration
     {
         // unique constraint: one score on one indicator and one certification
         $this->dropIndex(
-            'uq-indicator_scores-certification',
-            'indicator_scores'
+            'uq-indicator_score-certification',
+            'indicator_score'
         );
 
-        $this->dropCheck('chk-indicator_scores-status', 'indicator_scores');
+        $this->dropCheck('chk-indicator_score-status', 'indicator_score');
 
-        // drops foreign key for table `indicators`
+        // drops foreign key for table `indicator`
         $this->dropForeignKey(
-            'fk-indicator_scores-indicator_id',
-            'indicator_scores'
+            'fk-indicator_score-indicator_id',
+            'indicator_score'
         );
 
         // drops index for column `indicator_id`
         $this->dropIndex(
-            'idx-indicator_scores-indicator_id',
-            'indicator_scores'
+            'idx-indicator_score-indicator_id',
+            'indicator_score'
         );
 
-        // drops foreign key for table `certifications`
+        // drops foreign key for table `certification`
         $this->dropForeignKey(
-            'fk-indicator_scores-certification_id',
-            'indicator_scores'
+            'fk-indicator_score-certification_id',
+            'indicator_score'
         );
 
         // drops index for column `certification_id`
         $this->dropIndex(
-            'idx-indicator_scores-certification_id',
-            'indicator_scores'
+            'idx-indicator_score-certification_id',
+            'indicator_score'
         );
 
-        $this->dropTable('indicator_scores');
+        $this->dropTable('indicator_score');
     }
 }

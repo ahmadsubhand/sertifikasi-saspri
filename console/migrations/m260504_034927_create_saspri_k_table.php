@@ -65,12 +65,12 @@ class m260504_034927_create_saspri_k_table extends Migration
             'district_id'
         );
 
-        // add foreign key for table `districts`
+        // add foreign key for table `district`
         $this->addForeignKey(
             'fk-saspri_k-district_id',
             'saspri_k',
             'district_id',
-            'districts',
+            'district',
             'id',
             'CASCADE'
         );
@@ -115,7 +115,7 @@ class m260504_034927_create_saspri_k_table extends Migration
             'saspri_k'
         );
 
-        // drops foreign key for table `districts`
+        // drops foreign key for table `district`
         $this->dropForeignKey(
             'fk-saspri_k-district_id',
             'saspri_k'

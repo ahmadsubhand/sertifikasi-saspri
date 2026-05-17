@@ -3,19 +3,19 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `indicator_options`.
+ * Handles the creation of table `indicator_option`.
  * Has foreign keys to the tables:
  *
- * - `indicators`
+ * - `indicator`
  */
-class m260506_233651_create_indicator_options_table extends Migration
+class m260506_233651_create_indicator_option_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('indicator_options', [
+        $this->createTable('indicator_option', [
             'id' => $this->primaryKey(),
             'indicator_id' => $this->integer()->notNull(),
             'code' => $this->string()->notNull(),
@@ -26,17 +26,17 @@ class m260506_233651_create_indicator_options_table extends Migration
 
         // creates index for column `indicator_id`
         $this->createIndex(
-            'idx-indicator_options-indicator_id',
-            'indicator_options',
+            'idx-indicator_option-indicator_id',
+            'indicator_option',
             'indicator_id'
         );
 
-        // add foreign key for table `indicators`
+        // add foreign key for table `indicator`
         $this->addForeignKey(
-            'fk-indicator_options-indicator_id',
-            'indicator_options',
+            'fk-indicator_option-indicator_id',
+            'indicator_option',
             'indicator_id',
-            'indicators',
+            'indicator',
             'id',
             'CASCADE'
         );
@@ -47,18 +47,18 @@ class m260506_233651_create_indicator_options_table extends Migration
      */
     public function safeDown()
     {
-        // drops foreign key for table `indicators`
+        // drops foreign key for table `indicator`
         $this->dropForeignKey(
-            'fk-indicator_options-indicator_id',
-            'indicator_options'
+            'fk-indicator_option-indicator_id',
+            'indicator_option'
         );
 
         // drops index for column `indicator_id`
         $this->dropIndex(
-            'idx-indicator_options-indicator_id',
-            'indicator_options'
+            'idx-indicator_option-indicator_id',
+            'indicator_option'
         );
 
-        $this->dropTable('indicator_options');
+        $this->dropTable('indicator_option');
     }
 }
