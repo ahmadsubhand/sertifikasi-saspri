@@ -52,12 +52,12 @@ class TimSebayaController extends Controller
     {
         $base_query = PeerTeamMember::find()
             ->joinWith('certification c')
-            ->where(['peer_team_members.user_id' => Yii::$app->user->id])
+            ->where(['user_id' => Yii::$app->user->id])
             ->with('certification.saspriK');
 
         $peer_team_member_request = (clone $base_query)
             ->andWhere(['c.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
-            ->orderBy(['peer_team_due_date' => SORT_ASC])
+            ->orderBy(['c.peer_team_due_date' => SORT_ASC])
             ->all();
 
         $peer_team_member_uncompleted = (clone $base_query)
