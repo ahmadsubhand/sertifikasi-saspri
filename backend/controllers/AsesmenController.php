@@ -91,7 +91,9 @@ class AsesmenController extends Controller
             $parent_group_id = $IndicatorGroup['parent_group_id'];
             if ($model->parent_group_id) {
                 if (!$parent_group_id) {
-                    throw new BadRequestHttpException('Subgrup wajib memilih grup utama');
+                    throw new BadRequestHttpException(
+                        ($IndicatorGroup['code'] ?? $model->code) . ' adalah subgrup sehinggga wajib memiliki grup utama'
+                    );
                 } else {
                     $indicator_group = Assessment::findOne($assessment_id)
                         ->getRootGroups()
@@ -104,7 +106,9 @@ class AsesmenController extends Controller
                     }
                 }
             } else if (!$model->parent_group_id && $parent_group_id) {
-                throw new BadRequestHttpException('Grup utama tidak dapat dipindahkan ke dalam grup lain');
+                throw new BadRequestHttpException(
+                    ($IndicatorGroup['code'] ?? $model->code) . ' adalah grup utama sehingga tidak dapat dipindahkan ke dalam grup lain'
+                );
             }
     
             $model->assessment_id = $assessment_id;
@@ -113,7 +117,7 @@ class AsesmenController extends Controller
             $this->checkGroupWeight($model);
             $model->save();
             
-            Yii::$app->session->setFlash('success', 'Grup berhasil disimpan');
+            Yii::$app->session->setFlash('success', 'Grup ' . $model->code . ' berhasil disimpan');
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -142,7 +146,7 @@ class AsesmenController extends Controller
             }
             $indicator_group = Assessment::findOne($assessment_id)
                 ->getChildGroups()
-                ->where(['id' => $indicator_group_id])
+                ->andWhere(['child.id' => $indicator_group_id])
                 ->exists();
             if (!$indicator_group) {
                 throw new NotFoundHttpException(
@@ -153,7 +157,10 @@ class AsesmenController extends Controller
             $model->load(Yii::$app->request->post());
             $model->save();
             
-            Yii::$app->session->setFlash('success', 'Indikator berhasil disimpan');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Indikator ' . $model->code . ' dari grup ' . $model->indicatorGroup->code . ' berhasil disimpan'
+            );
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
 
         } catch (Exception $error) {
@@ -179,7 +186,12 @@ class AsesmenController extends Controller
             $model->load(Yii::$app->request->post());
             $model->save();
     
-            Yii::$app->session->setFlash('success', 'Opsi berhasil disimpan');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Opsi ' . $model->code .
+                ' dari indikator ' . $model->indicator->code . 
+                ' dalam grup ' . $model->indicator->indicatorGroup->code . ' berhasil disimpan'
+            );
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -203,7 +215,7 @@ class AsesmenController extends Controller
             $assessment_id = $model->assessment_id;
             $model->delete();
 
-            Yii::$app->session->setFlash('success', 'Grup berhasil dihapus');
+            Yii::$app->session->setFlash('success', 'Grup ' . $model->code . ' beserta isinya berhasil dihapus');
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -224,7 +236,10 @@ class AsesmenController extends Controller
             $assessment_id = $model->indicatorGroup->assessment_id;
             $model->delete();
             
-            Yii::$app->session->setFlash('success', 'Indikator berhasil dihapus');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Indikator ' . $model->code . ' dari grup ' . $model->indicatorGroup->code . ' berhasil dihapus'
+            );
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -245,7 +260,12 @@ class AsesmenController extends Controller
             $assessment_id = $model->indicator->indicatorGroup->assessment_id;
             $model->delete();
     
-            Yii::$app->session->setFlash('success', 'Opsi berhasil dihapus');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Opsi ' . $model->code .
+                ' dari indikator ' . $model->indicator->code . 
+                ' dalam grup ' . $model->indicator->indicatorGroup->code . ' berhasil dihapus'
+            );
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -297,10 +317,22 @@ class AsesmenController extends Controller
     private function checkGroupWeight(IndicatorGroup $new_indicator_group)
     {
         $remaining_weight = $new_indicator_group->countRemainingWeight();
-        if ($remaining_weight < 0) {
-            throw new UnprocessableEntityHttpException(
-                'Total bobot grup sudah melebihi 100'
-            );
+        if ($remaining_weight < $new_indicator_group->weight) {
+            $parent_group = $new_indicator_group->parentGroup;
+            if ($parent_group) {
+                throw new UnprocessableEntityHttpException(
+                    'Total bobot dalam grup ' .
+                    $parent_group->code .
+                    ' tidak boleh melebihi 100. Saat ini sisa bobot yang tersedia hanya ' .
+                    $remaining_weight
+                );
+            } else {
+                throw new UnprocessableEntityHttpException(
+                    'Total bobot grup utama dalam asesmen ini ' .
+                    ' tidak boleh melebihi 100. Saat ini sisa bobot yang tersedia hanya ' .
+                    $remaining_weight
+                );
+            }
         }
     }
 
