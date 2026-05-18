@@ -24,27 +24,38 @@ use yii\helpers\Url;
     <h3 class="fw-bold mb-0">Pengajuan Sertifikasi</h3>
   </div>
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-    <div class="px-4 d-flex align-items-center mx-4 justify-content-between">
-      <div>
-        <p class="mb-0">SASPRI-K</p>
-        <p class="mb-0 fs-4">
-          <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)
-        </p>
-        <p class="mb-2 font-sm">
-          Kabupaten: <?= Html::encode($district->regency->name) ?> |
-          Provinsi: <?= Html::encode($district->regency->province->name) ?>
-        </p>
+    <div class="px-4 row align-items-center mx-4 justify-content-between">
+      <div class=" col-md-4 my-2 ">
+        <div class=" w-fit">
+          <p class="mb-0">SASPRI-K</p>
+          <p class="mb-0 fs-4">
+            <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)
+          </p>
+          <p class="mb-2 font-sm">
+            Kabupaten: <?= Html::encode($district->regency->name) ?> |
+            Provinsi: <?= Html::encode($district->regency->province->name) ?>
+          </p>
+        </div>
       </div>
-      <div>
-        <p class="mb-0"><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></p>
-        <p class="mb-1 fs-4">
-          <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
-          <i class="fa-solid fa-chevron-right"></i>
-          <strong><?= Html::encode(CertificateLevel::next()[$certification->level] ?? '-') ?></strong>
-        </p>
+      <div class="col-md-4 my-2">
+        <div class="mx-md-auto w-fit">
+          <p class="mb-0"><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></p>
+          <p class="mb-1 fs-4">
+            <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
+            <i class="fa-solid fa-chevron-right"></i>
+            <strong><?= Html::encode(CertificateLevel::next()[$certification->level] ?? '-') ?></strong>
+          </p>
+        </div>
+      </div>
+      <div class="col-md-4 my-2">
+        <div class=" w-fit">
+          <p class="mb-0">Status Sertifikasi</p>
+          <p class="mb-0 fs-4"><strong><?= CertificationStatus::list()[$certification->status] ?></strong></p>
+        </div>
       </div>
     </div>
   </div>
+
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
     <div class="px-4">
       <p class=" fw-bold">Kelola Anggota Tim Mandiri</p>
@@ -125,7 +136,7 @@ use yii\helpers\Url;
     <?= Html::beginForm(['ajukan-sertifikasi'], 'post') ?>
     <button type="submit" class="btn s-btn-green me-2 w-100 mb-3" <?php echo CertificationStatus::PENDING_SELF_TEAM_FORMATION == $certification->status ? '' : 'disabled' ?>
       onclick="return confirm('Apakah Anda yakin ingin mengajukan sertifikasi? Pastikan komposisi tim sudah benar.')">
-      Ajukan Sertifikasi 
+      Ajukan Sertifikasi
     </button>
     <?= Html::endForm() ?>
   </div>

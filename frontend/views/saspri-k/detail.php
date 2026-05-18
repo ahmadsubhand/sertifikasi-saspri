@@ -69,7 +69,7 @@ $shingles = [
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
-    <a href="/tim-mandiri" class=" text-decoration-none text-black fs-5 me-3">
+    <a href="<?= Url::to(['/saspri-k'])?>" class=" text-decoration-none text-black fs-5 me-3">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
     <?php if (str_contains(strtolower($cert['status']), 'pending')) : ?>

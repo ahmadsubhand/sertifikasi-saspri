@@ -63,6 +63,11 @@ use yii\helpers\Url;
                 </td>
               </tr>
             <?php endforeach ?>
+            <?php if (empty($peer_team_member_request)): ?>
+            <tr>
+              <td colspan="8" class="text-center">Tidak ada sertifikasi yang menunggu pembentukan tim sebaya.</td>
+            </tr>
+          <?php endif; ?>
           </tbody>
         </table>
       </div>
@@ -97,9 +102,9 @@ use yii\helpers\Url;
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
-                <td><?= Html::encode($member->certification->peer_review_due_date
-                      ? date('Y-m-d', strtotime($member->certification->peer_review_due_date))
-                      : '-') ?>
+                <td><?= $this->render('/component/_date_comparator', [
+                  'cert' => $member->certification
+                ]); ?>
                 </td>
                 <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
                 <td>
@@ -111,6 +116,11 @@ use yii\helpers\Url;
                 </td>
               </tr>
             <?php endforeach ?>
+            <?php if (empty($peer_team_member_uncompleted)): ?>
+            <tr>
+              <td colspan="7" class="text-center">Tidak ada sertifikasi yang sedang berjalan.</td>
+            </tr>
+          <?php endif; ?>
           </tbody>
         </table>
       </div>
@@ -159,7 +169,12 @@ use yii\helpers\Url;
                   <a href="<?php echo Url::to(['tim-sebaya/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
                 </td>
               </tr>
-            <?php endforeach ?>
+            <?php endforeach ?>\
+            <?php if (empty($peer_team_member_completed)): ?>
+            <tr>
+              <td colspan="8" class="text-center">Anda belum pernah berperan sebagai tim sebaya.</td>
+            </tr>
+          <?php endif; ?>
           </tbody>
         </table>
       </div>

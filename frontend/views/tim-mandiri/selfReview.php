@@ -169,11 +169,11 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
             </li>
           <?php endforeach ?>
           <li class="page-item">
-            <a class="page-link s-btn-main">
-              <?php if ($page < $total_pages): ?>
-                <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none w-100 h-100">Berikutnya</button>
-              <?php else: ?>
+            <a class="page-link s-btn-main <?php echo $page == $total_pages && !$is_leader ? 'disabled' : '' ?>">
+              <?php if ($page == $total_pages && $is_leader): ?>
                 <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn-none">Selesai Review</button>
+                <?php else: ?>
+                  <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none w-100 h-100">Berikutnya</button>
               <?php endif; ?>
             </a>
           </li>

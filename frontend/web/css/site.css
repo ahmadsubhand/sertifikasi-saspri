@@ -164,6 +164,10 @@ table thead tr:first-child th:last-child {
 .h-fit{
   height: fit-content !important;
 }
+
+.w-fit{
+  width: fit-content !important;
+}
 /*  */
 
 .footer {

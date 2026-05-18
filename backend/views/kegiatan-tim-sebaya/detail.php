@@ -100,15 +100,15 @@ $shingles = [
     </div>
     <div class="col-sm-4">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <?php if ($cert['status'] === CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
+        <?php if ($cert['status'] != CertificationStatus::COMPLETED) : ?>
           <div class="px-3 text-center">
             <p class=" fw-bold h5">
-                Sertifikasi 
-                <?= 
-                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
-                    ' ke ' .
-                    CertificateLevel::list()[$cert['level']]
-                ?> 
+              Sertifikasi
+              <?=
+              ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::prev()[$cert['level']] : CertificateLevel::list()[$cert['level']]) .
+                ' ke ' .
+                CertificateLevel::list()[$cert['level']]
+              ?>
             </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
@@ -117,39 +117,24 @@ $shingles = [
                               : '-' ?></p>
           </div>
           <div class="px-3">
-            <?php if ($member_id) : ?>
-                <?= Html::a('Setuju', ['setuju', 'peer_team_member_id' => $member_id], [
-                  'class' => 'btn s-btn-green me-2 w-100 mt-3',
-                  'data-method' => 'post',
-                ]) ?>
-                <?= Html::a('Tolak', ['tolak', 'peer_team_member_id' => $member_id], [
-                  'class' => 'btn s-btn-red me-2 w-100 mt-3',
-                  'data-method' => 'post',
-                  'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Sebaya ini?',
-                ]) ?>
-            <?php endif; ?>
-          </div>
-        <?php elseif (str_contains(strtolower($cert['status']), 'review')) : ?>
-          <div class="px-3 text-center">
-            <p class=" fw-bold h5">
-                Sertifikasi 
-                <?= 
-                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
-                    ' ke ' .
-                    CertificateLevel::list()[$cert['level']]
-                ?> 
-            </p>
-            <br>
-            <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
-            <p class="h6"> <?= Html::encode($cert['peer_review_due_date'])
-                              ? 'Sebelum tanggal ' . date('d-m-Y', strtotime($cert['peer_review_due_date']))
-                              : '-' ?></p>
-          </div>
-          <div class="px-3">
-            <?php if ($cert['status'] === CertificationStatus::PEER_REVIEW && in_array(Yii::$app->user->id, $user_ids)) : ?>
+
+            <?php if (in_array(Yii::$app->user->id, array_column($peer_team, 'user_id')) && $cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
+              <?= Html::a('Setuju', ['setuju', 'peer_team_member_id' => $member_id], [
+                'class' => 'btn s-btn-green me-2 w-100 mt-3',
+                'data-method' => 'post',
+              ]) ?>
+              <?= Html::a('Tolak', ['tolak', 'peer_team_member_id' => $member_id], [
+                'class' => 'btn s-btn-red me-2 w-100 mt-3',
+                'data-method' => 'post',
+                'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Sebaya ini?',
+              ]) ?>
+            <?php endif ?>
+            <?php if (in_array(Yii::$app->user->id, array_column($peer_team, 'user_id')) && $cert->status == CertificationStatus::PEER_REVIEW) : ?>
+              <div>
                 <?= Html::a('Mulai Peer Review', ['peer-review', 'certification_id' => $cert['id']], [
                   'class' => 'btn s-btn-main me-2 w-100 mt-3',
                 ]) ?>
+              </div>
             <?php endif ?>
           </div>
         <?php else : ?>
@@ -170,15 +155,15 @@ $shingles = [
 
   <div class="row">
     <div class="col-sm-6">
-      <p class="fw-bold mb-2">Anggota Tim Mandiri</p>
       <?= $this->render('/component/_team_table', [
-        "model" => $self_team
+        "model" => $self_team,
+        'is_self' => 1
       ]) ?>
     </div>
     <div class="col-sm-6">
-      <p class="fw-bold mb-2">Anggota Tim Sebaya</p>
       <?= $this->render('/component/_team_table', [
-        "model" => $peer_team
+        "model" => $peer_team,
+        'is_self' => 0
       ]) ?>
     </div>
   </div>

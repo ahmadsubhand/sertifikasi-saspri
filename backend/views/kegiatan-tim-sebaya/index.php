@@ -101,9 +101,9 @@ $this->title = 'Tugas Tim Sebaya';
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
-                <td><?= Html::encode($member->certification->peer_review_due_date
-                      ? date('Y-m-d', strtotime($member->certification->peer_review_due_date))
-                      : '-') ?>
+                <td><?= $this->render('/component/_date_comparator', [
+                  'cert' => $member->certification
+                ]); ?>
                 </td>
                 <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
                 <td>
@@ -123,9 +123,7 @@ $this->title = 'Tugas Tim Sebaya';
       </div>
     </div>
   </div>
-
   <br>
-
   <div>
     <div class="d-flex align-items-center mb-2">
       <p class=" fw-bold h5">Riwayat Sertifikasi</p>
