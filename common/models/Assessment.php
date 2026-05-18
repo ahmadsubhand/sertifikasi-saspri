@@ -103,13 +103,10 @@ class Assessment extends \yii\db\ActiveRecord
     {
         return $this->hasMany(IndicatorGroup::class, ['assessment_id' => 'id'])
             ->alias('child')
-            // ->innerJoin(
-            //     ['parent' => IndicatorGroup::tableName()],
-            //     'parent.id = child.parent_group_id'
-            // )
-            ->where(['not', ['child.parent_group_id' => null]])
+            ->joinWith('parentGroup parent')
+            ->andWhere(['not', ['child.parent_group_id' => null]])
             ->orderBy([
-                // 'parent.order' => SORT_ASC,
+                'parent.order' => SORT_ASC,
                 'child.order' => SORT_ASC,
             ]);
     }
