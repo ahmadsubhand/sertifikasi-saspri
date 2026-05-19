@@ -42,7 +42,7 @@ class m260504_034927_create_saspri_k_table extends Migration
             'request_rejection_reason' => $this->string(),
 
             // Pergantian Wali
-            'change_status' => $this->string()->notNull()->defaultValue(ApprovalStatus::PENDING),
+            'change_status' => $this->string()->notNull()->defaultValue(ApprovalStatus::APPROVED),
             'new_coordinator_id' => $this->integer()->unique(),
             'change_request_reason' => $this->string(),
             'change_rejection_reason' => $this->string(),

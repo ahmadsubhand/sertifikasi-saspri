@@ -6,9 +6,13 @@ use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
+use common\helpers\FileHelper;
 use DateTime;
+use Exception;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\web\UnprocessableEntityHttpException;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "saspri_k".
@@ -31,7 +35,6 @@ use yii\web\UnprocessableEntityHttpException;
  * @property int|null $new_coordinator_id
  * @property string|null $change_request_reason
  * @property string|null $change_rejection_reason
- * @property int $valid_certificate_id
  *
  * @property Certification[] $certifications
  * @property User $coordinator
@@ -61,16 +64,14 @@ class SaspriK extends \yii\db\ActiveRecord
         return [
             [['request_rejection_reason', 'new_coordinator_id', 'change_request_reason', 'change_rejection_reason'], 'default', 'value' => null],
             [['change_status'], 'default', 'value' => 'pending'],
-            [['coordinator_id', 'district_id', 'region_name', 'address', 'cooperative_name', 'number_of_groups', 'number_of_active_members', 'livestock_type', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count', 'valid_certificate_id'], 'required'],
-            [['coordinator_id', 'district_id', 'number_of_groups', 'number_of_active_members', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count', 'new_coordinator_id', 'valid_certificate_id'], 'integer'],
+            [['coordinator_id', 'district_id', 'region_name', 'address', 'cooperative_name', 'number_of_groups', 'number_of_active_members', 'livestock_type', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count'], 'required'],
+            [['coordinator_id', 'district_id', 'number_of_groups', 'number_of_active_members', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count', 'new_coordinator_id'], 'integer'],
             [['region_name', 'address', 'cooperative_name', 'livestock_type', 'request_status', 'request_rejection_reason', 'change_status', 'change_request_reason', 'change_rejection_reason'], 'string', 'max' => 255],
             [['coordinator_id'], 'unique'],
-            [['valid_certificate_id'], 'unique'],
             [['new_coordinator_id'], 'unique'],
             [['coordinator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['coordinator_id' => 'id']],
             [['district_id'], 'exist', 'skipOnError' => true, 'targetClass' => District::class, 'targetAttribute' => ['district_id' => 'id']],
             [['new_coordinator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['new_coordinator_id' => 'id']],
-            [['valid_certificate_id'], 'exist', 'skipOnError' => true, 'targetClass' => Certification::class, 'targetAttribute' => ['valid_certificate_id' => 'id']],
         ];
     }
 
@@ -98,7 +99,6 @@ class SaspriK extends \yii\db\ActiveRecord
             'new_coordinator_id' => 'New Coordinator ID',
             'change_request_reason' => 'Change Request Reason',
             'change_rejection_reason' => 'Change Rejection Reason',
-            'valid_certificate_id' => 'Valid Certificate ID',
         ];
     }
 
@@ -169,7 +169,9 @@ class SaspriK extends \yii\db\ActiveRecord
      */
     public function getValidCertificate()
     {
-        return $this->hasOne(Certification::class, ['id' => 'valid_certificate_id']);
+        return $this->hasOne(Certification::class, ['saspri_k_id' => 'id'])
+            ->andWhere(['not in', 'grade', [CertificateGrade::BC, CertificateGrade::C]])
+            ->orderBy(['issued_at' => SORT_DESC]);
     }
 
     public function getOnGoingCertification(): ActiveQuery
@@ -226,7 +228,8 @@ class SaspriK extends \yii\db\ActiveRecord
         $assessment = Assessment::findOne(['active_at_level' => $certification->level]);
         if (!$assessment) {
             throw new UnprocessableEntityHttpException(
-                'Belum ada instrumen penilaian aktif untuk sertifikasi tingkat ' . ucfirst($certification->level)
+                'Belum ada instrumen penilaian aktif untuk sertifikasi tingkat ' .
+                CertificateLevel::list()[$certification->level]
             );
         }
 
@@ -238,11 +241,81 @@ class SaspriK extends \yii\db\ActiveRecord
         return $certification;
     }
 
+    public function createCertificationForNewSaspriK(): Certification
+    {
+        $certification = new Certification();
+        $certification->purpose = CertificationPurpose::LEVEL_UP;
+        $certification->status = CertificationStatus::COMPLETED;
+        $certification->level = CertificateLevel::NATALIA;
+        $certification->saspri_k_id = $this->id;
+
+        $assessment = Assessment::findOne(['active_at_level' => $certification->level]);
+        if (!$assessment) {
+            throw new UnprocessableEntityHttpException(
+                'Belum ada instrumen penilaian aktif untuk sertifikasi tingkat ' .
+                CertificateLevel::list()[$certification->level]
+            );
+        }
+        $certification->assessment_id = Assessment::findOne(['active_at_level' => $certification->level])->id;
+
+        return $certification;
+    }
+
     public function addMembers(array $user_ids)
     {
         User::updateAll(
             ['saspri_k_id' => $this->id],
             ['id' => $user_ids]
         );
+    }
+
+    /**
+     * @param UploadedFile[] $documents
+     * @param string[] $types
+     */
+
+    public function uploadNewDocuments(array $documents, array $types)
+    {
+        $relative_dir = '/uploads/document/' . $this->id;
+        $absolute_dir = Yii::getAlias('@frontend/web' . $relative_dir);
+        FileHelper::ensureDirectoryExists($absolute_dir);
+
+        foreach ($documents as $index => $document) {
+            $fileName = $this->generateDocumentFileName($document->extension);
+    
+            if ($document->saveAs($absolute_dir . '/' . $fileName)) {
+                $saspri_k_document = new SaspriKDocument();
+                $saspri_k_document->type = $types[$index];
+                $saspri_k_document->url = $relative_dir . '/' . $fileName;
+                $saspri_k_document->saspri_k_id = $this->id;
+                $saspri_k_document->save(false);
+            } else {
+                throw new Exception('Failed to save file saspri k document');
+            }
+        }
+    }
+
+    protected function generateDocumentFileName(string $extension): string
+    {
+        return sprintf(
+            'doc_%d_%d.%s',
+            $this->id,
+            time(),
+            $extension,
+        );
+    }
+
+    public function deleteOldDocuments(): void
+    {
+        $old_documents = $this->saspriKDocuments;
+        if (empty($old_documents)) {
+            return;
+        }
+        // dd($old_documents);
+        foreach ($old_documents as $old_document) {
+            $oldFile = Yii::getAlias('@frontend/web' . $old_document->url);
+            FileHelper::deleteFile($oldFile);
+            $old_document->delete();
+        }
     }
 }

@@ -99,18 +99,18 @@ WHERE id NOT IN (SELECT CAST(user_id AS UNSIGNED) FROM auth_assignment);
 -- SASPRI-K
 -- --------------------------------------------------------
 
-INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, cooperative_name, number_of_groups, number_of_active_members, livestock_type, total_livestock_count, breeding_livestock_count, productive_heifer_count, request_status, valid_certificate_id) VALUES
-(1, 14, 265, 'Baiturrahman', 'Jl. Merdeka No. 1', 'Koperasi Baiturrahman', 5, 50, 'Sapi', 200, 100, 50, 'approved', 1),
-(2, 34, 1, 'Bakongan', 'Jl. Merdeka No. 2', 'Koperasi Bakongan', 3, 30, 'Sapi', 120, 60, 30, 'approved', 2),
-(3, 54, 2, 'Kluet Utara', 'Jl. Merdeka No. 3', 'Koperasi Kluet', 4, 45, 'Sapi', 180, 90, 45, 'approved', 3),
-(4, 74, 3, 'Bakongan Timur', 'Jl. Merdeka No. 4', 'Koperasi Bakongan Timur', 2, 25, 'Sapi', 100, 50, 25, 'approved', 4),
-(5, 94, 4, 'Bakongan Barat', 'Jl. Merdeka No. 5', 'Koperasi Bakongan Barat', 3, 35, 'Sapi', 140, 70, 35, 'approved', 5),
-(6, 114, 5, 'Kluet Selatan', 'Jl. Merdeka No. 6', 'Koperasi Kluet Selatan', 4, 40, 'Sapi', 160, 80, 40, 'approved', 6),
-(7, 134, 6, 'Meukek', 'Jl. Merdeka No. 7', 'Koperasi Meukek', 2, 20, 'Sapi', 80, 40, 20, 'approved', 13),
-(8, 139, 7, 'Samatiga', 'Jl. Merdeka No. 8', 'Koperasi Samatiga', 2, 18, 'Sapi', 72, 36, 18, 'approved', 14),
-(9, 144, 8, 'Bubon', 'Jl. Merdeka No. 9', 'Koperasi Bubon', 2, 22, 'Sapi', 88, 44, 22, 'approved', 15),
-(10, 149, 9, 'Arongan', 'Jl. Merdeka No. 10', 'Koperasi Arongan', 2, 21, 'Sapi', 84, 42, 21, 'approved', 16),
-(11, 154, 10, 'Woyla', 'Jl. Merdeka No. 11', 'Koperasi Woyla', 3, 28, 'Sapi', 112, 56, 28, 'approved', 17);
+INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, cooperative_name, number_of_groups, number_of_active_members, livestock_type, total_livestock_count, breeding_livestock_count, productive_heifer_count, request_status) VALUES
+(1, 14, 265, 'Baiturrahman', 'Jl. Merdeka No. 1', 'Koperasi Baiturrahman', 5, 50, 'Sapi', 200, 100, 50, 'approved'),
+(2, 34, 1, 'Bakongan', 'Jl. Merdeka No. 2', 'Koperasi Bakongan', 3, 30, 'Sapi', 120, 60, 30, 'approved'),
+(3, 54, 2, 'Kluet Utara', 'Jl. Merdeka No. 3', 'Koperasi Kluet', 4, 45, 'Sapi', 180, 90, 45, 'approved'),
+(4, 74, 3, 'Bakongan Timur', 'Jl. Merdeka No. 4', 'Koperasi Bakongan Timur', 2, 25, 'Sapi', 100, 50, 25, 'approved'),
+(5, 94, 4, 'Bakongan Barat', 'Jl. Merdeka No. 5', 'Koperasi Bakongan Barat', 3, 35, 'Sapi', 140, 70, 35, 'approved'),
+(6, 114, 5, 'Kluet Selatan', 'Jl. Merdeka No. 6', 'Koperasi Kluet Selatan', 4, 40, 'Sapi', 160, 80, 40, 'approved'),
+(7, 134, 6, 'Meukek', 'Jl. Merdeka No. 7', 'Koperasi Meukek', 2, 20, 'Sapi', 80, 40, 20, 'approved'),
+(8, 139, 7, 'Samatiga', 'Jl. Merdeka No. 8', 'Koperasi Samatiga', 2, 18, 'Sapi', 72, 36, 18, 'approved'),
+(9, 144, 8, 'Bubon', 'Jl. Merdeka No. 9', 'Koperasi Bubon', 2, 22, 'Sapi', 88, 44, 22, 'approved'),
+(10, 149, 9, 'Arongan', 'Jl. Merdeka No. 10', 'Koperasi Arongan', 2, 21, 'Sapi', 84, 42, 21, 'approved'),
+(11, 154, 10, 'Woyla', 'Jl. Merdeka No. 11', 'Koperasi Woyla', 3, 28, 'Sapi', 112, 56, 28, 'approved');
 
 -- --------------------------------------------------------
 -- Certifications (Historical)

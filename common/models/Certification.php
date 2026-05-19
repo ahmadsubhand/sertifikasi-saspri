@@ -41,7 +41,6 @@ use yii\web\UnprocessableEntityHttpException;
  * @property Indicator[] $indicators
  * @property PeerTeamMember[] $peerTeamMembers
  * @property SaspriK $saspriK
- * @property SaspriK $saspriK0
  * @property SelfTeamMember[] $selfTeamMembers
  * @property User[] $users
  * @property User[] $users0
@@ -160,16 +159,6 @@ class Certification extends \yii\db\ActiveRecord
     public function getSaspriK()
     {
         return $this->hasOne(SaspriK::class, ['id' => 'saspri_k_id']);
-    }
-
-    /**
-     * Gets query for [[SaspriK0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSaspriK0()
-    {
-        return $this->hasOne(SaspriK::class, ['valid_certificate_id' => 'id']);
     }
 
     /**

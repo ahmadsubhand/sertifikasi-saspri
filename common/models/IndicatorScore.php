@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\enums\IndicatorStatus;
+use common\helpers\FileHelper;
 use Exception;
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -159,7 +160,7 @@ class IndicatorScore extends \yii\db\ActiveRecord
         $relative_dir = '/uploads/evidence/' . $certification_id;
         $absolute_dir = Yii::getAlias('@frontend/web' . $relative_dir);
 
-        $this->ensureDirectoryExists($absolute_dir);
+        FileHelper::ensureDirectoryExists($absolute_dir);
         $this->deleteOldEvidence();
         $fileName = $this->generateEvidenceFileName($file->extension);
 
@@ -171,22 +172,13 @@ class IndicatorScore extends \yii\db\ActiveRecord
         }
     }
 
-    protected function ensureDirectoryExists(string $directory): void
-    {
-        if (!is_dir($directory)) {
-            mkdir($directory, 0777, true);
-        }
-    }
-
     protected function deleteOldEvidence(): void
     {
         if (!$this->evidence_url) {
             return;
         }
         $oldFile = Yii::getAlias('@frontend/web' . $this->evidence_url);
-        if (is_file($oldFile)) {
-            unlink($oldFile);
-        }
+        FileHelper::deleteFile($oldFile);
     }
 
     protected function generateEvidenceFileName(string $extension): string 
