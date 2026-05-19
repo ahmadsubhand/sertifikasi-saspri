@@ -2,6 +2,8 @@
 
 namespace common\models;
 
+use common\enums\ApprovalStatus;
+
 /**
  * This is the model class for table "district".
  *
@@ -66,7 +68,8 @@ class District extends \yii\db\ActiveRecord
      */
     public function getSaspriKs()
     {
-        return $this->hasMany(SaspriK::class, ['district_id' => 'id']);
+        return $this->hasMany(SaspriK::class, ['district_id' => 'id'])
+            ->andWhere(['request_status' => ApprovalStatus::APPROVED]);
     }
 
 }

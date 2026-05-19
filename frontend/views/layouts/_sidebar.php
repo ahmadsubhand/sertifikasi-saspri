@@ -56,8 +56,8 @@ $currentRoute = Yii::$app->controller->getRoute();
         <div class="p-2">
           <div class="dropdown-divider border border-1"></div>
         </div>
-        <a href="<?php echo Url::to('/enroll') ?>" class="text-decoration-none text-white w-100 ">
-          <div class=" py-2 px-4 <?= str_contains($currentRoute, 'enroll') ? 's-bg-sec' : 's-bg-side' ?>">
+        <a href="<?php echo Url::to('/daftar-wali') ?>" class="text-decoration-none text-white w-100 ">
+          <div class=" py-2 px-4 <?= str_contains($currentRoute, 'wali') ? 's-bg-sec' : 's-bg-side' ?>">
             Daftar Sebagai Wali SASPRI-K
           </div>
         </a>

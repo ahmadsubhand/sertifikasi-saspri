@@ -130,12 +130,14 @@ $shingles = [
   <div class="row">
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
-        "model" => $selfTeam
+        "model" => $selfTeam,
+        'is_self' => 1
       ]) ?>
     </div>
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
-        "model" => $peerTeam
+        "model" => $peerTeam,
+        'is_self' => 0
       ]) ?>
     </div>
   </div>
