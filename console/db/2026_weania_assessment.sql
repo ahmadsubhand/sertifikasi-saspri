@@ -5,7 +5,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- --------------------------------------------------------
 
 INSERT INTO assessment (id, title, active_at_level, level, created_at, updated_at, released_at) VALUES
-(1, '20260212 Instrument Sertifikasi SASPRI-K 2026', 'weania', 'weania', '2026-05-07 10:00:00', '2026-05-07 10:00:00', '2026-05-07 10:00:00');
+(1, '20260212 Instrument Sertifikasi SASPRI-K 2026', 'weania', 'weania', 1778148000, 1778148000, '2026-05-07 10:00:00');
 
 -- --------------------------------------------------------
 -- Indicator Groups

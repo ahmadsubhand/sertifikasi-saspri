@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\enums\CertificateLevel;
 use common\enums\UserRole;
 use common\models\Assessment;
 use common\models\Indicator;
@@ -34,6 +35,10 @@ class AsesmenController extends Controller
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
+                    'buat' => ['post'],
+                    'ubah-judul' => ['patch'],
+                    'aktifkan' => ['post'],
+                    'ganti-tingkat' => ['post'],
                     'simpan-group' => ['post'],
                     'simpan-indikator' => ['post'],
                     'simpan-opsi' => ['post'],
@@ -51,6 +56,33 @@ class AsesmenController extends Controller
         return $this->render('index', [
             'assessments' => $assessments,
         ]);
+    }
+
+    public function actionBuat(int $assessment_id)
+    {
+        try {
+            $assessment = new Assessment();
+            if ($assessment_id) {
+                $cloned_assessment = $this->findAssessmentOrFail($assessment_id);
+                $assessment = Assessment::clone($cloned_assessment);
+            } else {
+                $request = Yii::$app->request->post();
+                $assessment->title = $request['title'];
+                $assessment->level = $request['level'];
+                $assessment->save(false);
+            }
+
+            Yii::$app->session->setFlash('success', "\"$assessment->title\" berhasil dibuat");
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
     }
 
     public function actionKelola(int $assessment_id)
@@ -80,35 +112,123 @@ class AsesmenController extends Controller
         }
     }
 
+    public function actionUbahJudul(int $assessment_id)
+    {
+        try {
+            $assessment = $this->findAssessmentOrFail($assessment_id);
+            $assessment->title = Yii::$app->request->post('title');
+            $assessment->save(false);
+
+            Yii::$app->session->setFlash('success', 'Berhasil mengubah judul asesmen');
+            return $this->redirect(['kelola', 'assessment_id' => $assessment->id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionAktifkan(int $assessment_id)
+    {
+        try {
+            $assessment = $this->findAssessmentOrFail($assessment_id);
+            $assessment->activate()->save(false);
+
+            Yii::$app->session->setFlash(
+                'success',
+                'Asesmen "' . $assessment->title . 
+                '" berhasil diaktifkan untuk tingkat ' . CertificateLevel::list()[$assessment->level]
+            );
+            return $this->redirect(['kelola', 'assessment_id' => $assessment->id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionGantiTingkat(int $assessment_id)
+    {
+        try {
+            $assessment = $this->findAssessmentOrFail($assessment_id);
+
+            if ($assessment->getCertifications()->exists()) {
+                throw new UnprocessableEntityHttpException(
+                    'Tingkat asesmen tidak dapat diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+                );
+            }
+            if ($assessment->active_at_level) {
+                throw new UnprocessableEntityHttpException(
+                    'Tingkat asesmen tidak dapat diubah karena asesmen sedang aktif. ' .
+                    'Silakan aktifkan asesmen lain pada tingkat ' . CertificateLevel::list()[$assessment->level].
+                    ' untuk menggantikan asesmen ini sehingga proses sertifikasi tetap memiliki asesmen aktif'
+                );
+            }
+
+            $assessment->level = Yii::$app->request->post('level');
+            $assessment->deactivate()->save(false);
+
+            Yii::$app->session->setFlash(
+                'success',
+                'Level asesmen "' . $assessment->title .
+                '" berhasil diubah menjadi tingkat ' .
+                CertificateLevel::list()[$assessment->level] .
+                ' dan asesmen telah dinonaktifkan'
+            );
+            return $this->redirect(['kelola', 'assessment_id' => $assessment->id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                } elseif ($error instanceof UnprocessableEntityHttpException) {
+                    return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+                }
+            }
+            throw $error;
+        }
+    }
+
     public function actionSimpanGrup(int $assessment_id, ?int $indicator_group_id = null)
     {
         try {
-            $model = $indicator_group_id ? $this->findGroupOrFail($indicator_group_id) : new IndicatorGroup();
-
-            // Mengecek parent atau child langsung dari model db,
-            // bukan dari model yang sudah disisipkan input user ($model->load)
             $IndicatorGroup = Yii::$app->request->post('IndicatorGroup');
-            $parent_group_id = $IndicatorGroup['parent_group_id'];
-            if ($model->parent_group_id) {
-                if (!$parent_group_id) {
-                    throw new BadRequestHttpException(
-                        ($IndicatorGroup['code'] ?? $model->code) . ' adalah subgrup sehinggga wajib memiliki grup utama'
-                    );
-                } else {
-                    $indicator_group = Assessment::findOne($assessment_id)
-                        ->getRootGroups()
-                        ->where(['id' => $parent_group_id])
-                        ->exists();
-                    if (!$indicator_group) {
-                        throw new NotFoundHttpException(
-                            'Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid'
+            $model = new IndicatorGroup();
+            if ($indicator_group_id) {
+                $model = $this->findGroupOrFail($indicator_group_id);
+
+                // Mengecek parent atau child langsung dari model db,
+                // bukan dari model yang sudah disisipkan input user ($model->load)
+                $parent_group_id = $IndicatorGroup['parent_group_id'];
+                if ($model->parent_group_id) {
+                    if (!$parent_group_id) {
+                        throw new BadRequestHttpException(
+                            ($IndicatorGroup['code'] ?? $model->code) . ' adalah subgrup sehinggga wajib memiliki grup utama'
                         );
+                    } else {
+                        $indicator_group = Assessment::findOne($assessment_id)
+                            ->getRootGroups()
+                            ->where(['id' => $parent_group_id])
+                            ->exists();
+                        if (!$indicator_group) {
+                            throw new NotFoundHttpException(
+                                'Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid'
+                            );
+                        }
                     }
+                } else if (!$model->parent_group_id && $parent_group_id) {
+                    throw new BadRequestHttpException(
+                        ($IndicatorGroup['code'] ?? $model->code) . ' adalah grup utama sehingga tidak dapat dipindahkan ke dalam grup lain'
+                    );
                 }
-            } else if (!$model->parent_group_id && $parent_group_id) {
-                throw new BadRequestHttpException(
-                    ($IndicatorGroup['code'] ?? $model->code) . ' adalah grup utama sehingga tidak dapat dipindahkan ke dalam grup lain'
-                );
             }
     
             $model->assessment_id = $assessment_id;
@@ -142,7 +262,7 @@ class AsesmenController extends Controller
 
             $indicator_group_id = Yii::$app->request->post('Indicator')['indicator_group_id'];
             if (!$indicator_group_id) {
-                throw new BadRequestHttpException('Indikator wajib memilih subgrup');
+                throw new BadRequestHttpException('Indikator wajib memiliki subgrup');
             }
             $indicator_group = Assessment::findOne($assessment_id)
                 ->getChildGroups()
@@ -180,7 +300,13 @@ class AsesmenController extends Controller
     public function actionSimpanOpsi(int $assessment_id, ?int $indicator_option_id = null)
     {
         try {
-            $this->validateWeight(Yii::$app->request->post('IndicatorOption')['weight']);
+            $Indicator = Yii::$app->request->post('IndicatorOption');
+
+            if (!$Indicator['indicator_id']) {
+                throw new BadRequestHttpException('Opsi wajib memiliki subgrup');
+            }
+            $this->findIndicatorOrFail($Indicator['indicator_id']);
+            $this->validateWeight($Indicator['weight']);
     
             $model = $indicator_option_id ? $this->findOptionOrFail($indicator_option_id) : new IndicatorOption();
             $model->load(Yii::$app->request->post());
@@ -201,6 +327,41 @@ class AsesmenController extends Controller
                     $error instanceof NotFoundHttpException
                 ) {
                     return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionHapus(int $assessment_id)
+    {
+        try {
+            $assessment = $this->findAssessmentOrFail($assessment_id);
+
+            if ($assessment->getCertifications()->exists()) {
+                throw new UnprocessableEntityHttpException(
+                    'Asesmen tidak dapat dihapus karena sudah digunakan dalam proses sertifikasi'
+                );
+            }
+
+            if ($assessment->active_at_level) {
+                throw new UnprocessableEntityHttpException(
+                    'Asesmen tidak dapat dihapus karena sedang aktif. ' .
+                    'Silakan aktifkan asesmen lain pada tingkat ' . CertificateLevel::list()[$assessment->level] .
+                    ' untuk menggantikan asesmen ini sebelum menghapusnya'
+                );
+            }
+
+            $title = $assessment->title;
+            $assessment->delete();
+
+            Yii::$app->session->setFlash('success', "Asesmen \"$title\" berhasil dihapus");
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException || $error instanceof UnprocessableEntityHttpException) {
+                    return $this->redirect(['index']);
                 }
             }
             throw $error;

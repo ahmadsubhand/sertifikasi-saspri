@@ -18,8 +18,8 @@ class m260504_034225_create_assessment_table extends Migration
             'title' => $this->string()->notNull(),
             'active_at_level' => $this->string(),
             'level' => $this->string()->notNull(),
-            'created_at' => $this->dateTime()->notNull(),
-            'updated_at' => $this->dateTime()->notNull(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
             'released_at' => $this->dateTime(),
         ]);
 

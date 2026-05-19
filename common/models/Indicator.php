@@ -93,4 +93,17 @@ class Indicator extends \yii\db\ActiveRecord
         return $this->hasMany(IndicatorScore::class, ['indicator_id' => 'id']);
     }
 
+    public function clone(int $new_group_id)
+    {
+        $new_indicator = new Indicator();
+        $new_indicator->attributes = $this->attributes;
+        $new_indicator->indicator_group_id = $new_group_id;
+        $new_indicator->save(false);
+
+        foreach ($this->indicatorOptions as $old_option) {
+            $old_option->clone($new_indicator->id);
+        }
+
+        return $new_indicator;
+    }
 }

@@ -62,4 +62,13 @@ class IndicatorOption extends \yii\db\ActiveRecord
         return $this->hasOne(Indicator::class, ['id' => 'indicator_id']);
     }
 
+    public function clone(int $new_indicator_id)
+    {
+        $new_option = new IndicatorOption();
+        $new_option->attributes = $this->attributes;
+        $new_option->indicator_id = $new_indicator_id;
+        $new_option->save(false);
+
+        return $new_option;
+    }
 }

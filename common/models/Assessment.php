@@ -4,6 +4,7 @@ namespace common\models;
 
 use ErrorException;
 use Exception;
+use yii\behaviors\TimestampBehavior;
 use yii\web\BadRequestHttpException;
 
 /**
@@ -30,6 +31,16 @@ class Assessment extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'assessment';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
     }
 
     /**
@@ -124,5 +135,45 @@ class Assessment extends \yii\db\ActiveRecord
             }
             throw $error;
         }
+    }
+
+    public function activate()
+    {
+        /** @var Assessment $active_assessment */
+        $active_assessment = Assessment::find()
+            ->where(['!=', 'id', $this->id])
+            ->andWhere(['active_at_level' => $this->level])
+            ->one();
+        if ($active_assessment) {
+            $active_assessment->active_at_level = null;
+            $active_assessment->save(false);
+        }
+
+        if (!$this->released_at) { // kalau udah pernah rilis, tidak perlu diperbarui lagi
+            $this->released_at = date('Y-m-d H:i:s');
+        }
+
+        $this->active_at_level = $this->level;
+        return $this;
+    }
+
+    public function deactivate()
+    {
+        $this->active_at_level = null;
+        return $this;
+    }
+
+    public static function clone(Assessment $cloned_assessment)
+    {
+        $new_assessment = new Assessment();
+        $new_assessment->title = 'Salinan dari ' . $cloned_assessment->title;
+        $new_assessment->level = $cloned_assessment->level;
+        $new_assessment->save(false);
+
+        foreach ($cloned_assessment->rootGroups as $old_root_group) {
+            $old_root_group->clone($new_assessment->id);
+        }
+
+        return $new_assessment;
     }
 }

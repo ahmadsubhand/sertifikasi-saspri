@@ -147,7 +147,7 @@ class IndicatorGroup extends \yii\db\ActiveRecord
     public function countRemainingWeight()
     {
         $assessment = $this->assessment;
-        $query = $assessment->getRootGroups()->andWhere(['!=', 'id', $this->id]);;
+        $query = $assessment->getRootGroups()->andWhere(['!=', 'id', $this->id]);
         if ($this->parent_group_id) {
             $query = $assessment->getChildGroups()
                 ->andWhere(['child.parent_group_id' => $this->parent_group_id])
@@ -155,12 +155,33 @@ class IndicatorGroup extends \yii\db\ActiveRecord
         }
         /** @var IndicatorGroup[] $indicator_groups */
         $indicator_groups = $query->all();
-        
+
         $total_weight = 0;
         foreach ($indicator_groups as $group) {
             $total_weight += $group->weight;
         }
         $MAX_TOTAL_WEIGHT = 100;
         return $MAX_TOTAL_WEIGHT - $total_weight;
+    }
+
+    public function clone(int $new_assessment_id, ?int $new_parent_group_id = null)
+    {
+        $new_group = new IndicatorGroup();
+        $new_group->attributes = $this->attributes;
+        $new_group->assessment_id = $new_assessment_id;
+        $new_group->parent_group_id = $new_parent_group_id;
+        $new_group->save(false);
+
+        if (!$new_parent_group_id) {
+            foreach ($this->childGroups as $old_child_group) {
+                $old_child_group->clone($new_assessment_id, $new_group->id);
+            }
+        } else {
+            foreach ($this->indicators as $old_indicator) {
+                $old_indicator->clone($new_group->id);
+            }
+        }
+
+        return $new_group;
     }
 }

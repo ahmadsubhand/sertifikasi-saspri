@@ -36,6 +36,48 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
         </button>
     </div>
 
+    <div class="card mb-4 border-dark shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Pengaturan Utama Asesmen</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <?= Html::beginForm(['ubah-judul', 'assessment_id' => $assessment->id], 'patch') ?>
+                    <label class="form-label fw-bold">Judul Asesmen</label>
+                    <div class="input-group">
+                        <?= Html::textInput('title', $assessment->title, ['class' => 'form-control', 'required' => true]) ?>
+                        <button class="btn btn-primary" type="submit">Ubah Judul</button>
+                    </div>
+                    <?= Html::endForm() ?>
+                </div>
+                <div class="col-md-4">
+                    <?= Html::beginForm(['ganti-tingkat', 'assessment_id' => $assessment->id], 'post') ?>
+                    <label class="form-label fw-bold">Tingkat Sertifikasi</label>
+                    <div class="input-group">
+                        <?= Html::dropDownList('level', $assessment->level, \common\enums\CertificateLevel::list(), ['class' => 'form-select']) ?>
+                        <button class="btn btn-warning" type="submit" data-confirm="Ganti tingkat asesmen? Ini akan menonaktifkan asesmen jika sedang aktif.">Ganti Level</button>
+                    </div>
+                    <?= Html::endForm() ?>
+                </div>
+                <div class="col-md-3 text-center">
+                    <label class="form-label d-block fw-bold">Status Saat Ini</label>
+                    <?php if ($assessment->level === $assessment->active_at_level): ?>
+                        <div class="alert alert-success py-2 mb-0">
+                            <i class="bi bi-check-circle-fill"></i> Aktif di Level <?= \common\enums\CertificateLevel::list()[$assessment->level] ?>
+                        </div>
+                    <?php else: ?>
+                        <?= Html::a('Aktifkan Sekarang', ['aktifkan', 'assessment_id' => $assessment->id], [
+                            'class' => 'btn btn-outline-success w-100',
+                            'data-confirm' => 'Aktifkan asesmen ini untuk menggantikan asesmen aktif saat ini di level ' . \common\enums\CertificateLevel::list()[$assessment->level] . '?',
+                            'data-method' => 'post',
+                        ]) ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php foreach ($root_groups as $root): ?>
         <div class="card mb-4 border-primary">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -341,11 +383,6 @@ function edit_opsi(data) {
     document.getElementById('option_code').value = data.code;
     document.getElementById('option_label').value = data.label;
     document.getElementById('option_order').value = data.order;
-    document.getElementById('option_weight').value = data.weight;
-    new bootstrap.Modal(document.getElementById('modal_opsi')).show();
-}
-</script>
-n_order').value = data.order;
     document.getElementById('option_weight').value = data.weight;
     new bootstrap.Modal(document.getElementById('modal_opsi')).show();
 }
