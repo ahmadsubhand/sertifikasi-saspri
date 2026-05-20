@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
@@ -47,6 +48,7 @@ class SaspriKController extends Controller
                     'hapus-anggota-tim-mandiri' => ['delete'],
                     'ubah-peran-anggota-tim-mandiri' => ['post'],
                     'ajukan-sertifikasi' => ['post'],
+                    'ajukan-pergantian-wali' => ['post'],
                 ],
             ],
         ];
@@ -214,6 +216,29 @@ class SaspriKController extends Controller
             if ($error instanceof ForbiddenHttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 return $this->goHome();
+            }
+            throw $error;
+        }
+    }
+
+    public function actionCariAnggotaSaspriK(string $q)
+    {
+        try {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $saspri_k = $this->findSaspriKAsCoordinator();
+            $users = $saspri_k->getUsers()
+                ->where(['!=', 'id', $saspri_k->coordinator_id])
+                ->andWhere(['like', 'username', $q])
+                ->select(['id', 'username'])
+                ->limit(10)
+                ->asArray()
+                ->all();
+
+            return $users;
+        } catch (Exception $error) {
+            if ($error instanceof ForbiddenHttpException) {
+                return [];
             }
             throw $error;
         }
@@ -392,6 +417,57 @@ class SaspriKController extends Controller
                     return $this->goHome();
                 } elseif ($error instanceof NotFoundHttpException) {
                     return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionPergantianWali()
+    {
+        try {
+            $saspri_k = $this->findSaspriKAsCoordinator();
+
+            return $this->render('pergantianWali', [
+                'saspri_k' => $saspri_k,
+            ]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionAjukanPergantianWali()
+    {
+        try {
+            $saspri_k = $this->findSaspriKAsCoordinator();
+            if ($saspri_k->change_status === ApprovalStatus::PENDING) {
+                throw new UnprocessableEntityHttpException(
+                    'Pergantian wali sudah pernah diajukan dan masih dalam proses tinjauan SASPRI-Nasional'
+                );
+            }
+            $new_coordinator = $this->findAMemberOfSaspriK(Yii::$app->request->post('new_coordinator_id'), $saspri_k);
+
+            $reason = Yii::$app->request->post('change_request_reason');
+            $saspri_k->requestCoordinatorChange($new_coordinator->id, $reason)->save(false);
+
+            Yii::$app->session->setFlash('success', 'Pergantian wali berhasil diajukan');
+            return $this->redirect(['pergantian-wali']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                } elseif (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['pergantian-wali']);
                 }
             }
             throw $error;

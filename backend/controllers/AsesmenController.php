@@ -52,7 +52,7 @@ class AsesmenController extends Controller
 
     public function actionIndex()
     {
-        $assessments = Assessment::find()->all();
+        $assessments = Assessment::find()->orderBy(['updated_at' => SORT_DESC])->all();
         return $this->render('index', [
             'assessments' => $assessments,
         ]);

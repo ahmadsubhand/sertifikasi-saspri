@@ -134,7 +134,6 @@ class PenerbitanSertifikasiController extends Controller
                 ->setGrade()
                 ->generateCertificationCode()
                 ->calculateNextCertificationDueDate()
-                ->updateValidCertificate()
                 ->save(false);
 
             Yii::$app->session->setFlash('success', 'Penerbitan Sertifikasi berhasil difinalisasi');

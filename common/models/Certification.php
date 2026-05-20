@@ -41,7 +41,6 @@ use yii\web\UnprocessableEntityHttpException;
  * @property Indicator[] $indicators
  * @property PeerTeamMember[] $peerTeamMembers
  * @property SaspriK $saspriK
- * @property SaspriK $saspriK0
  * @property SelfTeamMember[] $selfTeamMembers
  * @property User[] $users
  * @property User[] $users0
@@ -160,16 +159,6 @@ class Certification extends \yii\db\ActiveRecord
     public function getSaspriK()
     {
         return $this->hasOne(SaspriK::class, ['id' => 'saspri_k_id']);
-    }
-
-    /**
-     * Gets query for [[SaspriK0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSaspriK0()
-    {
-        return $this->hasOne(SaspriK::class, ['valid_certificate_id' => 'id']);
     }
 
     /**
@@ -427,18 +416,6 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
-    public function updateValidCertificate()
-    {
-        if (
-            $this->grade === CertificateGrade::A ||
-            $this->grade === CertificateGrade::AB ||
-            $this->grade === CertificateGrade::B
-        ) {
-            $this->saspriK->link('validCertificate', $this);
-        }
-        return $this;
-    }
-
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore
     {
         return $this->getIndicatorScores()
@@ -511,6 +488,12 @@ class Certification extends \yii\db\ActiveRecord
         $interval = (($this->grade === CertificateGrade::A) || ($this->grade === CertificateGrade::BC))
             ? 1 : 2;
         $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", strtotime($this->issued_at)));
+        return $this;
+    }
+
+    public function setNextCertificationDueDateToNow()
+    {
+        $this->next_certification_due_date = date('Y-m-d H:i:s');
         return $this;
     }
 }

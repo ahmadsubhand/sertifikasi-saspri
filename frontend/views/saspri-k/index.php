@@ -81,7 +81,7 @@ $shingles = [
             ]); ?>
           <?php endforeach ?>
           <div class="w-100 d-flex justify-content-between mt-3">
-            <a href="<?= Url::to(['#', 'saspri_id' => $saspri_k['id']]) ?>" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
+            <a href="<?= Url::to(['saspri-k/pergantian-wali']) ?>" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
             <!-- possible pjax change only for top-->
             <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a>
           </div>
