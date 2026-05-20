@@ -112,7 +112,9 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                             <?php foreach ($documents as $doc): ?>
                                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                     <span class="small text-muted"><?= Html::encode($doc->type) ?></span>
-                                    <a href="<?= Html::encode($doc->url) ?>" target="_blank" class="btn btn-sm btn-outline-primary py-0">
+                                    <a href="<?= Yii::$app->params['frontendUrl'] . Html::encode($doc->url) ?>"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-primary py-0">
                                         <i class="fa-solid fa-file-lines me-1"></i> Lihat
                                     </a>
                                 </li>

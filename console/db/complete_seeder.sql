@@ -114,7 +114,7 @@ INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, coo
 
 -- --------------------------------------------------------
 -- Certifications (Historical)
--- 3 Natalia A/AB/B, 2 Weania BC/C, 1 Natalia A
+-- 5 Natalia A, 1 Natalia AB, 1 Natalia B, 2 Weania BC/C
 -- --------------------------------------------------------
 
 INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
@@ -123,7 +123,9 @@ INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, leve
 (3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
 (4, 4, 1, 'level_up', 'completed', 'weania', 55, 'bc', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
 (5, 5, 1, 'level_up', 'completed', 'weania', 45, 'c', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
-(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10');
+(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(18, 4, 1, 'level_up', 'completed', 'natalia', 92, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10'),
+(19, 5, 1, 'level_up', 'completed', 'natalia', 94, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10');
 
 -- --------------------------------------------------------
 -- Ongoing Certifications
