@@ -175,7 +175,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       <?php endif; ?>
       <div class="border border-1 border-black ms-4"></div>
       <div class="py-2 ms-4">
-        <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 onclick=" tambah_group(<?= $root->id ?>)">
+        <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 onclick=" onClick="tambah_group(<?= $root->id ?>)">
           <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Subgroup
         </button>
       </div>
