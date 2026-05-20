@@ -28,7 +28,7 @@ $currentRoute = Yii::$app->controller->getRoute();
     </a>
   </div>
   <div class="<?= str_contains($currentRoute, 'wali') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
-    <a href="<?php echo Url::to('/wali') ?>" class="text-decoration-none text-white w-100 text-white h6 ">
+    <a href="<?php echo Url::to('/verifikasi-wali') ?>" class="text-decoration-none text-white w-100 text-white h6 ">
       <div class=" py-2 mx-2 ">
         Verifikasi Wali
       </div>

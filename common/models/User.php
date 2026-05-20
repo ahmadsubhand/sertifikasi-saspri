@@ -264,4 +264,24 @@ class User extends ActiveRecord implements IdentityInterface
         $this->saspri_k_id = null;
         return $this;
     }
+
+    public function demoteFromCoordinator()
+    {
+        $auth = Yii::$app->authManager;
+        $coordinatorRole = $auth->getRole(UserRole::COORDINATOR);
+        $userRole = $auth->getRole(UserRole::USER);
+
+        $auth->revoke($coordinatorRole, $this->id);
+        $auth->assign($userRole, $this->id);
+    }
+
+    public function promoteToCoordinator()
+    {
+        $auth = Yii::$app->authManager;
+        $coordinatorRole = $auth->getRole(UserRole::COORDINATOR);
+        $userRole = $auth->getRole(UserRole::USER);
+
+        $auth->revoke($userRole, $this->id);
+        $auth->assign($coordinatorRole, $this->id);
+    }
 }

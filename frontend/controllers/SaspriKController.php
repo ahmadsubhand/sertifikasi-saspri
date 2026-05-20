@@ -48,6 +48,7 @@ class SaspriKController extends Controller
                     'hapus-anggota-tim-mandiri' => ['delete'],
                     'ubah-peran-anggota-tim-mandiri' => ['post'],
                     'ajukan-sertifikasi' => ['post'],
+                    'ajukan-pergantian-wali' => ['post'],
                 ],
             ],
         ];
