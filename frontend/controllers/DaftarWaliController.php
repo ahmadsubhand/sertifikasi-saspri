@@ -81,15 +81,12 @@ class DaftarWaliController extends Controller
             }
 
             $saspri_k->load(Yii::$app->request->post());
-            $saspri_k->coordinator_id = Yii::$app->user->id;
-            $saspri_k->request_status = ApprovalStatus::PENDING;
-            $saspri_k->request_rejection_reason = null;
-            $saspri_k->save(false);
+            $saspri_k->requestRegistration(Yii::$app->user->id)->save(false);
 
             $saspri_k->deleteOldDocuments();
             $saspri_k->uploadNewDocuments($documents, $types);
 
-            if (!$saspri_k->validCertificate) {
+            if (!$saspri_k->getCertifications()->exists()) {
                 $saspri_k->createCertificationForNewSaspriK()->save(false);
             }
 

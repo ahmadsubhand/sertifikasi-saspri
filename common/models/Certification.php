@@ -416,18 +416,6 @@ class Certification extends \yii\db\ActiveRecord
         }
     }
 
-    public function updateValidCertificate()
-    {
-        if (
-            $this->grade === CertificateGrade::A ||
-            $this->grade === CertificateGrade::AB ||
-            $this->grade === CertificateGrade::B
-        ) {
-            $this->saspriK->link('validCertificate', $this);
-        }
-        return $this;
-    }
-
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore
     {
         return $this->getIndicatorScores()
@@ -500,6 +488,12 @@ class Certification extends \yii\db\ActiveRecord
         $interval = (($this->grade === CertificateGrade::A) || ($this->grade === CertificateGrade::BC))
             ? 1 : 2;
         $this->next_certification_due_date = date('Y-m-d H:i:s', strtotime("+$interval year", strtotime($this->issued_at)));
+        return $this;
+    }
+
+    public function setNextCertificationDueDateToNow()
+    {
+        $this->next_certification_due_date = date('Y-m-d H:i:s');
         return $this;
     }
 }

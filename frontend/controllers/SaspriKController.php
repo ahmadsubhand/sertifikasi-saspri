@@ -453,11 +453,8 @@ class SaspriKController extends Controller
             }
             $new_coordinator = $this->findAMemberOfSaspriK(Yii::$app->request->post('new_coordinator_id'), $saspri_k);
 
-            $saspri_k->new_coordinator_id = $new_coordinator->id;
-            $saspri_k->change_request_reason = Yii::$app->request->post('change_request_reason');
-            $saspri_k->change_status = ApprovalStatus::PENDING;
-            $saspri_k->change_rejection_reason = null;
-            $saspri_k->save(false);
+            $reason = Yii::$app->request->post('change_request_reason');
+            $saspri_k->requestCoordinatorChange($new_coordinator->id, $reason)->save(false);
 
             Yii::$app->session->setFlash('success', 'Pergantian wali berhasil diajukan');
             return $this->redirect(['pergantian-wali']);

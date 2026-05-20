@@ -43,7 +43,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
                                 <td><?= Html::encode($saspri->coordinator->username) ?></td>
                                 <td><?= Html::encode($saspri->cooperative_name) ?></td>
                                 <td>
-                                    <a href="#" class="btn btn-sm s-btn-main" title="Detail Pendaftaran">
+                                    <a href="<?= Url::to(['permintaan-pendaftaran-wali', 'saspri_k_id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main" title="Detail Pendaftaran">
                                         <i class="fa-solid fa-magnifying-glass"></i>
                                     </a>
                                 </td>

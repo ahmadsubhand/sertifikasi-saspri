@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
@@ -317,5 +318,53 @@ class SaspriK extends \yii\db\ActiveRecord
             FileHelper::deleteFile($oldFile);
             $old_document->delete();
         }
+    }
+
+    public function requestCoordinatorChange(int $new_coordinator_id, string $reason): self
+    {
+        $this->new_coordinator_id = $new_coordinator_id;
+        $this->change_request_reason = $reason;
+        $this->change_status = ApprovalStatus::PENDING;
+        $this->change_rejection_reason = null;
+        return $this;
+    }
+
+    public function approveCoordinatorChange(): self
+    {
+        $this->coordinator_id = $this->new_coordinator_id;
+        $this->new_coordinator_id = null;
+        $this->change_status = ApprovalStatus::APPROVED;
+        $this->change_request_reason = null;
+        $this->change_rejection_reason = null;
+        return $this;
+    }
+
+    public function rejectCoordinatorChange(string $reason): self
+    {
+        $this->change_status = ApprovalStatus::REJECTED;
+        $this->change_rejection_reason = $reason;
+        return $this;
+    }
+
+    public function requestRegistration(int $coordinator_id): self
+    {
+        $this->coordinator_id = $coordinator_id;
+        $this->request_status = ApprovalStatus::PENDING;
+        $this->request_rejection_reason = null;
+        return $this;
+    }
+
+    public function approveRegistration(): self
+    {
+        $this->request_status = ApprovalStatus::APPROVED;
+        $this->request_rejection_reason = null;
+        return $this;
+    }
+
+    public function rejectRegistration(string $reason): self
+    {
+        $this->request_status = ApprovalStatus::REJECTED;
+        $this->request_rejection_reason = $reason;
+        return $this;
     }
 }
