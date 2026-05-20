@@ -69,7 +69,7 @@ $shingles = [
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
-    <a href="<?= Url::to(['/saspri-k'])?>" class=" text-decoration-none text-black fs-5 me-3">
+    <a href="<?= Url::to(['/saspri-k']) ?>" class=" text-decoration-none text-black fs-5 me-3">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
     <?php if (str_contains(strtolower($cert['status']), 'pending')) : ?>
@@ -98,12 +98,12 @@ $shingles = [
         <?php if (str_contains(strtolower($cert['status']), 'review')) : ?>
           <div class="px-3 text-center">
             <p class=" fw-bold h5">
-                Sertifikasi 
-                <?= 
-                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
-                    ' ke ' .
-                    CertificateLevel::list()[$cert['level']]
-                ?> 
+              Sertifikasi
+              <?=
+              ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
+                ' ke ' .
+                CertificateLevel::list()[$cert['level']]
+              ?>
             </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>

@@ -51,7 +51,7 @@ use yii\helpers\Url;
                 <td><?= Html::encode(TeamRole::list()[$member->role]) ?></td>
                 <td><?= Html::encode(ApprovalStatus::list()[$member->status]) ?></td>
                 <td><?= Html::encode($member->certification->peer_team_due_date
-                      ? date('Y-m-d', strtotime($member->certification->peer_team_due_date))
+                      ? date('d-m-Y', strtotime($member->certification->peer_team_due_date))
                       : '-') ?>
                 </td>
                 <td>
@@ -169,7 +169,7 @@ use yii\helpers\Url;
                   <a href="<?php echo Url::to(['tim-sebaya/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
                 </td>
               </tr>
-            <?php endforeach ?>\
+            <?php endforeach ?>
             <?php if (empty($peer_team_member_completed)): ?>
             <tr>
               <td colspan="8" class="text-center">Anda belum pernah berperan sebagai tim sebaya.</td>

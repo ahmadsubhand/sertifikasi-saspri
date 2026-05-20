@@ -37,7 +37,7 @@ $currentRoute = Yii::$app->controller->getRoute();
   <div>
     <div class="s-bg-side align-items-center">
       <a class="text-decoration-none text-white h6 align-items-center" id="collapse-trig"
-      href="#collapse-sidenav" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-sidenav">
+        href="#collapse-sidenav" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-sidenav">
         <div class="d-flex py-2 mx-2">
           <p class="mb-0">
             Sertifikasi
@@ -54,28 +54,29 @@ $currentRoute = Yii::$app->controller->getRoute();
           Penentuan Tim Sebaya
         </div>
       </a>
-    </div>
-    <div id="collapse-sidenav" class="collapse show">
       <a href="<?php echo Url::to('/sertifikasi-berjalan') ?>" class="text-decoration-none text-white w-100 ">
         <div class=" py-2 px-4 <?= str_contains($currentRoute, 'berjalan') ? 's-bg-sec' : 's-bg-side' ?>">
           Sertifikasi Berjalan
         </div>
       </a>
-    </div>
-    <div id="collapse-sidenav" class="collapse show">
       <a href="<?php echo Url::to('/penerbitan-sertifikasi') ?>" class="text-decoration-none text-white w-100 ">
         <div class=" py-2 px-4 <?= str_contains($currentRoute, 'erbit') ? 's-bg-sec' : 's-bg-side' ?>">
-          Penerbitan Sertifikat
+          External Review
         </div>
       </a>
-    </div>
-    <div id="collapse-sidenav" class="collapse show">
       <a href="<?php echo Url::to('/kegiatan-tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
         <div class=" py-2 px-4 <?= str_contains($currentRoute, 'kegiatan') ? 's-bg-sec' : 's-bg-side' ?>">
           Kegiatan Tim Sebaya
         </div>
       </a>
     </div>
+  </div>
+  <div class="<?= str_contains($currentRoute, 'asesmen') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+    <a href="<?php echo Url::to('/asesmen') ?>" class="text-decoration-none text-white w-100 text-white h6 ">
+      <div class=" py-2 mx-2 ">
+        Manajemen Indikator
+      </div>
+    </a>
   </div>
 </aside>
 

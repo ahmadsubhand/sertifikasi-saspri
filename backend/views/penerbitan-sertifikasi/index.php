@@ -5,7 +5,7 @@ use yii\helpers\Html;
 
 /** @var \common\models\Certification[] $certifications */
 
-$this->title = 'Penerbitan Sertifikasi';
+$this->title = 'External Review';
 
 ?>
 
@@ -33,7 +33,7 @@ $this->title = 'Penerbitan Sertifikasi';
               <td><?= Html::encode($certification->saspriK->address) ?></td>
               <td><?=
                   $certification->external_review_due_date
-                    ? date('Y-m-d', strtotime($certification->external_review_due_date))
+                    ? date('d-m-Y', strtotime($certification->external_review_due_date))
                     : '-'
                   ?></td>
               <td><?= Html::encode($certification->grade ? CertificateGrade::list()[$certification->grade] : '-') ?></td>

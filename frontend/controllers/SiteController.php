@@ -96,7 +96,7 @@ class SiteController extends Controller
             if(yii::$app->user->can(UserRole::COORDINATOR)){
                 return $this->redirect('/saspri-k');
             } else if(yii::$app->user->can(UserRole::USER)){
-                return $this->redirect('/tim-sebaya');
+                return $this->redirect('/tim-mandiri');
             } else{
                 return $this->goBack();
             }

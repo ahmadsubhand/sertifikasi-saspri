@@ -42,17 +42,19 @@ $currentRoute = Yii::$app->controller->getRoute();
           </div>
         </a>
       <?php endif ?>
-      <a href="<?php echo Url::to('/tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
-        <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-sebaya') ? 's-bg-sec' : 's-bg-side' ?>">
-          Kegiatan Tim Sebaya
-        </div>
-      </a>
       <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
         <a href="<?php echo Url::to('/tim-mandiri') ?>" class="text-decoration-none text-white w-100 ">
           <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-mandiri') ? 's-bg-sec' : 's-bg-side' ?>">
             Kegiatan Tim Mandiri
           </div>
         </a>
+      <?php endif ?>
+      <a href="<?php echo Url::to('/tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
+        <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-sebaya') ? 's-bg-sec' : 's-bg-side' ?>">
+          Kegiatan Tim Sebaya
+        </div>
+      </a>
+      <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
         <div class="p-2">
           <div class="dropdown-divider border border-1"></div>
         </div>

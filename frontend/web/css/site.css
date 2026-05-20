@@ -75,14 +75,14 @@ table thead tr:first-child th:last-child {
   color: #6b78b9 ;
 }
 
-.s-btn-sec:hover {
-  background-color: #818a9a;
-  color: white;
-}
 .s-btn-sec {
   border: 1px solid #818a9a;
   background-color: white;
   color: #818a9a ;
+}
+.s-btn-sec:hover {
+  background-color: #818a9a;
+  color: white;
 }
 
 .s-btn-red {

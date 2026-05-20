@@ -29,4 +29,3 @@ switch ($cert->status) {
     echo '-';
     break;
 }
-?>

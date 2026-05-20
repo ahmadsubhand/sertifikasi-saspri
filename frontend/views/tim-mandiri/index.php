@@ -51,7 +51,7 @@ use yii\helpers\Url;
                 <td><?= Html::encode(TeamRole::list()[$member->role]) ?></td>
                 <td><?= Html::encode(ApprovalStatus::list()[$member->status]) ?></td>
                 <td><?= Html::encode($member->certification->self_team_due_date
-                      ? date('Y-m-d', strtotime($member->certification->self_team_due_date))
+                      ? date('d-m-Y', strtotime($member->certification->self_team_due_date))
                       : '-') ?>
                 </td>
                 <td>
