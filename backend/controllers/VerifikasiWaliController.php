@@ -37,11 +37,13 @@ class VerifikasiWaliController extends Controller
         $registration_requests = SaspriK::find()
             ->where(['request_status' => ApprovalStatus::PENDING])
             ->with(['coordinator', 'district'])
+            ->orderBy(['updated_at' => SORT_ASC])
             ->all();
 
         $change_requests = SaspriK::find()
             ->where(['change_status' => ApprovalStatus::PENDING])
             ->with(['coordinator', 'newCoordinator', 'district'])
+            ->orderBy(['updated_at' => SORT_ASC])
             ->all();
 
         return $this->render('index', [

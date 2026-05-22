@@ -21,11 +21,12 @@ class m260504_034927_create_saspri_k_table extends Migration
         $this->createTable('saspri_k', [
             'id' => $this->primaryKey(),
             'coordinator_id' => $this->integer()->notNull()->unique(),
+            'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
             // role wali sebenarnya bisa di dapat dari sini,
             // users.id === saspri_k.coordinator_id
 
             // Informasi SASPRI-K
-            // Apa saja informasi yang opsional?
             'district_id' => $this->integer()->notNull(),
             'region_name' => $this->string()->notNull(),
             'address' => $this->string()->notNull(),
@@ -37,7 +38,7 @@ class m260504_034927_create_saspri_k_table extends Migration
             'breeding_livestock_count' => $this->integer()->notNull(),
             'productive_heifer_count' => $this->integer()->notNull(),
 
-            // Pendaftaran Wali / SASPRI-K
+            // Pendaftaran Wali dan SASPRI-K
             'request_status' => $this->string()->notNull()->defaultValue(ApprovalStatus::PENDING),
             'request_rejection_reason' => $this->string(),
 
