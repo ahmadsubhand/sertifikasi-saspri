@@ -27,15 +27,15 @@ class PenentuanTimSebayaController extends Controller
     {
         return [
             'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => [UserRole::ADMIN],
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::ADMIN],
+                    ],
                 ],
             ],
-            ],
-                'verbs' => [
+            'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
                     'tambah-anggota-tim-sebaya' => ['post'],

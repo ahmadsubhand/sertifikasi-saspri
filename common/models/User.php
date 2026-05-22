@@ -45,6 +45,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return '{{%user}}';
     }
+    
 
     /**
      * {@inheritdoc}
@@ -86,6 +87,21 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        unset(
+            $fields['auth_key'], 
+            $fields['password_hash'], 
+            $fields['password_reset_token'],
+            $fields['verification_token'],
+            $fields['access_token'],
+        );
+
+        return [...$fields];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -99,7 +115,10 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        return static::findOne([
+            'access_token' => $token,
+            // 'status' => self::STATUS_ACTIVE
+        ]);
     }
 
     /**
@@ -213,6 +232,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAccessToken()
+    {
+        $this->access_token = Yii::$app->security->generateRandomString();
     }
 
     /**
