@@ -55,7 +55,7 @@ $certLabel = [
 $certIndex = [
   'level',
   'code',
-  'submitted_at',
+  'created_at',
   'issued_at',
   'grade',
 ];
@@ -108,9 +108,12 @@ $shingles = [
             </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
-            <p class="h6">Sebelum tanggal <?= $this->render('/component/_date_comparator',[
-              'cert' => $cert
-            ]); ?> </p>
+            <?php if ($cert->status === CertificationStatus::PEER_REVIEW) : ?>
+              <p class="h6">Sebelum tanggal <?= $this->render('/component/_date_comparator', [
+                                              'cert' => $cert
+                                            ]); ?>
+              </p>
+            <?php endif ?>
           </div>
           <?php if (in_array(Yii::$app->user->id, array_column($peer_team, 'user_id')) && $cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
             <div class="px-3">
@@ -129,7 +132,7 @@ $shingles = [
             <div>
               <?= Html::a('Mulai Peer Review', ['/tim-sebaya/peer-review', 'certification_id' => $cert['id']], [
                 'class' => 'btn s-btn-main me-2 w-100 mt-3',
-              ])?>
+              ]) ?>
             </div>
           <?php endif ?>
         <?php else : ?>

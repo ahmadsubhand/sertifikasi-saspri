@@ -52,7 +52,7 @@ $certLabel = [
 $certIndex = [
   'level',
   'code',
-  'submitted_at',
+  'created_at',
   'issued_at',
   'grade',
 ];
@@ -62,7 +62,6 @@ $shingles = [
   'breeding_livestock_count' => 'Ekor',
   'productive_heifer_count' => 'Ekor',
 ];
-
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
@@ -89,7 +88,7 @@ $shingles = [
     </div>
     <div class="col-sm-4">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <?php if (str_contains(strtolower($cert['status']), 'review')) : ?>
+        <?php if ($cert->status != CertificationStatus::COMPLETED) : ?>
           <div class="px-3 text-center">
             <p class=" fw-bold h5">
                 Sertifikasi 
@@ -101,12 +100,16 @@ $shingles = [
             </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
-            <p class="h6"> <?= Html::encode($cert['external_review_due_date'])
-                              ? 'Sebelum tanggal ' . date('d-m-Y', strtotime($cert['external_review_due_date']))
-                              : '-' ?></p>
-            <?= str_contains(strtolower($cert['status']), 'external') ? Html::a('Mulai External Review', ['external-review', 'certification_id' => $cert['id']], [
-              'class' => 'btn s-btn-main me-2 w-100 mt-3',
-            ]) : '' ?>
+            <p class="h6"> Sebelum tanggal <?= $this->render('/component/_date_comparator',[
+              'cert' => $cert
+            ]); ?> </p>
+            <?php if ($cert->status == CertificationStatus::EXTERNAL_REVIEW) : ?>
+            <div>
+              <?= Html::a('Mulai External Review', ['external-review', 'certification_id' => $cert['id']], [
+                'class' => 'btn s-btn-main me-2 w-100 mt-3',
+              ])?>
+            </div>
+          <?php endif ?>
           </div>
 
         <?php else : ?>
@@ -127,12 +130,14 @@ $shingles = [
   <div class="row">
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
-        "model" => $self_team
-      ]) ?>
+        "model" => $self_team,
+        "is_self" => 1
+        ]) ?>
     </div>
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
-        "model" => $peer_team
+        "model" => $peer_team,
+        "is_self" => 0
       ]) ?>
     </div>
   </div>

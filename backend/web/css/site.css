@@ -132,11 +132,11 @@ table thead tr:first-child th:last-child {
   background-color: #818a9a80;
 }
 
-[data-bs-toggle="collapse"] .fa-chevron-up {
+[data-bs-toggle="collapse"] i.fa-chevron-up {
   transition: transform 0.3s ease;
 }
 
-[data-bs-toggle="collapse"][aria-expanded="false"] .fa-chevron-up {
+[data-bs-toggle="collapse"][aria-expanded="false"] i.fa-chevron-up{
   transform: rotate(180deg);
 }
 

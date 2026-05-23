@@ -31,7 +31,7 @@ if ($saspri_k->new_coordinator_id) {
     <?php if ($is_pending): ?>
         <div class="alert alert-info shadow-sm border-0">
             <i class="fa-solid fa-circle-info me-2"></i>
-            Pergantian wali sedang dalam proses tinjauan oleh SASPRI-Nasional. 
+            Pergantian wali sedang dalam proses tinjauan oleh SASPRI-Nasional.
             <?php if ($new_coordinator): ?>
                 Wali pengganti yang diajukan: <strong><?= Html::encode($new_coordinator->username) ?></strong>
             <?php endif; ?>
@@ -52,22 +52,18 @@ if ($saspri_k->new_coordinator_id) {
                 <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->csrfToken) ?>
 
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Alasan Pergantian Wali</label>
-                    <textarea name="change_request_reason" class="form-control border-black" rows="4" placeholder="Masukkan alasan pergantian wali..." required><?= Html::encode($saspri_k->change_request_reason) ?></textarea>
-                </div>
-
-                <div class="mb-3">
                     <label class="form-label fw-bold">Pencarian Wali Pengganti</label>
                     <div class="user-search-container">
                         <input type="text" id="user-search-input" placeholder="Cari anggota (username) ..."
                             class="form-control dropdown-toggle border-black" autocomplete="off">
                         <div id="search-dropdown" class="search-dropdown dropdown-menu shadow"></div>
                     </div>
-                    
+
                     <div id="selected-user-container" class="mt-3">
                         <?php if ($new_coordinator): ?>
+                            Calon koordinator:
                             <div class="d-flex bg-white shadow border-1 border align-items-center p-2 btn rounded-4" style="width: fit-content;">
-                                <span><?= Html::encode($new_coordinator->username) ?></span>
+                                <span> <?= Html::encode($new_coordinator->username) ?></span>
                                 <span class="remove-btn ms-2" onclick="window.removeSelectedUser()">&times;</span>
                                 <input type="hidden" name="new_coordinator_id" value="<?= $new_coordinator->id ?>">
                             </div>
@@ -75,6 +71,11 @@ if ($saspri_k->new_coordinator_id) {
                             <input type="hidden" name="new_coordinator_id" id="new-coordinator-id" required>
                         <?php endif; ?>
                     </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Alasan Pergantian Wali</label>
+                    <textarea name="change_request_reason" class="form-control border-black" rows="4" placeholder="Masukkan alasan pergantian wali..." required><?= Html::encode($saspri_k->change_request_reason) ?></textarea>
                 </div>
 
                 <div class="mb-4">
@@ -87,7 +88,7 @@ if ($saspri_k->new_coordinator_id) {
                 </div>
 
                 <div class="w-100">
-                    <button type="submit" class="btn s-btn-main w-100 py-2 fw-bold">
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
                         Ajukan pergantian wali
                     </button>
                 </div>
@@ -97,62 +98,63 @@ if ($saspri_k->new_coordinator_id) {
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('user-search-input');
-    const dropdown = document.getElementById('search-dropdown');
-    const container = document.getElementById('selected-user-container');
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('user-search-input');
+        const dropdown = document.getElementById('search-dropdown');
+        const container = document.getElementById('selected-user-container');
 
-    let timeout = null;
+        let timeout = null;
 
-    input.addEventListener('input', function() {
-        clearTimeout(timeout);
-        const q = this.value;
-        if (q.length < 2) {
-            dropdown.style.display = 'none';
-            return;
-        }
+        input.addEventListener('input', function() {
+            clearTimeout(timeout);
+            const q = this.value;
+            if (q.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
 
-        timeout = setTimeout(() => {
-            fetch('<?= Url::to(['saspri-k/cari-anggota-saspri-k']) ?>?q=' + encodeURIComponent(q))
-                .then(response => response.json())
-                .then(data => {
-                    dropdown.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach(user => {
-                            const item = document.createElement('div');
-                            item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
-                            item.textContent = user.username;
-                            item.onclick = () => selectUser(user);
-                            dropdown.appendChild(item);
-                        });
-                        dropdown.style.display = 'block';
-                    } else {
-                        dropdown.style.display = 'none';
-                    }
-                });
-        }, 300);
-    });
+            timeout = setTimeout(() => {
+                fetch('<?= Url::to(['saspri-k/cari-anggota-saspri-k']) ?>?q=' + encodeURIComponent(q))
+                    .then(response => response.json())
+                    .then(data => {
+                        dropdown.innerHTML = '';
+                        if (data.length > 0) {
+                            data.forEach(user => {
+                                const item = document.createElement('div');
+                                item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
+                                item.textContent = user.username;
+                                item.onclick = () => selectUser(user);
+                                dropdown.appendChild(item);
+                            });
+                            dropdown.style.display = 'block';
+                        } else {
+                            dropdown.style.display = 'none';
+                        }
+                    });
+            }, 300);
+        });
 
-    function selectUser(user) {
-        container.innerHTML = `
-            <div class="d-flex bg-white shadow border-1 border align-items-center p-2 btn rounded-4" style="width: fit-content;">
-                <span>${user.username}</span>
+        function selectUser(user) {
+            container.innerHTML = `
+            Calon koordinator:
+            <div class="d-flex bg-white shadow border-1 border align-items-center justify-content-between p-2 btn rounded-4" style="width: fit-content;">
+                <span>Calon koordinator: ${user.username}</span>
                 <span class="remove-btn ms-2" onclick="window.removeSelectedUser()">&times;</span>
                 <input type="hidden" name="new_coordinator_id" value="${user.id}">
             </div>
         `;
-        input.value = '';
-        dropdown.style.display = 'none';
-    }
-
-    window.removeSelectedUser = function() {
-        container.innerHTML = '<input type="hidden" name="new_coordinator_id" id="new-coordinator-id" required>';
-    };
-
-    document.addEventListener('click', function(e) {
-        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            input.value = '';
             dropdown.style.display = 'none';
         }
+
+        window.removeSelectedUser = function() {
+            container.innerHTML = '<input type="hidden" name="new_coordinator_id" id="new-coordinator-id" required>';
+        };
+
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
     });
-});
 </script>

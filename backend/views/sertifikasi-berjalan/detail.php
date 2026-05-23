@@ -2,10 +2,10 @@
 
 use common\models\SelfTeamMember;
 use common\enums\CertificateLevel;
+use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 /** @var int $id
  *  @var common\models\SaspriK $saspri
@@ -13,9 +13,6 @@ use yii\helpers\Url;
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
-
-$this->title = 'Detail Sertifikasi Berjalan';
-
 $label = [
   'SASPRI-K',
   'SASPRI-KK',
@@ -49,13 +46,15 @@ $certLabel = [
   'Level Sertifikat',
   'No. Sertifikat',
   'Tanggal Pengajuan',
-  'Status',
+  'Tanggal Penerbitan',
+  'Predikat',
 ];
 $certIndex = [
   'level',
   'code',
-  'submitted_at',
-  'status',
+  'created_at',
+  'issued_at',
+  'grade',
 ];
 $shingles = [
   'number_of_active_members' => 'Orang',
@@ -63,15 +62,14 @@ $shingles = [
   'breeding_livestock_count' => 'Ekor',
   'productive_heifer_count' => 'Ekor',
 ];
-
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
-    <a href="<?= Url::to(['index']) ?>" class=" text-decoration-none text-black fs-5 me-3">
+    <a href="/tim-mandiri" class=" text-decoration-none text-black fs-5 me-3">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
-    <p class="fw-bold mb-0 h3"><?= Html::encode($this->title) ?></p>
+    <p class="fw-bold mb-0 h3">Detail Sertifikasi</p>
   </div>
   <div class="row">
     <div class="col-sm-8">
@@ -90,24 +88,42 @@ $shingles = [
     </div>
     <div class="col-sm-4">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <div class="px-3 text-center">
-          <p class=" fw-bold h5">Informasi Sertifikasi</p>
-          <?php foreach ($certIndex as $key => $dat) : ?>
-            <?php
-            $dataValue = $cert[$dat] ?? '-';
-            if ($dat === 'level') {
-              $dataValue = CertificateLevel::list()[$dataValue] ?? $dataValue;
-            } elseif ($dat === 'status') {
-              $dataValue = CertificationStatus::list()[$dataValue] ?? $dataValue;
-            }
-            ?>
-            <?php echo $this->render('/component/_idline', [
-              'label' => $certLabel[$key],
-              'data' => $dataValue,
-              'shingles' => ''
-            ]); ?>
-          <?php endforeach ?>
-        </div>
+        <?php if ($cert->status != CertificationStatus::COMPLETED) : ?>
+          <div class="px-3 text-center">
+            <p class=" fw-bold h5">
+                Sertifikasi 
+                <?= 
+                    ($cert['purpose'] === CertificationPurpose::LEVEL_UP ? CertificateLevel::list()[$cert['level']] : CertificateLevel::prev()[$cert['level']]) .
+                    ' ke ' .
+                    CertificateLevel::list()[$cert['level']]
+                ?> 
+            </p>
+            <br>
+            <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
+            <p class="h6"> Sebelum tanggal <?= $this->render('/component/_date_comparator',[
+              'cert' => $cert
+            ]); ?> </p>
+            <?php if ($cert->status == CertificationStatus::EXTERNAL_REVIEW) : ?>
+            <div>
+              <?= Html::a('Mulai External Review', ['external-review', 'certification_id' => $cert['id']], [
+                'class' => 'btn s-btn-main me-2 w-100 mt-3',
+              ])?>
+            </div>
+          <?php endif ?>
+          </div>
+
+        <?php else : ?>
+          <div class="px-3 text-center">
+            <p class=" fw-bold h5">Sertifikat</p>
+            <?php foreach ($certIndex as $key => $dat) : ?>
+              <?php echo $this->render('/component/_idline', [
+                'label' => $certLabel[$key],
+                'data' => $cert[$dat] ?? '-',
+                'shingles' => ''
+              ]); ?>
+            <?php endforeach ?>
+          </div>
+        <?php endif ?>
       </div>
     </div>
   </div>
@@ -115,13 +131,13 @@ $shingles = [
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
         "model" => $self_team,
-        "is_self" => true
-      ]) ?>
+        "is_self" => 1
+        ]) ?>
     </div>
     <div class="col-sm-6">
       <?= $this->render('/component/_team_table', [
         "model" => $peer_team,
-        "is_self" => false
+        "is_self" => 0
       ]) ?>
     </div>
   </div>

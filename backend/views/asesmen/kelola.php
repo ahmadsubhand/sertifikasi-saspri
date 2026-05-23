@@ -93,101 +93,100 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
   <!-- groups -->
   <?php foreach ($root_groups as $root): ?>
     <div class="card bg-white px-2 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100 mb-4">
-      <a id="parRoot<?= $root->id ?>" class="text-decoration-none" data-bs-toggle="collapse" href="#collapseRoot<?= $root->id ?>" role="button" aria-expanded="true" aria-controls="collapseRoot<?= $root->id ?>">
-        <div class="card-header text-black d-flex bg-white justify-content-between align-items-center">
+      <div class="card-header text-black d-flex bg-white justify-content-between align-items-center">
+        <a id="parRoot<?= $root->id ?>" class="text-decoration-none" data-bs-toggle="collapse" href="#collapseRoot<?= $root->id ?>" role="button" aria-expanded="true" aria-controls="collapseRoot<?= $root->id ?>">
           <div class="d-flex gap-3">
             <h5 class="mb-0 text-black">Group [<?= Html::encode($root->code) ?>] <?= Html::encode($root->label) ?></h5>
             <i class="fa-solid fa-chevron-up text-black h-fit me-2 my-auto"></i>
           </div>
-      </a>
-      <div class="btn-group btn-group-sm">
-        <button class="btn btn-primary" onclick='edit_group(<?= json_encode($root->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-        <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $root->id], [
-          'class' => 'btn btn-danger',
-          'data' => [
-            'confirm' => 'Apakah Anda yakin ingin menghapus group ini beserta seluruh isinya?',
-            'method' => 'delete',
-          ],
-        ]) ?>
+          <div class="btn-group btn-group-sm">
+            <a class="btn btn-primary rounded-start-2" onclick='edit_group(<?= json_encode($root->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+            <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $root->id], [
+              'class' => 'btn btn-danger',
+              'data' => [
+                'confirm' => 'Apakah Anda yakin ingin menghapus group ini beserta seluruh isinya?',
+                'method' => 'delete',
+              ],
+            ]) ?>
+          </div>
+        </a>
       </div>
-    </div>
-    <div class="card-body collapse show" id="collapseRoot<?= $root->id ?>" parent-link="parRoot<?= $root->id ?>">
-      <!-- root indicators -->
-      <?php if (!empty($root->indicators)): ?>
-        <div class="mb-4 ms-4">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="fw-bold">Indikator Group Utama</h6>
-          </div>
-          <div class="">
-            <?php foreach ($root->indicators as $indicator): ?>
-              <?= $this->render('_indicator_card', ['indicator' => $indicator, 'assessment' => $assessment]) ?>
-            <?php endforeach; ?>
-            <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2" onclick="tambah_indikator(<?= $root->id ?>)">
-              <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Indikator
-            </button>
-          </div>
-        </div>
-      <?php endif; ?>
-
-      <!-- subgroup -->
-      <?php foreach ($root->childGroups as $child): ?>
-        <div class="card mb-3 s-border-main ms-4 shadow-sm">
-          <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center">
-            <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?></span>
-            <div class="btn-group btn-group-sm">
-              <button class="btn btn-primary" onclick='edit_group(<?= json_encode($child->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-              <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $child->id], [
-                'class' => 'btn btn-danger',
-                'data' => [
-                  'confirm' => 'Apakah Anda yakin ingin menghapus subgroup ini beserta seluruh isinya?',
-                  'method' => 'delete',
-                ],
-              ]) ?>
+      <div class="card-body collapse show" id="collapseRoot<?= $root->id ?>" parent-link="parRoot<?= $root->id ?>">
+        <!-- root indicators -->
+        <?php if (!empty($root->indicators)): ?>
+          <div class="mb-4 ms-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="fw-bold">Indikator Group Utama</h6>
             </div>
-          </div>
-          <div class="card-body px-4 py-3">
-            <!-- subgroup indicators -->
-            <div class="p-2 border-bottom d-flex justify-content-between align-items-center bg-light">
-              <span class="small fw-bold text-dark rounded rounded-2">Indikator</span>
-            </div>
-            <div>
-              <?php foreach ($child->indicators as $indicator): ?>
+            <div class="">
+              <?php foreach ($root->indicators as $indicator): ?>
                 <?= $this->render('_indicator_card', ['indicator' => $indicator, 'assessment' => $assessment]) ?>
               <?php endforeach; ?>
-              <?php if (empty($child->indicators)): ?>
-                <div>
-                  <p class="text-center text-muted small py-3">Belum ada indikator.</p>
-                </div>
-              <?php endif; ?>
-              <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2" onclick="tambah_indikator(<?= $child->id ?>)">
+              <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2" onclick="tambah_indikator(<?= $root->id ?>)">
                 <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Indikator
               </button>
             </div>
           </div>
+        <?php endif; ?>
+        <!-- subgroup -->
+        <?php foreach ($root->childGroups as $child): ?>
+          <div class="card mb-3 s-border-main ms-4 shadow-sm">
+            <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center">
+              <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?></span>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-primary" onclick='edit_group(<?= json_encode($child->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+                <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $child->id], [
+                  'class' => 'btn btn-danger',
+                  'data' => [
+                    'confirm' => 'Apakah Anda yakin ingin menghapus subgroup ini beserta seluruh isinya?',
+                    'method' => 'delete',
+                  ],
+                ]) ?>
+              </div>
+            </div>
+            <div class="card-body px-4 py-3">
+              <!-- subgroup indicators -->
+              <div class="p-2 border-bottom d-flex justify-content-between align-items-center bg-light">
+                <span class="small fw-bold text-dark rounded rounded-2">Indikator</span>
+              </div>
+              <div>
+                <?php foreach ($child->indicators as $indicator): ?>
+                  <?= $this->render('_indicator_card', ['indicator' => $indicator, 'assessment' => $assessment]) ?>
+                <?php endforeach; ?>
+                <?php if (empty($child->indicators)): ?>
+                  <div>
+                    <p class="text-center text-muted small py-3">Belum ada indikator.</p>
+                  </div>
+                <?php endif; ?>
+                <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2" onclick="tambah_indikator(<?= $child->id ?>)">
+                  <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Indikator
+                </button>
+              </div>
+            </div>
 
+          </div>
+        <?php endforeach; ?>
+        <?php if (empty($root->childGroups) && empty($root->indicators)): ?>
+          <div class="text-center py-4 bg-light rounded">
+            <p class="text-muted mb-2">Group ini masih kosong.</p>
+            <button class="btn btn-sm btn-outline-primary" onclick="tambah_indikator(<?= $root->id ?>)">Tambah Indikator Pertama</button>
+          </div>
+        <?php endif; ?>
+        <div class="border border-1 border-black ms-4"></div>
+        <div class="py-2 ms-4">
+          <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 onclick=" tambah_group(<?= $root->id ?>)">
+            <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Subgroup
+          </button>
         </div>
-      <?php endforeach; ?>
-      <?php if (empty($root->childGroups) && empty($root->indicators)): ?>
-        <div class="text-center py-4 bg-light rounded">
-          <p class="text-muted mb-2">Group ini masih kosong.</p>
-          <button class="btn btn-sm btn-outline-primary" onclick="tambah_indikator(<?= $root->id ?>)">Tambah Indikator Pertama</button>
-        </div>
-      <?php endif; ?>
-      <div class="border border-1 border-black ms-4"></div>
-      <div class="py-2 ms-4">
-        <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 onclick=" tambah_group(<?= $root->id ?>)">
-          <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Subgroup
-        </button>
       </div>
     </div>
-</div>
-<?php endforeach ?>
-<div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center rounded rounded-2">
-  <button class="btn s-btn-main  w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 " onclick="tambah_group(null)">
-    <i class="fa-solid fa-circle-plus fs-3 mb-1"></i>
-    <p class="mb-0">Tambah Group</p>
-  </button>
-</div>
+  <?php endforeach ?>
+  <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center rounded rounded-2">
+    <button class="btn s-btn-main  w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 " onclick="tambah_group(null)">
+      <i class="fa-solid fa-circle-plus fs-3 mb-1"></i>
+      <p class="mb-0">Tambah Group</p>
+    </button>
+  </div>
 </div>
 
 <!-- Modal Group -->
@@ -264,7 +263,10 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
         <?= $form->field($option_model, 'label')->textInput(['id' => 'option_label']) ?>
         <div class="row">
           <div class="col-6"><?= $form->field($option_model, 'order')->textInput(['type' => 'number', 'id' => 'option_order']) ?></div>
-          <div class="col-6"><?= $form->field($option_model, 'weight')->textInput(['type' => 'number', 'id' => 'option_weight']) ?></div>
+          <div class="col-6">
+            <?= $form->field($option_model, 'weight', ['options' => ['class' => 'mb-0']])->textInput(['type' => 'number', 'id' => 'option_weight']) ?>
+            <p class=" text-danger small">*max 100</p>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -277,7 +279,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
 </div>
 
 <script>
-  // be stuff (data collection)
+  // be stuff
   function tambah_group(parent_id) {
     const form = document.getElementById('form_group');
     form.action = '<?= \yii\helpers\Url::to(['simpan-grup', 'assessment_id' => $assessment->id]) ?>';
@@ -384,8 +386,8 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     new bootstrap.Modal(document.getElementById('modal_opsi')).show();
   }
 
-  // fe stuff (persistance)
-  const collapseRootObj = document.querySelectorAll('[id^=collapse]')
+  // fe stuff
+  const collapseRootObj = document.querySelectorAll('[id^=collapseRoot], [id^=collapseInd]')
   collapseRootKey = "rootState"
 
   const onLocal = JSON.parse(localStorage.getItem(collapseRootKey)) || {}
@@ -395,10 +397,12 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     if (onLocal[e.id] === true) {
       e.classList.add('show')
       const par = document.getElementById(e.getAttribute('parent-link'))
+      console.log(par)
       par.setAttribute('aria-expanded', 'true')
     } else if (onLocal[e.id] === false) {
       e.classList.remove('show')
       const par = document.getElementById(e.getAttribute('parent-link'))
+      console.log(par)
       par.setAttribute('aria-expanded', 'false')
     }
   })

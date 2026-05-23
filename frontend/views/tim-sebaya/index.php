@@ -12,6 +12,8 @@ use yii\helpers\Url;
 /** @var \common\models\PeerTeamMember[] $peer_team_member_request */
 /** @var \common\models\PeerTeamMember[] $peer_team_member_uncompleted */
 /** @var \common\models\PeerTeamMember[] $peer_team_member_completed */
+
+// dd($peer_team_member_completed)
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
@@ -23,7 +25,7 @@ use yii\helpers\Url;
     <div class="d-flex align-items-center mb-2">
       <p class=" fw-bold h5">Permintaan Partisipasi Tim Mandiri </p>
       <a href="#collapse-party" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
-        <i class="fa-solid fa-chevron-down"></i>
+        <i class="fa-solid fa-chevron-up"></i>
       </a>
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
@@ -64,10 +66,10 @@ use yii\helpers\Url;
               </tr>
             <?php endforeach ?>
             <?php if (empty($peer_team_member_request)): ?>
-            <tr>
-              <td colspan="8" class="text-center">Tidak ada sertifikasi yang menunggu pembentukan tim sebaya.</td>
-            </tr>
-          <?php endif; ?>
+              <tr>
+                <td colspan="8" class="text-center">Tidak ada sertifikasi yang menunggu pembentukan tim sebaya.</td>
+              </tr>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
@@ -78,7 +80,7 @@ use yii\helpers\Url;
     <div class="d-flex align-items-center mb-2">
       <p class=" fw-bold h5">Sertifikasi Berjalan </p>
       <a href="#collapse-running" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
-        <i class="fa-solid fa-chevron-down"></i>
+        <i class="fa-solid fa-chevron-up"></i>
       </a>
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
@@ -102,9 +104,9 @@ use yii\helpers\Url;
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
-                <td><?= $this->render('/component/_date_comparator', [
-                  'cert' => $member->certification
-                ]); ?>
+                <td><?= $member->certification->status === CertificationStatus::PEER_REVIEW ? $this->render('/component/_date_comparator', [
+                      'cert' => $member->certification
+                    ]) : '-'; ?>
                 </td>
                 <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
                 <td>
@@ -117,10 +119,10 @@ use yii\helpers\Url;
               </tr>
             <?php endforeach ?>
             <?php if (empty($peer_team_member_uncompleted)): ?>
-            <tr>
-              <td colspan="7" class="text-center">Tidak ada sertifikasi yang sedang berjalan.</td>
-            </tr>
-          <?php endif; ?>
+              <tr>
+                <td colspan="7" class="text-center">Tidak ada sertifikasi yang sedang berjalan.</td>
+              </tr>
+            <?php endif; ?>
           </tbody>
         </table>
       </div>
@@ -131,7 +133,7 @@ use yii\helpers\Url;
     <div class="d-flex align-items-center mb-2">
       <p class=" fw-bold h5">Riwayat Sertifikasi</p>
       <a href="#collapse-history" class=" text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-party">
-        <i class="fa-solid fa-chevron-down"></i>
+        <i class="fa-solid fa-chevron-up"></i>
       </a>
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
@@ -151,7 +153,7 @@ use yii\helpers\Url;
           </thead>
           <tbody>
             <?php foreach ($peer_team_member_completed as $key => $member) : ?>
-              <tr>
+              <tr class="member-history-container d-none" data-page-index="<?= $key ?>">
                 <td scope="row"><?php echo (int)$key + 1 ?></th>
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
@@ -171,13 +173,91 @@ use yii\helpers\Url;
               </tr>
             <?php endforeach ?>
             <?php if (empty($peer_team_member_completed)): ?>
-            <tr>
-              <td colspan="8" class="text-center">Anda belum pernah berperan sebagai tim sebaya.</td>
-            </tr>
-          <?php endif; ?>
+              <tr>
+                <td colspan="8" class="text-center">Anda belum pernah berperan sebagai tim sebaya.</td>
+              </tr>
+            <?php endif; ?>
           </tbody>
         </table>
+        <nav aria-label="Histroy Pag" class="align-items-center d-flex flex-row">
+          <ul class="pagination mx-auto w-fit" id="page-ul"> 
+
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
 </div>
+
+<?php $this->registerJS(<<<JS
+const items_perpage = 10
+const rows = $('.member-history-container')
+const count = rows.length
+const page_count = Math.ceil(count/items_perpage)
+
+
+function renderPagin(page){
+  page_control = $('#page-ul')
+  page_control.empty
+  
+  page_control.append(`
+  <li class="page-item \${page <= 1 ? 'disabled' : ''}">
+    <a class="page-linkbtn btn-lg s-btn-sec page-btn" data-page="\${page-1}" ">
+    <i class="fa-solid fa-angles-left"></i>
+    </a>
+  </li>
+  `)
+
+  for (let i = 1; i <= page_count; i++) {
+    
+    page_control.append(`
+    <li class="page-item \${i === page ? 'text-primary' : 'text-secondary'}">
+      <a class="page-link btn btn-lg p-5 page-btn" data-page="\${i}">
+      \${i}
+      </a>
+    </li>
+    `)
+    
+  }
+  page_control.append(`
+  <li class="page-item \${page >= page_count ? 'disabled' : ''}">
+    <a class="page-link btn s-btn-main page-btn" data-page="\${page+1}">
+    <i class="fa-solid fa-angles-right"></i>
+    </a>
+  </li>
+  `)
+}
+
+function flipPage(page){
+  const start_index = (page-1) * items_perpage
+  const end_index = start_index + items_perpage
+
+  console.log(start_index, end_index)
+  
+  rows.each(function() {
+    const row_index = $(this).data('page-index')
+    console.log(row_index)
+
+    if (start_index <= row_index && row_index < end_index) {
+      console.log('here')
+      rows.removeClass('d-none')
+    } else {
+      console.log('else')
+      rows.addClass('d-none')
+    }
+  })
+
+  renderPagin(page)
+}
+
+
+$('#page-ul').on('click', '.page-btn', function(){
+  page = $(this).data('page')
+  flipPage(page)
+})
+
+if(count > 0){
+  flipPage(1)
+}
+
+JS); ?>

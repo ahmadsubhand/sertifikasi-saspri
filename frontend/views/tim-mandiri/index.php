@@ -102,9 +102,9 @@ use yii\helpers\Url;
                 <td><?= Html::encode(ucfirst($member->certification->saspriK->region_name)) ?></td>
                 <td><?= Html::encode($member->certification->saspriK->address) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$member->certification->level]) ?></td>
-                <td><?= $this->render('/component/_date_comparator', [
+                <td><?= $member->certification->status === CertificationStatus::SELF_REVIEW ? $this->render('/component/_date_comparator', [
                   'cert' => $member->certification
-                ]); ?>
+                ]) : '-'; ?>
                 </td>
                 <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
                 <td>

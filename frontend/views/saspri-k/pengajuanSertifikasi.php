@@ -14,7 +14,17 @@ use yii\helpers\Url;
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\District $district */
 /** @var \common\models\SelfTeamMember[] $self_team_members */
+
+$percentages = [
+  CertificationStatus::PENDING_SELF_TEAM_FORMATION => '2%',
+  CertificationStatus::SELF_REVIEW => '27%',
+  CertificationStatus::PENDING_PEER_TEAM_FORMATION => '50%',
+  CertificationStatus::PEER_REVIEW => '50%',
+  CertificationStatus::EXTERNAL_REVIEW => '73%',
+  CertificationStatus::COMPLETED => '100%',
+]
 ?>
+
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
@@ -24,35 +34,40 @@ use yii\helpers\Url;
     <h3 class="fw-bold mb-0">Pengajuan Sertifikasi</h3>
   </div>
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-    <div class="px-4 row align-items-center mx-4 justify-content-between">
-      <div class=" col-md-4 my-2 ">
-        <div class=" w-fit">
-          <p class="mb-0">SASPRI-K</p>
-          <p class="mb-0 fs-4">
-            <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)
-          </p>
-          <p class="mb-2 font-sm">
-            Kabupaten: <?= Html::encode($district->regency->name) ?> |
-            Provinsi: <?= Html::encode($district->regency->province->name) ?>
-          </p>
-        </div>
+    <div class="px-4 mx-4 row align-items-center justify-content-between">
+      <div class="col-md-6 my-2">
+        <p class="mb-0 text-secondary small fw-semibold">SASPRI-K</p>
+        <p class="mb-0 fs-4">
+          <strong><?= Html::encode($saspri_k->region_name) ?></strong> (<?= Html::encode($district->name) ?>)
+        </p>
+        <p class="mb-0 text-muted small mt-1">
+          Kabupaten: <?= Html::encode($district->regency->name) ?> |
+          Provinsi: <?= Html::encode($district->regency->province->name) ?>
+        </p>
       </div>
-      <div class="col-md-4 my-2">
-        <div class="mx-md-auto w-fit">
-          <p class="mb-0"><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></p>
-          <p class="mb-1 fs-4">
-            <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
-            <i class="fa-solid fa-chevron-right"></i>
-            <strong><?= Html::encode(CertificateLevel::next()[$certification->level] ?? '-') ?></strong>
-          </p>
-        </div>
+
+      <div class="col-md-6 my-2 d-flex flex-column align-items-start align-items-md-end">
+        <p class="mb-0 text-secondary small fw-semibold"><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></p>
+        <p class="mb-0 fs-4 d-flex align-items-center gap-2">
+          <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
+          <i class="fa-solid fa-chevron-right text-muted fs-5 mx-1"></i>
+          <strong><?= Html::encode(CertificateLevel::next()[$certification->level] ?? '-') ?></strong>
+        </p>
       </div>
-      <div class="col-md-4 my-2">
-        <div class=" w-fit">
-          <p class="mb-0">Status Sertifikasi</p>
-          <p class="mb-0 fs-4"><strong><?= CertificationStatus::list()[$certification->status] ?></strong></p>
-        </div>
-      </div>
+
+    </div>
+  </div>
+  <div class="bg-white px-5 py-4 rounded-2 shadow border-1 border text-center">
+    <p class="fs-4 fw-bold">Status Sertifikasi</p>
+    <div class="progress">
+      <div class="progress-bar <?= $certification->status === CertificationStatus::COMPLETED ? 'bg-success' : 's-bg-main' ?>" role="progressbar" style="width: <?= $percentages[$certification->status] ?>;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <div class="w-100 d-flex justify-content-between text-center">
+      <p class="text-start" style="width: 5rem;">Mulai</p>
+      <p class="" style="width: 5rem;">Self Review</p>
+      <p class="" style="width: 5rem;">Peer Review</p>
+      <p class="" style="width: 5rem;">External Review</p>
+      <p class="text-end" style="width: 5rem;">Selesai</p>
     </div>
   </div>
 

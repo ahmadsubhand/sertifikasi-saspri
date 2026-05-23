@@ -11,7 +11,7 @@ use yii\helpers\Url;
  * @var \common\models\Certification[] $completed_certifications
  * @var \common\models\User[] $saspri_k_members */
 
-
+// dd($saspri_k_members);
 
 $label = [
   'SASPRI-K',
@@ -188,7 +188,7 @@ $shingles = [
           </thead>
           <tbody>
             <?php foreach ($saspri_k_members as $key => $member) : ?>
-              <tr>
+              <tr class="member-container" data-page-index="<?= $key ?>">
                 <td scope="row"><?php echo (int)$key + 1 ?></th>
                 <td><?= Html::encode($member->username) ?></td>
                 <!-- kok nomer gk keluar slur? -->
@@ -216,6 +216,11 @@ $shingles = [
             <?php endif; ?>
           </tbody>
         </table>
+        <nav aria-label="Histroy Pag" class="align-items-center d-flex flex-row">
+          <ul class="pagination mx-auto w-fit" id="page-ul">
+
+          </ul>
+        </nav>
       </div>
     </div>
   </div>

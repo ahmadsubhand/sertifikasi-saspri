@@ -8,7 +8,7 @@ use yii\helpers\Html;
 
 ?>
 
-<div class="card rounded-2 my-3 d-flex flex-row s-border-main">
+<div class="ind-card card rounded-2 my-3 d-flex flex-row s-border-main">
   <div class="s-bg-main d-block rounded-start-2" style="width: 1rem !important;"></div>
   <div class="py-3 ps-2 pe-4 w-100">
     <div class="d-flex justify-content-between">
@@ -31,7 +31,7 @@ use yii\helpers\Html;
       </div>
 
     </div>
-    <div class="my-2 collapse" id="collapseInd<?= $indicator->id ?>" parent-link="parInd<?= $indicator->id ?>">
+    <div class="opt-all my-2 collapse" id="collapseInd<?= $indicator->id ?>" parent-link="parInd<?= $indicator->id ?>">
       <p class="mb-1">Opsi Jawaban:</p>
       <?php foreach ($indicator->indicatorOptions as $option): ?>
         <div class="d-flex justify-content-between border-bottom border-2">
@@ -39,7 +39,7 @@ use yii\helpers\Html;
             <p class="mb-0 s-color-main"><?= Html::encode($option->code) ?></p>
             <div>
               <p class="mb-0"><?= Html::encode($option->label) ?></p>
-              <p class="mb-0 fw-light text-black">weight: <?= Html::encode($option->weight) ?></p>
+              <p class="opt-weight mb-0 fw-light text-black" data-weight="<?= Html::encode($option->weight) ?>">bobot: <?= Html::encode($option->weight) ?></p>
             </div>
           </div>
           <div class="d-flex flex-row align-items-center btn-group btn-group-sm">
@@ -53,8 +53,8 @@ use yii\helpers\Html;
             ]) ?>
           </div>
         </div>
-      <?php endforeach ?>
-      <?php if (empty($indicator->indicatorOptions)): ?>
+        <?php endforeach ?>
+        <?php if (empty($indicator->indicatorOptions)): ?>
         <div class="py-2">
           <p colspan="4" class="text-center text-muted small py-2">Belum ada opsi.</p>
         </div>

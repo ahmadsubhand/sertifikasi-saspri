@@ -62,50 +62,53 @@ $shingles = [
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center mb-4">
         <a href="<?= Url::to(['index']) ?>" class="text-decoration-none text-black fs-5 me-3">
             <i class="fa-solid fa-arrow-left"></i>
         </a>
         <h3 class="fw-bold mb-0"><?= Html::encode($this->title) ?></h3>
     </div>
 
+    <div class="d-flex mx-auto w-100 justify-content-evenly">
+        <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mb-3 h-fit" style="width: 20rem;">
+            <div class="text-center px-3 py-2">
+                <p class="text-muted mb-1">Wali Saat Ini</p>
+                <h4 class="fw-bold text-danger"><?= Html::encode($saspri_k->coordinator->username) ?></h4>
+                <p class="small text-muted mb-0"><?= Html::encode($saspri_k->coordinator->phone_number) ?></p>
+            </div>
+        </div>
+        <div class=" align-items-sm-center text-center my-auto">
+            <h4 class="fw-bold mb-4 text-center h6">Menjadi</h4>
+            <i class="fa-solid fa-angles-right fs-1 mx-auto"></i>
+        </div>
+        <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mb-3 h-fit" style="width: 20rem;">
+            <div class="text-center px-3 py-2">
+                <p class="text-muted mb-1">Calon Wali Pengganti</p>
+                <h4 class="fw-bold text-success"><?= Html::encode($saspri_k->newCoordinator->username) ?></h4>
+                <p class="small text-muted mb-0"><?= Html::encode($saspri_k->newCoordinator->phone_number) ?></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Konfirmasi Pergantian Wali -->
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mb-3">
         <div class="px-4">
-            <h5 class="fw-bold mb-4 text-center">Konfirmasi Pergantian Wali</h5>
-            <div class="row align-items-center mb-4">
-                <div class="col-md-5 text-center">
-                    <p class="text-muted mb-1">Wali Saat Ini</p>
-                    <h4 class="fw-bold text-danger"><?= Html::encode($saspri_k->coordinator->username) ?></h4>
-                    <p class="small text-muted mb-0"><?= Html::encode($saspri_k->coordinator->phone_number) ?></p>
-                </div>
-                <div class="col-md-2 text-center">
-                    <i class="fa-solid fa-right-long fs-1 text-primary d-none d-md-block"></i>
-                    <i class="fa-solid fa-down-long fs-1 text-primary d-block d-md-none my-3"></i>
-                </div>
-                <div class="col-md-5 text-center">
-                    <p class="text-muted mb-1">Calon Wali Pengganti</p>
-                    <h4 class="fw-bold text-success"><?= Html::encode($saspri_k->newCoordinator->username) ?></h4>
-                    <p class="small text-muted mb-0"><?= Html::encode($saspri_k->newCoordinator->phone_number) ?></p>
-                </div>
-            </div>
-
             <div class="alert alert-warning border-0 shadow-sm mb-4">
                 <p class="mb-0 fw-bold">Alasan Pergantian:</p>
                 <p class="mb-0 italic">"<?= Html::encode($saspri_k->change_request_reason) ?: 'Tidak disebutkan' ?>"</p>
             </div>
 
             <div class="d-flex justify-content-center gap-3">
-                <?= Html::beginForm(['ganti-wali', 'saspri_k_id' => $saspri_k->id], 'post', ['class' => 'd-inline']) ?>
-                    <input type="hidden" name="action" value="approve">
-                    <button type="submit" class="btn btn-success px-4 py-2 fw-bold" onclick="return confirm('Apakah Anda yakin ingin menyetujui pergantian wali ini?')">
-                        <i class="fa-solid fa-check me-2"></i> Setujui Pergantian
-                    </button>
-                <?= Html::endForm() ?>
-
                 <button type="button" class="btn btn-danger px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
                     <i class="fa-solid fa-xmark me-2"></i> Tolak Pergantian
                 </button>
+                <?= Html::beginForm(['ganti-wali', 'saspri_k_id' => $saspri_k->id], 'post', ['class' => 'd-inline']) ?>
+                <input type="hidden" name="action" value="approve">
+                <button type="submit" class="btn btn-success px-4 py-2 fw-bold" onclick="return confirm('Apakah Anda yakin ingin menyetujui pergantian wali ini?')">
+                    <i class="fa-solid fa-check me-2"></i> Setujui Pergantian
+                </button>
+                <?= Html::endForm() ?>
+
             </div>
         </div>
     </div>
@@ -140,10 +143,14 @@ $shingles = [
                                 $val = $val ? date('d-m-Y', is_numeric($val) ? $val : strtotime($val)) : '-';
                             }
                             ?>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="small text-muted"><?= $certLabel[$key] ?>:</span>
-                                <span class="small fw-bold"><?= Html::encode($val) ?></span>
-                            </div>
+
+                            <?= $this->render('/component/_idline', [
+                                'label' => $certLabel[$key],
+                                'data' => $val ?? '-',
+                                'shingles' => ''
+                            ]); ?>
+                            <!-- <span class="small text-muted"><?= $certLabel[$key] ?>:</span>
+                                <span class="small fw-bold"><?= Html::encode($val) ?></span> -->
                         <?php endforeach ?>
                     <?php else: ?>
                         <p class="text-muted py-4">Belum memiliki sertifikasi valid.</p>

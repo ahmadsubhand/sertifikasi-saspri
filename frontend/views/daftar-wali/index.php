@@ -27,7 +27,7 @@ if ($saspri_k && $saspri_k->district_id) {
     if ($district) {
         $regency_id = $district->regency_id;
         $province_id = $district->regency->province_id;
-        
+
         $regencies = Regency::find()->where(['province_id' => $province_id])->all();
         $districts = District::find()->where(['regency_id' => $regency_id])->all();
     }
@@ -55,25 +55,27 @@ $model = $saspri_k ?: new \common\models\SaspriK();
             Silakan perbaiki data di bawah ini dan ajukan ulang.
         </div>
     <?php endif; ?>
-    
+
     <!-- Nanti ini dibungkus dalam !$is_pending atau semua field di disable biar user gk ngajuin ulang klo lg pending -->
     <?php $form = ActiveForm::begin([
         'id' => 'form-daftar-saspri',
         'action' => ['daftar-saspri-k'],
-        'options' => ['enctype' => 'multipart/form-data']
+        'options' => ['enctype' => 'multipart/form-data', 'disabled' => $is_pending]
     ]) ?>
 
     <div class="row">
         <div class="col-sm-6">
-            <?= $form->field($model, 'region_name')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Nama SASPRI-K'])->label('Nama SASPRI-K') ?>
-            <?= $form->field($model, 'address')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Alamat Sekretariat'])->label('Alamat Sekretariat') ?>
+            <?= $form->field($model, 'region_name')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Nama SASPRI-K', 'disabled' => $is_pending])->label('Nama SASPRI-K') ?>
+            <?= $form->field($model, 'cooperative_name')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Nama Koperasi', 'disabled' => $is_pending])->label('Nama Koperasi') ?>
+            <?= $form->field($model, 'address')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Alamat Sekretariat', 'disabled' => $is_pending])->label('Alamat Sekretariat') ?>
 
             <div class="mb-3">
                 <label class="form-label">Provinsi</label>
                 <?= Html::dropDownList('province_id', $province_id, ArrayHelper::map($provinces, 'id', 'name'), [
                     'id' => 'province-id',
                     'prompt' => 'Pilih Provinsi',
-                    'class' => 'form-select border-black'
+                    'class' => 'form-select border-black',
+                    'disabled' => $is_pending
                 ]) ?>
             </div>
 
@@ -82,32 +84,34 @@ $model = $saspri_k ?: new \common\models\SaspriK();
                 <?= Html::dropDownList('regency_id', $regency_id, ArrayHelper::map($regencies, 'id', 'name'), [
                     'id' => 'regency-id',
                     'prompt' => 'Pilih Kabupaten/Kota',
-                    'class' => 'form-select border-black'
+                    'class' => 'form-select border-black',
+                    'disabled' => $is_pending
                 ]) ?>
             </div>
 
             <?= $form->field($model, 'district_id')->dropDownList(ArrayHelper::map($districts, 'id', 'name'), [
                 'id' => 'district-id',
                 'prompt' => 'Pilih Kecamatan',
-                'class' => 'form-select border-black'
+                'class' => 'form-select border-black',
+                'disabled' => $is_pending
             ])->label('Kecamatan') ?>
 
-            <?= $form->field($model, 'number_of_groups')->textInput(['type' => 'number', 'class' => 'form-control border-black'])->label('Jumlah Kelompok Yang Dibina') ?>
-            <?= $form->field($model, 'livestock_type')->textInput(['class' => 'form-control border-black'])->label('Ternak Yang Diusahakan') ?>
-            <?= $form->field($model, 'breeding_livestock_count')->textInput(['type' => 'number', 'class' => 'form-control border-black'])->label('Jumlah Ternak Indukan (Pernah Beranak)') ?>
         </div>
 
         <div class="col-sm-6">
-            <?= $form->field($model, 'cooperative_name')->textInput(['class' => 'form-control border-black', 'placeholder' => 'Nama Koperasi'])->label('Nama Koperasi') ?>
-            <?= $form->field($model, 'number_of_active_members')->textInput(['type' => 'number', 'class' => 'form-control border-black'])->label('Jumlah Anggota Aktif') ?>
-            <?= $form->field($model, 'total_livestock_count')->textInput(['type' => 'number', 'class' => 'form-control border-black'])->label('Jumlah Total Ternak Anggota Aktif') ?>
-            <?= $form->field($model, 'productive_heifer_count')->textInput(['type' => 'number', 'class' => 'form-control border-black'])->label('Jumlah Total Ternak dara Produktif (Siap Kawin)') ?>
+
+            <?= $form->field($model, 'number_of_groups')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Kelompok Yang Dibina') ?>
+            <?= $form->field($model, 'number_of_active_members')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Anggota Aktif') ?>
+            <?= $form->field($model, 'total_livestock_count')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Total Ternak Anggota Aktif') ?>
+            <?= $form->field($model, 'productive_heifer_count')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Total Ternak dara Produktif (Siap Kawin)') ?>
+            <?= $form->field($model, 'livestock_type')->textInput(['class' => 'form-control border-black', 'disabled' => $is_pending])->label('Ternak Yang Diusahakan') ?>
+            <?= $form->field($model, 'breeding_livestock_count')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Ternak Indukan (Pernah Beranak)') ?>
         </div>
 
-        <div class="col-12">
+        <div class="col-sm-12">
             <div class="d-flex justify-content-between mt-4">
                 <p class="fw-bold">Dokumen Pendukung</p>
-                <button type="button" id="add-row" class="btn btn-sm text-white" style="background-color: #6B78B9;">
+                <button type="button" id="add-row" class="btn btn-sm text-white" <?= $ispending ?? 'disabled' ?> style="background-color: #6B78B9;">
                     <i class="fa-solid fa-plus"></i> Tambah Dokumen
                 </button>
             </div>
@@ -116,39 +120,46 @@ $model = $saspri_k ?: new \common\models\SaspriK();
                     <div class="doc-row row mb-3">
                         <div class="col-sm-6">
                             <label class="form-label">Kategori / Nama Dokumen</label>
-                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" placeholder="Contoh: Sertifikat SPR" required>
+                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $ispending ?? 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
                         </div>
                         <div class="col-sm-5">
                             <label class="form-label">Unggah Dokumen</label>
-                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" required>
+                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= $ispending ?? 'disabled' ?> required>
                         </div>
-                        <div class="col-sm-1 d-flex align-items-end">
-                            <button type="button" class="rem-row btn btn-danger btn-sm w-100">
+                        <div class="col-sm-1 d-flex align-items-end" <?= $ispending ?? 'disabled' ?>>
+                            <button type="button" class="rem-row btn btn-danger w-100">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 <?php else: ?>
                     <?php foreach ($documents as $doc): ?>
-                        <div class="doc-row row mb-3">
+                        <div class="doc-row row mt-3">
                             <div class="col-sm-6">
                                 <label class="form-label">Kategori / Nama Dokumen</label>
-                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" value="<?= Html::encode($doc->type) ?>" required>
+                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $ispending ?? 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
+                            </div>
+                            <div class="col-sm-5">
+                                <label class="form-label">Ganti Dokumen</label>
+                                <input class="form-control border-black" type="file" <?= $ispending ?? 'disabled' ?>  name="saspri_k_documents[]" required>
+
+                            </div>
+                            <div class="col-sm-1 d-flex align-items-end">
+                                <button type="button" class="rem-row btn btn-danger w-100"<?= $ispending ?? 'disabled' ?>>
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
                                 <div class="mt-1 existing-file-info">
                                     <small class="text-muted">File sebelumnya: <a href="<?= Url::to($doc->url) ?>" target="_blank" class="text-decoration-none"><i class="fa-solid fa-file-lines"></i> Lihat Dokumen</a></small>
                                 </div>
                             </div>
                             <div class="col-sm-5">
-                                <label class="form-label">Ganti Dokumen</label>
-                                <input class="form-control border-black" type="file" name="saspri_k_documents[]" required>
-                                <small class="text-info">
+                                <small class="text-info lh-1">
                                     * Pengajuan ulang memerlukan unggah ulang dokumen. File lama akan otomatis dihapus.
                                 </small>
-                            </div>
-                            <div class="col-sm-1 d-flex align-items-end">
-                                <button type="button" class="rem-row btn btn-danger btn-sm w-100">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -157,7 +168,7 @@ $model = $saspri_k ?: new \common\models\SaspriK();
         </div>
 
         <div class="w-100 my-4">
-            <?= Html::submitButton($is_rejected ? 'Ajukan Ulang' : 'Daftar', ['class' => 'btn w-100 py-2 fw-bold', 'style' => 'background-color: #6B78B9; color: white;']) ?>
+            <?= Html::submitButton($is_rejected ? 'Ajukan Ulang' : 'Daftar', ['class' => 'btn w-100 py-2 fw-bold s-btn-main', 'disabled' => $is_pending]) ?>
         </div>
     </div>
 

@@ -209,21 +209,27 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
         <div class="d-flex justify-content-between w-100 mt-3">
             <div class="d-flex align-items-center gap-2">
-                <button type="submit" id="btn-save-temp" form="pendaftaran-wali-form" name="target_page" value="<?= $page ?>" class="btn btn-sm btn-outline-secondary py-2 px-3">Simpan sementara</button>
+                <button type="submit" id="btn-save-temp" form="pendaftaran-wali-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2">Simpan sementara</button>
             </div>
             <div>
                 <nav aria-label="pagination">
                     <ul class="pagination mb-0">
                         <li class="page-item <?php echo $page > 1 ? '' : 'disabled' ?>">
-                            <button type="submit" id="btn-prev" form="pendaftaran-wali-form" name="target_page" value="<?= $page - 1 ?>" class="page-link s-btn-sec border-0">Sebelumnya</button>
+                            <a class="page-link s-btn-sec">
+                                <button type="submit" id="btn-prev" form="pendaftaran-wali-form" name="target_page" value="<?= $page - 1 ?>" class="btn-none">Sebelumnya</button>
+                            </a>
                         </li>
                         <?php foreach (range(1, $total_pages) as $inPage): ?>
-                            <li class="page-item <?= $inPage == $page ? 'active' : '' ?>">
-                                <button type="submit" id="btn-pagin" form="pendaftaran-wali-form" name="target_page" value="<?= $inPage ?>" class="page-link <?= $inPage == $page ? 's-btn-main' : 'text-secondary' ?> border-0"><?= $inPage ?></button>
+                            <li class="page-item">
+                                <a class="page-link <?= $inPage == $page ? 'text-primary' : 'text-secondary' ?>">
+                                    <button type="submit" id="btn-pagin" form="pendaftaran-wali-form" name="target_page" value="<?= $inPage ?>" class="btn-none"><?= $inPage ?></button>
+                                </a>
                             </li>
                         <?php endforeach ?>
                         <li class="page-item <?php echo $page < $total_pages ? '' : 'disabled' ?>">
-                            <button type="submit" id="btn-next" form="pendaftaran-wali-form" name="target_page" value="<?= $page + 1 ?>" class="page-link s-btn-main border-0">Berikutnya</button>
+                            <a class="page-link s-btn-main <?php echo $page == $total_pages ? 'disabled' : '' ?>">
+                                <button type="submit" id="btn-next" form="pendaftaran-wali-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none">Berikutnya</button>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -234,17 +240,18 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <!-- Final Actions -->
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border mt-3 mb-5">
         <div class="d-flex justify-content-center gap-3">
+            <button type="button" class="btn btn-danger px-5 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
+                <i class="fa-solid fa-xmark me-2"></i> Tolak Pendaftaran
+            </button>
             <?php if ($page == $total_pages): ?>
                 <button type="submit" id="btn-approve" form="pendaftaran-wali-form" class="btn btn-success px-5 py-2 fw-bold" onclick="return confirm('Apakah Anda yakin ingin menyetujui pendaftaran wali ini?')">
                     <i class="fa-solid fa-check me-2"></i> Setujui Pendaftaran
                 </button>
             <?php else: ?>
-                <div class="text-muted small italic">Selesaikan penilaian pada seluruh kategori indikator untuk mengaktifkan tombol Setuju.</div>
+                <div class="text-muted small italic w-25">Selesaikan penilaian pada seluruh kategori indikator untuk mengaktifkan tombol Setuju.</div>
             <?php endif; ?>
 
-            <button type="button" class="btn btn-danger px-5 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
-                <i class="fa-solid fa-xmark me-2"></i> Tolak Pendaftaran
-            </button>
+            
         </div>
     </div>
 </div>
@@ -276,7 +283,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 <?php
 $this->registerJs(
-  <<<JS
+    <<<JS
     // Handle form action changes
     $('#btn-approve').on('click', function() {
         $('#pendaftaran-wali-form').attr('action', '$approveAction');

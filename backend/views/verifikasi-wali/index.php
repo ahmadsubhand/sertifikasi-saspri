@@ -18,7 +18,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
         <div class="d-flex align-items-center mb-2">
             <p class="fw-bold h5">Permintaan Pendaftaran Wali Baru</p>
             <a href="#collapse-registration" class="text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true">
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-up"></i>
             </a>
         </div>
         <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
@@ -37,7 +37,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
                     <tbody>
                         <?php foreach ($registration_requests as $index => $saspri): ?>
                             <tr>
-                                <th scope="row"><?= $index + 1 ?></th>
+                                <td scope="row"><?= $index + 1 ?></th>
                                 <td><?= Html::encode($saspri->region_name) ?></td>
                                 <td><?= Html::encode($saspri->district->name) ?></td>
                                 <td><?= Html::encode($saspri->coordinator->username) ?></td>
@@ -63,7 +63,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
         <div class="d-flex align-items-center mb-2">
             <p class="fw-bold h5">Permintaan Pergantian Wali</p>
             <a href="#collapse-change" class="text-decoration-none text-black fw-bolder h6 ms-2" data-bs-toggle="collapse" role="button" aria-expanded="true">
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-up"></i>
             </a>
         </div>
         <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
@@ -82,7 +82,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
                     <tbody>
                         <?php foreach ($change_requests as $index => $saspri): ?>
                             <tr>
-                                <th scope="row"><?= $index + 1 ?></th>
+                                <td scope="row"><?= $index + 1 ?></th>
                                 <td><?= Html::encode($saspri->region_name) ?></td>
                                 <td><?= Html::encode($saspri->district->name) ?></td>
                                 <td><?= Html::encode($saspri->coordinator->username) ?></td>

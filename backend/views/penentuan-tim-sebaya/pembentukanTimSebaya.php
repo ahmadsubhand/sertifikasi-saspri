@@ -59,7 +59,7 @@ $certLabel = [
 $certIndex = [
   'level',
   'code',
-  'submitted_at',
+  'created_at',
   'issued_at',
   'grade',
 ];
