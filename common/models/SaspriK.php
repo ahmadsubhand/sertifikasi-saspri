@@ -11,6 +11,7 @@ use common\helpers\FileHelper;
 use DateTime;
 use Exception;
 use Yii;
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\web\UnprocessableEntityHttpException;
 use yii\web\UploadedFile;
@@ -55,6 +56,16 @@ class SaspriK extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'saspri_k';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+        ];
     }
 
     /**

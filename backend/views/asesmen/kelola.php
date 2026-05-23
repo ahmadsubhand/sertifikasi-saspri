@@ -178,6 +178,21 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
             <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Subgroup
           </button>
         </div>
+<<<<<<< HEAD
+=======
+      <?php endforeach; ?>
+      <?php if (empty($root->childGroups) && empty($root->indicators)): ?>
+        <div class="text-center py-4 bg-light rounded">
+          <p class="text-muted mb-2">Group ini masih kosong.</p>
+          <button class="btn btn-sm btn-outline-primary" onclick="tambah_indikator(<?= $root->id ?>)">Tambah Indikator Pertama</button>
+        </div>
+      <?php endif; ?>
+      <div class="border border-1 border-black ms-4"></div>
+      <div class="py-2 ms-4">
+        <button class="btn s-btn-outline-main w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 onclick=" onClick="tambah_group(<?= $root->id ?>)">
+          <i class="fa-solid fa-circle-plus fs-5"></i> Tambah Subgroup
+        </button>
+>>>>>>> d89b5dff9d647b94ce12c4117b3842142fc95a30
       </div>
     </div>
   <?php endforeach ?>

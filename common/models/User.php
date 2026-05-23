@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\enums\UserRole;
+use common\models\query\UserQuery;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -19,6 +20,7 @@ use yii\web\IdentityInterface;
  * @property string $verification_token
  * @property string $email
  * @property string $auth_key
+ * @property string|null $access_token
  * @property int $status
  * @property int $created_at
  * @property int $updated_at
@@ -26,6 +28,7 @@ use yii\web\IdentityInterface;
  * @property int|null $saspri_k_id
  * @property string|null $phone_number
  * 
+ * @property AuthAssignment $role
  * @property SaspriK $saspriKAsCoordinator
  * @property SaspriK $saspriKAsNewCoordinator
  * @property SaspriK $saspriK
@@ -41,6 +44,16 @@ class User extends ActiveRecord implements IdentityInterface
     public static function tableName()
     {
         return '{{%user}}';
+    }
+    
+
+    /**
+     * {@inheritdoc}
+     * @return UserQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new UserQuery(get_called_class());
     }
 
     /**
@@ -61,19 +74,32 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
-            [['password_reset_token', 'verification_token', 'saspri_k_id', 'phone_number'], 'default', 'value' => null],
-            [['role'], 'default', 'value' => UserRole::USER],
-            [['role'], 'in', 'range' => UserRole::values()],
-            [['username', 'auth_key', 'password_hash', 'email', 'created_at', 'updated_at'], 'required'],
+            [['password_reset_token', 'verification_token', 'saspri_k_id', 'phone_number', 'access_token'], 'default', 'value' => null],
+            [['username', 'auth_key', 'password_hash', 'email'], 'required'],
             [['created_at', 'updated_at', 'saspri_k_id'], 'integer'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token', 'phone_number', 'role'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token', 'phone_number', 'access_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['email'], 'unique'],
             [['password_reset_token'], 'unique'],
-            [['saspri_k_id'], 'unique'],
+            [['access_token'], 'unique'],
             [['saspri_k_id'], 'exist', 'skipOnError' => true, 'targetClass' => SaspriK::class, 'targetAttribute' => ['saspri_k_id' => 'id']],
         ];
+    }
+
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        unset(
+            $fields['auth_key'], 
+            $fields['password_hash'], 
+            $fields['password_reset_token'],
+            $fields['verification_token'],
+            $fields['access_token'],
+        );
+
+        return [...$fields];
     }
 
     /**
@@ -89,7 +115,10 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        throw new NotSupportedException('"findIdentityByAccessToken" is not implemented.');
+        return static::findOne([
+            'access_token' => $token,
+            // 'status' => self::STATUS_ACTIVE
+        ]);
     }
 
     /**
@@ -206,6 +235,14 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAccessToken()
+    {
+        $this->access_token = Yii::$app->security->generateRandomString();
+    }
+
+    /**
      * Generates new password reset token
      */
     public function generatePasswordResetToken()
@@ -227,6 +264,11 @@ class User extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    public function getRole() // sementara role cuma satu dulu
+    {
+        return $this->hasOne(AuthAssignment::class, ['user_id' => 'id']);
     }
 
     /**

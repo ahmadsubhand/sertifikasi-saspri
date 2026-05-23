@@ -147,11 +147,11 @@ class IndicatorGroup extends \yii\db\ActiveRecord
     public function countRemainingWeight()
     {
         $assessment = $this->assessment;
-        $query = $assessment->getRootGroups()->andWhere(['!=', 'id', $this->id]);
+        $query = $assessment->getRootGroups()->andFilterWhere(['!=', 'id', $this->id]);
         if ($this->parent_group_id) {
             $query = $assessment->getChildGroups()
                 ->andWhere(['child.parent_group_id' => $this->parent_group_id])
-                ->andWhere(['!=', 'child.id', $this->id]);
+                ->andFilterWhere(['!=', 'child.id', $this->id]);
         }
         /** @var IndicatorGroup[] $indicator_groups */
         $indicator_groups = $query->all();

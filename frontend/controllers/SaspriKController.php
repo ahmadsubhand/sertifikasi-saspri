@@ -89,11 +89,34 @@ class SaspriKController extends Controller
         }
     }
 
+    public function actionCariAnggotaSaspriK(string $q)
+    {
+        try {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $saspri_k = $this->findSaspriKAsCoordinator();
+            $users = $saspri_k->getUsers()
+                ->where(['!=', 'id', $saspri_k->coordinator_id])
+                ->andWhere(['like', 'username', $q])
+                ->select(['id', 'username'])
+                ->limit(10)
+                ->asArray()
+                ->all();
+
+            return $users;
+        } catch (Exception $error) {
+            if ($error instanceof ForbiddenHttpException) {
+                return [];
+            }
+            throw $error;
+        }
+    }
+
     public function actionCariUser(string $q)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $users = $this->getAvailableSaspriKMembersQuery()
+        $users = User::find()->availableForSaspriK()
             ->andWhere(['like', 'username', $q])
             ->select(['id', 'username'])
             ->limit(10)
@@ -110,7 +133,7 @@ class SaspriKController extends Controller
             if (!empty($user_ids)) {
                 $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
 
-                $valid_users = $this->getAvailableSaspriKMembersQuery()
+                $valid_users = User::find()->availableForSaspriK()
                     ->andWhere(['id' => $array_user_ids])
                     ->select('username')
                     ->column();
@@ -205,7 +228,7 @@ class SaspriKController extends Controller
 
             $saspri_k = $this->findSaspriKAsCoordinator();
             $certification = $saspri_k->onGoingCertification;
-            $users = $this->getAvailableSelfTeamMembersQuery($saspri_k, $certification)
+            $users = User::find()->availableForSelfTeam($saspri_k, $certification)
                 ->andWhere(['like', 'username', $q])
                 ->limit(10)
                 ->asArray()
@@ -221,29 +244,6 @@ class SaspriKController extends Controller
         }
     }
 
-    public function actionCariAnggotaSaspriK(string $q)
-    {
-        try {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $users = $saspri_k->getUsers()
-                ->where(['!=', 'id', $saspri_k->coordinator_id])
-                ->andWhere(['like', 'username', $q])
-                ->select(['id', 'username'])
-                ->limit(10)
-                ->asArray()
-                ->all();
-
-            return $users;
-        } catch (Exception $error) {
-            if ($error instanceof ForbiddenHttpException) {
-                return [];
-            }
-            throw $error;
-        }
-    }
-
     public function actionTambahAnggotaTimMandiri()
     {
         try {
@@ -254,7 +254,7 @@ class SaspriKController extends Controller
                 $this->ensureSelfTeamCanBeModified($certification);
 
                 $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
-                $valid_users = $this->getAvailableSelfTeamMembersQuery($saspri_k, $certification)
+                $valid_users = User::find()->availableForSelfTeam($saspri_k, $certification)
                     ->andWhere(['id' => $array_user_ids])
                     ->select('username')
                     ->column();
@@ -485,14 +485,6 @@ class SaspriKController extends Controller
         return $saspri_k;
     }
 
-    private function getAvailableSaspriKMembersQuery()
-    {
-        return User::find()
-            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
-            ->where(['!=', 'aa.item_name', UserRole::ADMIN])
-            ->andWhere(['saspri_k_id' => null]);
-    }
-
     private function findAMemberOfSaspriK(int $user_id, SaspriK $saspri_k): User
     {
         $user = $saspri_k->getUsers()->where(['id' => $user_id])->one();
@@ -522,19 +514,6 @@ class SaspriKController extends Controller
                 'Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai'
             );
         }
-    }
-
-    private function getAvailableSelfTeamMembersQuery(SaspriK $saspri_k, ?Certification $certification)
-    {
-        $existing_member_ids = $certification
-            ? $certification->getSelfTeamMembers()
-            ->select('user_id')
-            ->column()
-            : [];
-
-        return $saspri_k->getUsers()
-            ->where(['!=', 'id', $saspri_k->coordinator_id])
-            ->andWhere(['not in', 'id', $existing_member_ids]);
     }
 
     private function findAMemberOfSelfTeam(int $user_id, Certification $certification): SelfTeamMember

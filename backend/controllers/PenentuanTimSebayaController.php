@@ -27,15 +27,15 @@ class PenentuanTimSebayaController extends Controller
     {
         return [
             'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-                [
-                    'allow' => true,
-                    'roles' => [UserRole::ADMIN],
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::ADMIN],
+                    ],
                 ],
             ],
-            ],
-                'verbs' => [
+            'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
                     'tambah-anggota-tim-sebaya' => ['post'],
@@ -99,7 +99,7 @@ class PenentuanTimSebayaController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
 
             $certification = $this->findCertificationOrFail($certification_id);
-            $users = $this->getAvailablePeerTeamMembersQuery($certification)
+            $users = User::find()->availableForPeerTeam($certification)
                 ->andWhere(['like', 'username', $q])
                 ->select(['id', 'username'])
                 ->limit(10)
@@ -129,7 +129,7 @@ class PenentuanTimSebayaController extends Controller
                 $certification = $this->findCertificationOrFail($certification_id);
 
                 $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
-                $valid_users = $this->getAvailablePeerTeamMembersQuery($certification)
+                $valid_users = User::find()->availableForPeerTeam($certification)
                     ->andWhere(['id' => $array_user_ids])
                     ->select('username')
                     ->column();
@@ -258,27 +258,6 @@ class PenentuanTimSebayaController extends Controller
             throw new UnprocessableEntityHttpException('Sertifikasi sedang tidak dalam tahap pembentukan Tim Sebaya');
         }
         return $certification;
-    }
-
-    private function getAvailablePeerTeamMembersQuery(Certification $certification)
-    {
-        $existing_member_ids = $certification
-            ->getPeerTeamMembers()
-            ->select('user_id')
-            ->column();
-
-        return User::find()
-            ->leftJoin('auth_assignment aa', 'aa.user_id = id')
-            ->andWhere(['not in', 'id', $existing_member_ids])
-            ->andWhere([
-                'or',
-                ['aa.item_name' => UserRole::ADMIN],
-                [
-                    'and',
-                    ['not', ['saspri_k_id' => null]],
-                    ['!=', 'saspri_k_id', $certification->saspri_k_id]
-                ]
-            ]);
     }
 
     private function findAMemberOfPeerTeam(int $user_id, Certification $certification): PeerTeamMember
