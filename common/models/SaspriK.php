@@ -199,6 +199,19 @@ class SaspriK extends \yii\db\ActiveRecord
             ->orderBy(['issued_at' => SORT_DESC]);
     }
 
+    public function findOrCreateOnGoingCertification()
+    {
+        try {
+            $certification = $this->onGoingCertification ?: $this->createNewCertificationRequest();
+            return $certification;
+        } catch (Exception $error) {
+            if ($error instanceof UnprocessableEntityHttpException) {
+                throw new UnprocessableEntityHttpException($error->getMessage());
+            }
+            throw $error;
+        }
+    }
+
     public function createNewCertificationRequest(): Certification
     {
         $last_certification = $this->latestCompletedCertification;

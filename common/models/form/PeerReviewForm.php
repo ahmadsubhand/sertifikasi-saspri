@@ -70,7 +70,7 @@ class PeerReviewForm extends Model
                 continue;
             }
 
-            if (!in_array($indicator_score['status'], IndicatorStatus::values())) {
+            if (($score !== 0) && !in_array($indicator_score['status'], IndicatorStatus::values())) {
                 $this->addError(
                     $attribute,
                     "Status untuk indikator {$indicator_score_id} tidak valid"

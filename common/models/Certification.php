@@ -11,6 +11,7 @@ use common\helpers\UserHelper;
 use Exception;
 use yii\behaviors\TimestampBehavior;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 /**
@@ -271,6 +272,16 @@ class Certification extends \yii\db\ActiveRecord
     public function addSelfTeamMembers(array $user_ids)
     {
         foreach ($user_ids as $user_id) {
+            $already_exists = SelfTeamMember::find()
+                ->where([
+                    'id' => $user_id,
+                    'certification_id' => $this->id,
+                ])
+                ->exists();
+            if ($already_exists) {
+                throw new ConflictHttpException('Anggota sudah pernah ditambahkan');
+            }
+
             $member = new SelfTeamMember();
             $member->user_id = $user_id;
             $member->certification_id = $this->id;
@@ -283,6 +294,16 @@ class Certification extends \yii\db\ActiveRecord
     public function addPeerTeamMembers(array $user_ids)
     {
         foreach ($user_ids as $user_id) {
+            $already_exists = PeerTeamMember::find()
+                ->where([
+                    'id' => $user_id,
+                    'certification_id' => $this->id,
+                ])
+                ->exists();
+            if ($already_exists) {
+                throw new ConflictHttpException('Anggota sudah pernah ditambahkan');
+            }
+
             $member = new PeerTeamMember();
             $member->user_id = $user_id;
             $member->certification_id = $this->id;
@@ -350,6 +371,20 @@ class Certification extends \yii\db\ActiveRecord
         //         'Masing-masing anggota harus dari SASPRI-K yang berbeda satu sama lain'
         //     );
         // }
+    }
+
+    public function validateCertificationStatus(string $status) {
+        if (!in_array($status, CertificationStatus::values())) {
+            throw new Exception('Invalid certification status');
+        }
+
+        if ($this->status !== $status) {
+            throw new UnprocessableEntityHttpException(
+                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[$status]
+            );
+        }
+
+        return $this;
     }
 
     public function saveScores(array $indicator_scores, string $score_attribute)

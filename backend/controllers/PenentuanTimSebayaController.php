@@ -5,10 +5,11 @@ namespace backend\controllers;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
-use common\helpers\UserHelper;
 use common\models\Certification;
+use common\models\form\AddMembersForm;
 use common\models\PeerTeamMember;
 use common\models\User;
+use common\services\CertificationService;
 use Exception;
 use Yii;
 use yii\db\ActiveQuery;
@@ -16,6 +17,7 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -134,25 +136,15 @@ class PenentuanTimSebayaController extends Controller
     public function actionTambahAnggotaTimSebaya(int $certification_id)
     {
         try {
-            $user_ids = Yii::$app->request->post('user_ids');
-            if (!empty($user_ids)) {
-                $certification = $this->findCertificationOrFail($certification_id);
-
-                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
-                $valid_users = User::find()->availableForPeerTeam($certification)
-                    ->andWhere(['id' => $array_user_ids])
-                    ->select('username')
-                    ->column();
-
-                if (count($valid_users) !== count($array_user_ids)) {
-                    throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di Tim Sebaya saat ini');
-                }
-
-                $certification->addPeerTeamMembers($array_user_ids);
-
-                Yii::$app->session->setFlash('success', implode(', ', $valid_users) . ' berhasil ditambahkan ke Tim Sebaya');
-                return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
+            $data = new AddMembersForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
             }
+            $username_users = CertificationService::addPeerTeamMembers($certification_id, $data);
+
+            Yii::$app->session->setFlash('success', implode(', ', $username_users) . ' berhasil ditambahkan ke Tim Sebaya');
+            return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -161,7 +153,10 @@ class PenentuanTimSebayaController extends Controller
                     $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
-                } elseif ($error instanceof BadRequestHttpException) {
+                } elseif (
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof ConflictHttpException
+                ) {
                     return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
                 }
             }

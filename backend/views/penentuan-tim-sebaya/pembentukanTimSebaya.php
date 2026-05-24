@@ -117,7 +117,7 @@ $shingles = [
         <form id="add-members-form" method="post"
           action="<?= \yii\helpers\Url::to(['penentuan-tim-sebaya/tambah-anggota-tim-sebaya', 'certification_id' => $certification->id]) ?>">
           <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-          <input type="hidden" name="user_ids" id="selected-user-ids">
+          <div id="selected-user-inputs"></div>
           <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">
             Tambah Anggota
           </button>
@@ -147,12 +147,12 @@ $shingles = [
               <td><?= $member->user->saspriK ? Html::encode($member->user->saspriK->cooperative_name) : '-' ?></td>
               <td>
                 <?= Html::beginForm(
-                  [
-                    'ubah-peran-anggota-tim-sebaya',
-                    'user_id' => $member->user_id,
-                    'certification_id' => $certification->id
-                  ],
-                  'post'
+                    [
+                      'ubah-peran-anggota-tim-sebaya',
+                      'user_id' => $member->user_id,
+                      'certification_id' => $certification->id
+                    ],
+                    'post'
                 ) ?>
                 <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                   <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
@@ -170,19 +170,19 @@ $shingles = [
               </td>
               <td>
                 <?= Html::a(
-                  '<i class="fa-solid fa-xmark"></i>',
-                  [
-                    'hapus-anggota-tim-sebaya',
-                    'user_id' => $member->user_id,
-                    'certification_id' => $certification->id,
-                  ],
-                  [
-                    'class' => 'btn s-btn-red btn-sm',
-                    'data' => [
-                      'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                      'method' => 'delete',
+                    '<i class="fa-solid fa-xmark"></i>',
+                    [
+                      'hapus-anggota-tim-sebaya',
+                      'user_id' => $member->user_id,
+                      'certification_id' => $certification->id,
                     ],
-                  ]
+                    [
+                      'class' => 'btn s-btn-red btn-sm',
+                      'data' => [
+                        'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                        'method' => 'delete',
+                      ],
+                    ]
                 ) ?>
               </td>
             </tr>
@@ -232,7 +232,7 @@ $shingles = [
     const input = document.getElementById('user-search-input');
     const dropdown = document.getElementById('search-dropdown');
     const chipsContainer = document.getElementById('selected-users-container');
-    const hiddenInput = document.getElementById('selected-user-ids');
+    const hiddenInputsContainer = document.getElementById('selected-user-inputs');
     const submitBtn = document.getElementById('submit-add-btn');
 
     let selectedUsers = [];
@@ -302,7 +302,16 @@ $shingles = [
     }
 
     function updateHiddenInput() {
-      hiddenInput.value = selectedUsers.map(u => u.id).join(',');
+      hiddenInputsContainer.innerHTML = '';
+      selectedUsers.forEach(user => {
+        const input = document.createElement('input');
+
+        input.type = 'hidden';
+        input.name = 'user_ids[]';
+        input.value = user.id;
+
+        hiddenInputsContainer.appendChild(input);
+      });
     }
 
     window.removeUserFromList = removeUser;

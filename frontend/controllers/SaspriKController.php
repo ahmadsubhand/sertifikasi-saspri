@@ -11,6 +11,8 @@ use common\models\Certification;
 use common\models\SaspriK;
 use common\models\SelfTeamMember;
 use common\models\User;
+use common\models\form\AddMembersForm;
+use common\services\CertificationService;
 use Exception;
 use yii\web\Controller;
 use Yii;
@@ -262,28 +264,14 @@ class SaspriKController extends Controller
     public function actionTambahAnggotaTimMandiri()
     {
         try {
-            $user_ids = Yii::$app->request->post('user_ids');
-            if (!empty($user_ids)) {
-                $saspri_k = $this->findSaspriKAsCoordinator();
-                $certification = $this->findOrCreateOnGoingCertification($saspri_k);
-                $this->ensureSelfTeamCanBeModified($certification);
-
-                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
-                $valid_users = User::find()->availableForSelfTeam($saspri_k, $certification)
-                    ->andWhere(['id' => $array_user_ids])
-                    ->select('username')
-                    ->column();
-
-                if (count($valid_users) !== count($array_user_ids)) {
-                    throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di Tim Mandiri saat ini');
-                }
-
-                $certification->save(false); // untuk mendapatkan id jika sertifikasi baru diajukan
-                $certification->addSelfTeamMembers($array_user_ids);
-
-                Yii::$app->session->setFlash('success', implode(', ', $valid_users) . ' berhasil ditambahkan ke Tim Mandiri');
+            $data = new AddMembersForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
             }
+            $username_users = CertificationService::addSelfTeamMembers($data);
 
+            Yii::$app->session->setFlash('success', implode(', ', $username_users) . ' berhasil ditambahkan ke Tim Mandiri');
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -295,7 +283,10 @@ class SaspriKController extends Controller
                         return $this->redirect(['pengajuan-sertifikasi']);
                     }
                     return $this->redirect(['index']);
-                } elseif ($error instanceof BadRequestHttpException) {
+                } elseif (
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof ConflictHttpException
+                ) {
                     return $this->redirect(['pengajuan-sertifikasi']);
                 }
             }
