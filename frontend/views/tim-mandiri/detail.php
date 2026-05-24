@@ -4,6 +4,7 @@ use common\models\SelfTeamMember;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
+use common\enums\RequestResponse;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -117,13 +118,19 @@ $shingles = [
           </div>
           <?php if (in_array(Yii::$app->user->id, array_column($self_team, 'user_id')) && $cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
             <div class="px-3">
-              <?= Html::a('Setuju', ['setuju', 'self_team_member_id' => $member_id], [
+              <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-green me-2 w-100 mt-3',
                 'data-method' => 'post',
+                'data-params' => [
+                    'action' => RequestResponse::APPROVE,
+                ],
               ]) ?>
-              <?= Html::a('Tolak', ['tolak', 'self_team_member_id' => $member_id], [
+              <?= Html::a('Tolak', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-red me-2 w-100 mt-3',
                 'data-method' => 'post',
+                'data-params' => [
+                    'action' => RequestResponse::REJECT,
+                ],
                 'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Mandiri ini?',
               ]) ?>
             </div>

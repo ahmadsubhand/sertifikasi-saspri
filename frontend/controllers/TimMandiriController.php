@@ -4,15 +4,18 @@ namespace frontend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
+use common\enums\RequestResponse;
 use common\enums\UserRole;
 use common\enums\TeamRole;
 use common\helpers\CertificationHelper;
 use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
+use common\models\form\RequestResponseForm;
 use common\models\form\SelfReviewForm;
 use common\models\SelfTeamMember;
 use common\services\CertificationService;
+use common\services\SelfTeamMemberService;
 use Exception;
 use Yii;
 use yii\db\ActiveQuery;
@@ -119,35 +122,21 @@ class TimMandiriController extends Controller
         ]);
     }
 
-    public function actionSetuju(int $self_team_member_id)
+    public function actionTanggapiPermintaanBergabung(int $self_team_member_id)
     {
         try {
-            $member = TeamHelper::findPendingSelfTeamMemberOrFail($self_team_member_id);
-            $member->approveRequest()->save(false);
-
-            Yii::$app->session->setFlash('success', 'Berhasil menyetujui permintaan bergabung Tim Mandiri');
-            return $this->redirect(['index']);
-        } catch (Exception $error) {
-            if ($error instanceof HttpException) {
-                Yii::$app->session->setFlash('error', $error->getMessage());
-                if (
-                    $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException
-                ) {
-                    return $this->redirect(['index']);
-                }
+            $data = new RequestResponseForm();
+            $data->load(Yii::$app->request->post(), '');
+            if ($data->validate()) {
+                SelfTeamMemberService::joinRequestResponse($self_team_member_id, $data);
+            } else {
+                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
             }
-            throw $error;
-        }
-    }
 
-    public function actionTolak(int $self_team_member_id)
-    {
-        try {
-            $member = TeamHelper::findPendingSelfTeamMemberOrFail($self_team_member_id);
-            $member->rejectRequest()->save(false);
-
-            Yii::$app->session->setFlash('success', 'Berhasil menolak permintaan bergabung Tim Mandiri');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) .  ' permintaan bergabung Tim Mandiri'
+            );
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {

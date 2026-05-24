@@ -58,8 +58,8 @@ use yii\helpers\Url;
                 </td>
                 <td>
                   <?= $this->render("/component/_btn_opt", [
-                    'yes' => ['setuju', 'peer_team_member_id' => $member->id],
-                    'no' => ['tolak', 'peer_team_member_id' => $member->id],
+                    'yes' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
+                    'no' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
                     'look' => ['/tim-sebaya/detail', 'case_id' => $member->certification->id],
                   ]); ?>
                 </td>
