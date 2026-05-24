@@ -29,6 +29,11 @@ class PeerTeamMember extends \yii\db\ActiveRecord
         return 'peer_team_member';
     }
 
+    public static function label()
+    {
+        return 'Tim Sebaya';
+    }
+
     /**
      * {@inheritdoc}
      */

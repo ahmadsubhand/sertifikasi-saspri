@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\enums\IndicatorScoreAttribute;
 use common\enums\IndicatorStatus;
 use common\helpers\FileHelper;
 use Exception;
@@ -87,43 +88,23 @@ class IndicatorScore extends \yii\db\ActiveRecord
         return $this->hasOne(Indicator::class, ['id' => 'indicator_id']);
     }
 
-    public function fillSelfTeamScore(int $score)
-    {
-        $value = (int) $score;
+    public function fillScore(array $indicator_score, string $attribute_name) {
+        if (!in_array($attribute_name, IndicatorScoreAttribute::values())) {
+            throw new Exception('Invalid attribute name of indicator score');
+        }
+
+        $value = (int) $indicator_score[$attribute_name] ?? 0;
         if ($value < 0 || $value > 100) {
             throw new BadRequestHttpException(
                 'Terdapat penilaian yang di luar rentang 0-100'
             );
         }
-        $this->self_team_score = $value;
+        $this->$attribute_name= $value;
+
         return $this;
     }
 
-    public function fillPeerTeamScore(int $score)
-    {
-        $value = (int) $score;
-        if ($value < 0 || $value > 100) {
-            throw new BadRequestHttpException(
-                'Terdapat penilaian yang di luar rentang 0-100'
-            );
-        }
-        $this->peer_team_score = $value;
-        return $this;
-    }
-
-    public function fillFinalScore(int $score)
-    {
-        $value = (int) $score;
-        if ($value < 0 || $value > 100) {
-            throw new BadRequestHttpException(
-                'Terdapat penilaian yang di luar rentang 0-100'
-            );
-        }
-        $this->final_score = $value;
-        return $this;
-    }
-
-    public function fillPeerTeamStatus(?string $status)
+    public function fillStatus(?string $status)
     {
         if (!$status) {
             $this->status = null;
