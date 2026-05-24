@@ -12,6 +12,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\HttpException;
 use yii\web\UnprocessableEntityHttpException;
@@ -37,25 +38,41 @@ class VerifikasiWaliController extends Controller
         ?int $offset_registration = 0,
         ?int $offset_change = 0,
     ) {
-        $registration_requests = SaspriK::find()
-            ->where(['request_status' => ApprovalStatus::PENDING])
+        $registration_query = SaspriK::find()
+            ->where(['request_status' => ApprovalStatus::PENDING]);
+
+        $change_query = SaspriK::find()
+            ->where(['change_status' => ApprovalStatus::PENDING]);
+
+        $registrations = $registration_query
             ->with(['coordinator', 'district'])
             ->orderBy(['updated_at' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset_registration)
             ->all();
+        $registration_has_next = count($registrations) > $limit;
+        if ($registration_has_next) array_pop($registrations);
 
-        $change_requests = SaspriK::find()
-            ->where(['change_status' => ApprovalStatus::PENDING])
+        $changes = $change_query
             ->with(['coordinator', 'newCoordinator', 'district'])
             ->orderBy(['updated_at' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset_change)
             ->all();
+        $change_has_next = count($changes) > $limit;
+        if ($change_has_next) array_pop($changes);
 
         return $this->render('index', [
-            'registration_requests' => $registration_requests,
-            'change_requests' => $change_requests,
+            'registration_requests' => $registrations,
+            'registration_prev_link' => $offset_registration > 0 ? Url::current(['offset_registration' => max(0, $offset_registration - $limit)]) : null,
+            'registration_next_link' => $registration_has_next ? Url::current(['offset_registration' => $offset_registration + $limit]) : null,
+            'offset_registration' => $offset_registration,
+
+            'change_requests' => $changes,
+            'change_prev_link' => $offset_change > 0 ? Url::current(['offset_change' => max(0, $offset_change - $limit)]) : null,
+            'change_next_link' => $change_has_next ? Url::current(['offset_change' => $offset_change + $limit]) : null,
+            'offset_change' => $offset_change,
+            'limit' => $limit,
         ]);
     }
 

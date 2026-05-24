@@ -15,6 +15,7 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -58,16 +59,18 @@ class TimSebayaController extends Controller
             ->alias('ptm')
             ->joinWith('certification c')
             ->joinWith('certification.saspriK')
-            ->where(['user_id' => Yii::$app->user->id])
-            ->limit($limit);
+            ->where(['user_id' => Yii::$app->user->id]);
 
-        $peer_team_member_request = (clone $base_query)
+        $requests = (clone $base_query)
             ->andWhere(['c.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
             ->orderBy(['c.peer_team_due_date' => SORT_ASC])
+            ->limit($limit + 1)
             ->offset($offset_request)
             ->all();
+        $request_has_next = count($requests) > $limit;
+        if ($request_has_next) array_pop($requests);
 
-        $peer_team_member_uncompleted = (clone $base_query)
+        $uncompleted = (clone $base_query)
             ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
             ->andWhere([
                 'not in',
@@ -78,20 +81,38 @@ class TimSebayaController extends Controller
                 ]
             ])
             ->orderBy(['c.peer_review_due_date' => SORT_ASC])
+            ->limit($limit + 1)
             ->offset($offset_uncompleted)
             ->all();
+        $uncompleted_has_next = count($uncompleted) > $limit;
+        if ($uncompleted_has_next) array_pop($uncompleted);
 
-        $peer_team_member_completed = (clone $base_query)
+        $completed = (clone $base_query)
             ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
             ->andWhere(['c.status' => CertificationStatus::COMPLETED])
             ->orderBy(['c.issued_at' => SORT_DESC])
+            ->limit($limit + 1)
             ->offset($offset_completed)
             ->all();
+        $completed_has_next = count($completed) > $limit;
+        if ($completed_has_next) array_pop($completed);
 
         return $this->render('index', [
-            'peer_team_member_request' => $peer_team_member_request,
-            'peer_team_member_uncompleted' => $peer_team_member_uncompleted,
-            'peer_team_member_completed' => $peer_team_member_completed,
+            'peer_team_member_request' => $requests,
+            'request_prev_link' => $offset_request > 0 ? Url::current(['offset_request' => max(0, $offset_request - $limit)]) : null,
+            'request_next_link' => $request_has_next ? Url::current(['offset_request' => $offset_request + $limit]) : null,
+            'offset_request' => $offset_request,
+
+            'peer_team_member_uncompleted' => $uncompleted,
+            'uncompleted_prev_link' => $offset_uncompleted > 0 ? Url::current(['offset_uncompleted' => max(0, $offset_uncompleted - $limit)]) : null,
+            'uncompleted_next_link' => $uncompleted_has_next ? Url::current(['offset_uncompleted' => $offset_uncompleted + $limit]) : null,
+            'offset_uncompleted' => $offset_uncompleted,
+
+            'peer_team_member_completed' => $completed,
+            'completed_prev_link' => $offset_completed > 0 ? Url::current(['offset_completed' => max(0, $offset_completed - $limit)]) : null,
+            'completed_next_link' => $completed_has_next ? Url::current(['offset_completed' => $offset_completed + $limit]) : null,
+            'offset_completed' => $offset_completed,
+            'limit' => $limit,
         ]);
     }
 

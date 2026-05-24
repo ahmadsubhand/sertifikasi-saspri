@@ -11,7 +11,7 @@ use Exception;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
-use yii\web\BadRequestHttpException;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -70,16 +70,22 @@ class SertifikasiBerjalanController extends Controller
             $query->andWhere(['level' => $level]);
         }
 
-        $certifications = $query
+        $certs = (clone $query)
             ->orderBy([
                 'updated_at' => SORT_DESC
             ])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->all();
 
+        $has_next = count($certs) > $limit;
+        if ($has_next) array_pop($certs);
+
         return $this->render('index', [
-            'certifications' => $certifications,
+            'certifications' => $certs,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)]) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit]) : null,
+            'offset' => $offset,
         ]);
     }
 

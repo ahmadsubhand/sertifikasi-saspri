@@ -9,7 +9,14 @@ use yii\helpers\Url;
 /** @var \common\models\SaspriK $saspri_k 
  * @var \common\models\Certification $valid_certificate
  * @var \common\models\Certification[] $completed_certifications
- * @var \common\models\User[] $saspri_k_members */
+ * @var \common\models\User[] $saspri_k_members 
+ * @var string|null $cert_prev_link
+ * @var string|null $cert_next_link
+ * @var int $certification_offset
+ * @var string|null $user_prev_link
+ * @var string|null $user_next_link
+ * @var int $user_offset
+ */
 
 // dd($saspri_k_members);
 
@@ -126,7 +133,7 @@ $shingles = [
           <tbody>
             <?php foreach ($completed_certifications as $key => $value) : ?>
               <tr>
-                <td scope="row"><?php echo (int)$key + 1 ?></th>
+                <td scope="row"><?php echo $certification_offset + (int)$key + 1 ?></th>
                 <td><?= Html::encode(CertificateLevel::list()[$value->level]) ?></td>
                 <td><?= Html::encode($value->created_at ? date('d-m-Y', $value->created_at)
                       : '-')  ?></td>
@@ -152,6 +159,16 @@ $shingles = [
             <?php endif; ?>
           </tbody>
         </table>
+        <nav aria-label="Certification History Pagination" class="align-items-center d-flex flex-row mt-3">
+          <ul class="pagination mx-auto w-fit">
+            <li class="page-item <?= $cert_prev_link === null ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= $cert_prev_link ?>">Sebelumnya</a>
+            </li>
+            <li class="page-item <?= $cert_next_link === null ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= $cert_next_link ?>">Berikutnya</a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
   </div>
@@ -189,7 +206,7 @@ $shingles = [
           <tbody>
             <?php foreach ($saspri_k_members as $key => $member) : ?>
               <tr class="member-container" data-page-index="<?= $key ?>">
-                <td scope="row"><?php echo (int)$key + 1 ?></th>
+                <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
                 <td><?= Html::encode($member->username) ?></td>
                 <!-- kok nomer gk keluar slur? -->
                 <td><?= Html::encode($member->phone_number) ?></td>
@@ -216,9 +233,14 @@ $shingles = [
             <?php endif; ?>
           </tbody>
         </table>
-        <nav aria-label="Histroy Pag" class="align-items-center d-flex flex-row">
-          <ul class="pagination mx-auto w-fit" id="page-ul">
-
+        <nav aria-label="Member Pagination" class="align-items-center d-flex flex-row mt-3">
+          <ul class="pagination mx-auto w-fit">
+            <li class="page-item <?= $user_prev_link === null ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= $user_prev_link ?>">Sebelumnya</a>
+            </li>
+            <li class="page-item <?= $user_next_link === null ? 'disabled' : '' ?>">
+              <a class="page-link" href="<?= $user_next_link ?>">Berikutnya</a>
+            </li>
           </ul>
         </nav>
       </div>

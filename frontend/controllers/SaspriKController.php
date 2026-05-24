@@ -17,6 +17,7 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\ForbiddenHttpException;
@@ -63,22 +64,36 @@ class SaspriKController extends Controller
         try {
             $saspri_k = $this->findSaspriKAsCoordinator();
 
+            $certs = $saspri_k->getCertifications()
+                ->where(['status' => CertificationStatus::COMPLETED])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->limit($certification_limit + 1)
+                ->offset($certification_offset)
+                ->all();
+            $cert_has_next = count($certs) > $certification_limit;
+            if ($cert_has_next) array_pop($certs);
+
+            $users = $saspri_k->getUsers()
+                ->where(['!=', 'id', Yii::$app->user->id])
+                ->orderBy(['updated_at' => SORT_DESC])
+                ->select(UserHelper::$basicSelect)
+                ->limit($user_limit + 1)
+                ->offset($user_offset)
+                ->all();
+            $user_has_next = count($users) > $user_limit;
+            if ($user_has_next) array_pop($users);
+
             return $this->render('index', [
                 'saspri_k' => $saspri_k,
                 'valid_certificate' => $saspri_k->validCertificate,
-                'completed_certifications' => $saspri_k->getCertifications()
-                    ->where(['status' => CertificationStatus::COMPLETED])
-                    ->orderBy(['updated_at' => SORT_DESC]) // nanti bisa dicustom
-                    ->limit($certification_limit)
-                    ->offset($certification_offset)
-                    ->all(),
-                'saspri_k_members' => $saspri_k->getUsers()
-                    ->where(['!=', 'id', Yii::$app->user->id])
-                    ->orderBy(['updated_at' => SORT_DESC]) // nanti bisa dicustom
-                    ->select(UserHelper::$basicSelect)
-                    ->limit($user_limit)
-                    ->offset($user_offset)
-                    ->all(),
+                'completed_certifications' => $certs,
+                'cert_prev_link' => $certification_offset > 0 ? Url::current(['certification_offset' => max(0, $certification_offset - $certification_limit)]) : null,
+                'cert_next_link' => $cert_has_next ? Url::current(['certification_offset' => $certification_offset + $certification_limit]) : null,
+                'certification_offset' => $certification_offset,
+                'saspri_k_members' => $users,
+                'user_prev_link' => $user_offset > 0 ? Url::current(['user_offset' => max(0, $user_offset - $user_limit)]) : null,
+                'user_next_link' => $user_has_next ? Url::current(['user_offset' => $user_offset + $user_limit]) : null,
+                'user_offset' => $user_offset,
             ]);
         } catch (Exception $error) {
             if ($error instanceof ForbiddenHttpException) {

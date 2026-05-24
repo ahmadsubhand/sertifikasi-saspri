@@ -12,6 +12,7 @@ use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
@@ -48,15 +49,22 @@ class PenerbitanSertifikasiController extends Controller
 
     public function actionIndex(?int $limit = 10, ?int $offset = 0)
     {
-        $certifications = Certification::find()
+        $certs = Certification::find()
             ->where(['status' => CertificationStatus::EXTERNAL_REVIEW])
             ->orderBy(['external_review_due_date' => SORT_ASC])
             ->with(['saspriK'])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->all();
+
+        $has_next = count($certs) > $limit;
+        if ($has_next) array_pop($certs);
+
         return $this->render('index', [
-            'certifications' => $certifications,
+            'certifications' => $certs,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)]) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit]) : null,
+            'offset' => $offset,
         ]);
     }
 
