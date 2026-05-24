@@ -55,10 +55,11 @@ class TimSebayaController extends Controller
         ?int $offset_completed = 0,
     ) {
         $base_query = PeerTeamMember::find()
+            ->alias('ptm')
             ->joinWith('certification c')
+            ->joinWith('certification.saspriK')
             ->where(['user_id' => Yii::$app->user->id])
-            ->with('certification.saspriK')
-            ->limit($limit);;
+            ->limit($limit);
 
         $peer_team_member_request = (clone $base_query)
             ->andWhere(['c.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
@@ -67,6 +68,7 @@ class TimSebayaController extends Controller
             ->all();
 
         $peer_team_member_uncompleted = (clone $base_query)
+            ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
             ->andWhere([
                 'not in',
                 'c.status',
@@ -80,6 +82,7 @@ class TimSebayaController extends Controller
             ->all();
 
         $peer_team_member_completed = (clone $base_query)
+            ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
             ->andWhere(['c.status' => CertificationStatus::COMPLETED])
             ->orderBy(['c.issued_at' => SORT_DESC])
             ->offset($offset_completed)

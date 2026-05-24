@@ -40,8 +40,10 @@ use yii\web\UnprocessableEntityHttpException;
  * @property IndicatorScore[] $indicatorScores
  * @property Indicator[] $indicators
  * @property PeerTeamMember[] $peerTeamMembers
+ * @property PeerTeamMember[] $fullPeerTeamMembers
  * @property SaspriK $saspriK
  * @property SelfTeamMember[] $selfTeamMembers
+ * @property SelfTeamMember[] $fullSelfTeamMembers
  * @property User[] $users
  * @property User[] $users0
  */
@@ -142,11 +144,22 @@ class Certification extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[PeerTeamMembers]].
+     * Gets query for [[PeerTeamMembers]] - Approved only
      *
      * @return \yii\db\ActiveQuery
      */
     public function getPeerTeamMembers()
+    {
+        return $this->hasMany(PeerTeamMember::class, ['certification_id' => 'id'])
+            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+    }
+
+    /**
+     * Gets query for [[PeerTeamMembers]] - All status
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFullPeerTeamMembers()
     {
         return $this->hasMany(PeerTeamMember::class, ['certification_id' => 'id']);
     }
@@ -162,11 +175,22 @@ class Certification extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[SelfTeamMembers]].
+     * Gets query for [[SelfTeamMembers]] - Approved only
      *
      * @return \yii\db\ActiveQuery
      */
     public function getSelfTeamMembers()
+    {
+        return $this->hasMany(SelfTeamMember::class, ['certification_id' => 'id'])
+            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+    }
+
+    /**
+     * Gets query for [[SelfTeamMembers]] - All status
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFullSelfTeamMembers()
     {
         return $this->hasMany(SelfTeamMember::class, ['certification_id' => 'id']);
     }

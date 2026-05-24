@@ -55,9 +55,10 @@ class TimMandiriController extends Controller
         ?int $offset_completed = 0,
     ) {
         $base_query = SelfTeamMember::find()
+            ->alias('stm')
             ->joinWith('certification c')
+            ->joinWith('certification.saspriK')
             ->where(['user_id' => Yii::$app->user->id])
-            ->with('certification.saspriK')
             ->limit($limit);
 
         $self_team_member_request = (clone $base_query)
@@ -67,6 +68,7 @@ class TimMandiriController extends Controller
             ->all();
 
         $self_team_member_uncompleted = (clone $base_query)
+            ->andWhere(['stm.status' => ApprovalStatus::APPROVED])
             ->andWhere([
                 'not in',
                 'c.status',
@@ -80,6 +82,7 @@ class TimMandiriController extends Controller
             ->all();
 
         $self_team_member_completed = (clone $base_query)
+            ->andWhere(['stm.status' => ApprovalStatus::APPROVED])
             ->andWhere(['c.status' => CertificationStatus::COMPLETED])
             ->orderBy(['c.issued_at' => SORT_DESC])
             ->offset($offset_completed)

@@ -47,7 +47,7 @@ class PenentuanTimSebayaController extends Controller
         ];
     }
 
-    public function actionIndex(?int $limit = 10, ?int $offset = 0) 
+    public function actionIndex(?int $limit = 10, ?int $offset = 0)
     {
         $certifications = Certification::find()
             ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
@@ -71,15 +71,15 @@ class PenentuanTimSebayaController extends Controller
                 'certification' => $certification,
                 'valid_certificate' => $certification->saspriK->validCertificate,
                 'peer_team_members' => $certification
-                ->getPeerTeamMembers()
-                ->with([
-                    'user' => function (ActiveQuery $query) {
-                        $query->alias('u')
-                            ->with('saspriK')
-                            ->select(['u.id', 'u.username', 'u.saspri_k_id']);
-                    }
-                ])
-                ->all(),
+                    ->getFullPeerTeamMembers()
+                    ->with([
+                        'user' => function (ActiveQuery $query) {
+                            $query->alias('u')
+                                ->with('saspriK')
+                                ->select(['u.id', 'u.username', 'u.saspri_k_id']);
+                        }
+                    ])
+                    ->all(),
             ]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {

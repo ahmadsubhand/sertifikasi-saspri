@@ -200,7 +200,7 @@ class SaspriKController extends Controller
                 'district' => $saspri_k->district,
                 'certification' => $certification,
                 'self_team_members' => $certification
-                    ->getSelfTeamMembers()
+                    ->getFullSelfTeamMembers()
                     ->with([
                         'user' => function (ActiveQuery $query) {
                             $query->select(['id', 'username']);
