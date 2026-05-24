@@ -32,18 +32,25 @@ class VerifikasiWaliController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex(
+        ?int $limit = 10,
+        ?int $offset_registration = 0,
+        ?int $offset_change = 0,
+    ) {
         $registration_requests = SaspriK::find()
             ->where(['request_status' => ApprovalStatus::PENDING])
             ->with(['coordinator', 'district'])
             ->orderBy(['updated_at' => SORT_ASC])
+            ->limit($limit)
+            ->offset($offset_registration)
             ->all();
 
         $change_requests = SaspriK::find()
             ->where(['change_status' => ApprovalStatus::PENDING])
             ->with(['coordinator', 'newCoordinator', 'district'])
             ->orderBy(['updated_at' => SORT_ASC])
+            ->limit($limit)
+            ->offset($offset_change)
             ->all();
 
         return $this->render('index', [

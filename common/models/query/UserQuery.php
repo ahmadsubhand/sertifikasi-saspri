@@ -38,8 +38,8 @@ class UserQuery extends \yii\db\ActiveQuery
 
     public function availableForSaspriK()
     {
-        return $this->leftJoin('auth_assignment aa', 'aa.user_id = id')
-            ->andWhere(['!=', 'aa.item_name', UserRole::ADMIN])
+        return $this->joinWith('role r')
+            ->andWhere(['!=', 'r.item_name', UserRole::ADMIN])
             ->andWhere(['saspri_k_id' => null]);
     }
 
@@ -63,11 +63,11 @@ class UserQuery extends \yii\db\ActiveQuery
             ->select('user_id')
             ->column();
 
-        return $this->leftJoin('auth_assignment aa', 'aa.user_id = id')
+        return $this->joinWith('role r')
             ->andWhere(['not in', 'id', $existing_member_ids])
             ->andWhere([
                 'or',
-                ['aa.item_name' => UserRole::ADMIN],
+                ['r.item_name' => UserRole::ADMIN],
                 [
                     'and',
                     ['not', ['saspri_k_id' => null]],

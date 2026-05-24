@@ -55,10 +55,10 @@ class SaspriKController extends Controller
     }
 
     public function actionIndex(
-        int $user_limit = 10,
-        int $user_offset = 0,
-        int $certification_limit = 10,
-        int $certification_offset = 0
+        ?int $user_limit = 10,
+        ?int $user_offset = 0,
+        ?int $certification_limit = 10,
+        ?int $certification_offset = 0
     ) {
         try {
             $saspri_k = $this->findSaspriKAsCoordinator();

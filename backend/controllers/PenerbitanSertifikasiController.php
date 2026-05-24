@@ -46,12 +46,14 @@ class PenerbitanSertifikasiController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(?int $limit = 10, ?int $offset = 0)
     {
         $certifications = Certification::find()
             ->where(['status' => CertificationStatus::EXTERNAL_REVIEW])
             ->orderBy(['external_review_due_date' => SORT_ASC])
             ->with(['saspriK'])
+            ->limit($limit)
+            ->offset($offset)
             ->all();
         return $this->render('index', [
             'certifications' => $certifications,

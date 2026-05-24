@@ -47,12 +47,14 @@ class PenentuanTimSebayaController extends Controller
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(?int $limit = 10, ?int $offset = 0) 
     {
         $certifications = Certification::find()
             ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
             ->orderBy(['peer_team_due_date' => SORT_ASC])
             ->with(['saspriK'])
+            ->limit($limit)
+            ->offset($offset)
             ->all();
         return $this->render('index', [
             'certifications' => $certifications,

@@ -48,16 +48,22 @@ class TimSebayaController extends Controller
         ];
     }
 
-    public function actionIndex()
-    {
+    public function actionIndex(
+        ?int $limit = 10,
+        ?int $offset_request = 0,
+        ?int $offset_uncompleted = 0,
+        ?int $offset_completed = 0,
+    ) {
         $base_query = PeerTeamMember::find()
             ->joinWith('certification c')
             ->where(['user_id' => Yii::$app->user->id])
-            ->with('certification.saspriK');
+            ->with('certification.saspriK')
+            ->limit($limit);;
 
         $peer_team_member_request = (clone $base_query)
             ->andWhere(['c.status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
             ->orderBy(['c.peer_team_due_date' => SORT_ASC])
+            ->offset($offset_request)
             ->all();
 
         $peer_team_member_uncompleted = (clone $base_query)
@@ -70,11 +76,13 @@ class TimSebayaController extends Controller
                 ]
             ])
             ->orderBy(['c.peer_review_due_date' => SORT_ASC])
+            ->offset($offset_uncompleted)
             ->all();
 
         $peer_team_member_completed = (clone $base_query)
             ->andWhere(['c.status' => CertificationStatus::COMPLETED])
             ->orderBy(['c.issued_at' => SORT_DESC])
+            ->offset($offset_completed)
             ->all();
 
         return $this->render('index', [

@@ -102,15 +102,15 @@ WHERE id NOT IN (SELECT CAST(user_id AS UNSIGNED) FROM auth_assignment);
 INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, cooperative_name, number_of_groups, number_of_active_members, livestock_type, total_livestock_count, breeding_livestock_count, productive_heifer_count, request_status, created_at, updated_at) VALUES
 (1, 14, 265, 'Baiturrahman', 'Jl. Merdeka No. 1', 'Koperasi Baiturrahman', 5, 50, 'Sapi', 200, 100, 50, 'approved', 1714876800, 1714876800),
 (2, 34, 1, 'Bakongan', 'Jl. Merdeka No. 2', 'Koperasi Bakongan', 3, 30, 'Sapi', 120, 60, 30, 'approved', 1714876800, 1714876800),
-(3, 54, 2, 'Kluet Utara', 'Jl. Merdeka No. 3', 'Koperasi Kluet', 4, 45, 'Sapi', 180, 90, 45, 'approved', 1714876800, 1714876800),
-(4, 74, 3, 'Bakongan Timur', 'Jl. Merdeka No. 4', 'Koperasi Bakongan Timur', 2, 25, 'Sapi', 100, 50, 25, 'approved', 1714876800, 1714876800),
-(5, 94, 4, 'Bakongan Barat', 'Jl. Merdeka No. 5', 'Koperasi Bakongan Barat', 3, 35, 'Sapi', 140, 70, 35, 'approved', 1714876800, 1714876800),
-(6, 114, 5, 'Kluet Selatan', 'Jl. Merdeka No. 6', 'Koperasi Kluet Selatan', 4, 40, 'Sapi', 160, 80, 40, 'approved', 1714876800, 1714876800),
-(7, 134, 6, 'Meukek', 'Jl. Merdeka No. 7', 'Koperasi Meukek', 2, 20, 'Sapi', 80, 40, 20, 'approved', 1714876800, 1714876800),
-(8, 139, 7, 'Samatiga', 'Jl. Merdeka No. 8', 'Koperasi Samatiga', 2, 18, 'Sapi', 72, 36, 18, 'approved', 1714876800, 1714876800),
-(9, 144, 8, 'Bubon', 'Jl. Merdeka No. 9', 'Koperasi Bubon', 2, 22, 'Sapi', 88, 44, 22, 'approved', 1714876800, 1714876800),
-(10, 149, 9, 'Arongan', 'Jl. Merdeka No. 10', 'Koperasi Arongan', 2, 21, 'Sapi', 84, 42, 21, 'approved', 1714876800, 1714876800),
-(11, 154, 10, 'Woyla', 'Jl. Merdeka No. 11', 'Koperasi Woyla', 3, 28, 'Sapi', 112, 56, 28, 'approved', 1714876800, 1714876800);
+(3, 54, 685, 'Medan Kota', 'Jl. Merdeka No. 3', 'Koperasi Medan Kota', 4, 45, 'Sapi', 180, 90, 45, 'approved', 1714876800, 1714876800),
+(4, 74, 1445, 'Ilir Barat Dua', 'Jl. Merdeka No. 4', 'Koperasi Ilir Barat', 2, 25, 'Sapi', 100, 50, 25, 'approved', 1714876800, 1714876800),
+(5, 94, 2563, 'Sukasari', 'Jl. Merdeka No. 5', 'Koperasi Sukasari', 3, 35, 'Sapi', 140, 70, 35, 'approved', 1714876800, 1714876800),
+(6, 114, 3190, 'Semarang Tengah', 'Jl. Merdeka No. 6', 'Koperasi Semarang Tengah', 4, 40, 'Sapi', 160, 80, 40, 'approved', 1714876800, 1714876800),
+(7, 134, 3924, 'Karang Pilang', 'Jl. Merdeka No. 7', 'Koperasi Karang Pilang', 2, 20, 'Sapi', 80, 40, 20, 'approved', 1714876800, 1714876800),
+(8, 139, 686, 'Medan Sunggal', 'Jl. Merdeka No. 8', 'Koperasi Medan Sunggal', 2, 18, 'Sapi', 72, 36, 18, 'approved', 1714876800, 1714876800),
+(9, 144, 2564, 'Coblong', 'Jl. Merdeka No. 9', 'Koperasi Coblong', 2, 22, 'Sapi', 88, 44, 22, 'approved', 1714876800, 1714876800),
+(10, 149, 3191, 'Semarang Utara', 'Jl. Merdeka No. 10', 'Koperasi Semarang Utara', 2, 21, 'Sapi', 84, 42, 21, 'approved', 1714876800, 1714876800),
+(11, 154, 3925, 'Wonocolo', 'Jl. Merdeka No. 11', 'Koperasi Wonocolo', 3, 28, 'Sapi', 112, 56, 28, 'approved', 1714876800, 1714876800);
 
 -- --------------------------------------------------------
 -- Certifications (Historical)
@@ -246,11 +246,11 @@ FROM (
 -- --------------------------------------------------------
 
 INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, cooperative_name, number_of_groups, number_of_active_members, livestock_type, total_livestock_count, breeding_livestock_count, productive_heifer_count, request_status, request_rejection_reason, created_at, updated_at) VALUES
-(12, 4, 11, 'Teunom', 'Jl. Merdeka No. 12', 'Koperasi Teunom', 2, 15, 'Sapi', 60, 30, 15, 'pending', NULL, 1714876800, 1714876800),
-(13, 5, 12, 'Panga', 'Jl. Merdeka No. 13', 'Koperasi Panga', 2, 16, 'Sapi', 64, 32, 16, 'pending', NULL, 1714876800, 1714876800),
-(14, 6, 13, 'Krueng Sabee', 'Jl. Merdeka No. 14', 'Koperasi Krueng Sabee', 2, 17, 'Sapi', 68, 34, 17, 'pending', NULL, 1714876800, 1714876800),
-(15, 7, 14, 'Setia Bakti', 'Jl. Merdeka No. 15', 'Koperasi Setia Bakti', 2, 18, 'Sapi', 72, 36, 18, 'rejected', 'Dokumen tidak lengkap', 1714876800, 1714876800),
-(16, 8, 15, 'Sampoiniet', 'Jl. Merdeka No. 16', 'Koperasi Sampoiniet', 2, 19, 'Sapi', 76, 38, 19, 'rejected', 'Wilayah tidak sesuai', 1714876800, 1714876800);
+(12, 4, 1446, 'Seberang Ulu Satu', 'Jl. Merdeka No. 12', 'Koperasi Seberang Ulu', 2, 15, 'Sapi', 60, 30, 15, 'pending', NULL, 1714876800, 1714876800),
+(13, 5, 2565, 'Babakan Ciparay', 'Jl. Merdeka No. 13', 'Koperasi Babakan Ciparay', 2, 16, 'Sapi', 64, 32, 16, 'pending', NULL, 1714876800, 1714876800),
+(14, 6, 3192, 'Semarang Timur', 'Jl. Merdeka No. 14', 'Koperasi Semarang Timur', 2, 17, 'Sapi', 68, 34, 17, 'pending', NULL, 1714876800, 1714876800),
+(15, 7, 3926, 'Rungkut', 'Jl. Merdeka No. 15', 'Koperasi Rungkut', 2, 18, 'Sapi', 72, 36, 18, 'rejected', 'Dokumen tidak lengkap', 1714876800, 1714876800),
+(16, 8, 687, 'Medan Helvetia', 'Jl. Merdeka No. 16', 'Koperasi Medan Helvetia', 2, 19, 'Sapi', 76, 38, 19, 'rejected', 'Wilayah tidak sesuai', 1714876800, 1714876800);
 
 INSERT INTO saspri_k_document (saspri_k_id, type, url) VALUES
 (12, 'Sertifikat Natalia', '/uploads/document/12/natalia.pdf'),
