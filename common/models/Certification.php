@@ -333,6 +333,8 @@ class Certification extends \yii\db\ActiveRecord
         if ($leaderCount !== 1 || $memberCount < 2) {
             throw new UnprocessableEntityHttpException('Tim Mandiri harus terdiri dari 1 ketua dan minimal 2 anggota lainnya');
         }
+
+        return $this;
     }
 
     public function validateApprovedPeerTeamComposition()
@@ -371,6 +373,8 @@ class Certification extends \yii\db\ActiveRecord
         //         'Masing-masing anggota harus dari SASPRI-K yang berbeda satu sama lain'
         //     );
         // }
+
+        return $this;
     }
 
     public function validateCertificationStatus(string $status) {
@@ -380,7 +384,7 @@ class Certification extends \yii\db\ActiveRecord
 
         if ($this->status !== $status) {
             throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[$status]
+                'Sertifikasi tidak dalam tahap ' . strtolower(CertificationStatus::list()[$status])
             );
         }
 

@@ -188,7 +188,7 @@ $shingles = [
           <form id="add-members-form" method="post"
             action="<?= Url::to(['saspri-k/tambah-anggota']) ?>">
             <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-            <input type="hidden" name="user_ids" id="selected-user-ids">
+            <div id="selected-user-inputs"></div>
             <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">Tambah
               Anggota</button>
           </form>
@@ -254,7 +254,7 @@ $shingles = [
     const input = document.getElementById('user-search-input');
     const dropdown = document.getElementById('search-dropdown');
     const chipsContainer = document.getElementById('selected-users-container');
-    const hiddenInput = document.getElementById('selected-user-ids');
+    const hiddenInputsContainer = document.getElementById('selected-user-inputs');
     const submitBtn = document.getElementById('submit-add-btn');
 
     let selectedUsers = [];
@@ -324,7 +324,16 @@ $shingles = [
     }
 
     function updateHiddenInput() {
-      hiddenInput.value = selectedUsers.map(u => u.id).join(',');
+      hiddenInputsContainer.innerHTML = '';
+      selectedUsers.forEach(user => {
+        const input = document.createElement('input');
+
+        input.type = 'hidden';
+        input.name = 'user_ids[]';
+        input.value = user.id;
+
+        hiddenInputsContainer.appendChild(input);
+      });
     }
 
     window.removeUserFromList = removeUser;

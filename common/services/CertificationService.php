@@ -5,8 +5,10 @@ namespace common\services;
 use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
 use common\helpers\TeamHelper;
+use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
+use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
 use common\models\form\SelfReviewForm;
@@ -45,6 +47,47 @@ class CertificationService
         return $valid_users;
     }
 
+    public static function removeSelfTeamMember(int $user_id)
+    {
+        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $certification = $saspri_k->findOrCreateOnGoingCertification()
+            ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
+        $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
+        $member->delete();
+        return [
+            ...$member,
+            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+        ];
+    }
+
+    public static function changeSelfTeamMemberRole(int $user_id, ChangeMemberRoleForm $data)
+    {
+        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $certification = $saspri_k->findOrCreateOnGoingCertification()
+            ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
+        $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
+        $member->changeRole($data->role)->save();
+        return [
+            ...$member,
+            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+        ];
+    }
+
+    public static function submitForSelfReview()
+    {
+        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $certification = $saspri_k->onGoingCertification;
+        if (!$certification) {
+            throw new NotFoundHttpException('Tidak ada sertifikasi yang sedang berlangsung');
+        }
+        $certification->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION)
+            ->validateApprovedSelfTeamComposition()
+            ->submitForSelfReview()
+            ->save();
+
+        return $certification;
+    }
+
     public static function saveSelfReview(int $certification_id, SelfReviewForm $data)
     {
         TeamHelper::checkSelfReviewPermission($certification_id);
@@ -64,8 +107,8 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::SELF_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::SELF_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::SELF_REVIEW)
-            ->submitSelfReview()
-            ->save();
+            ->submitSelfReview();
+        $certification->save();
 
         return $certification;
     }
@@ -86,6 +129,41 @@ class CertificationService
 
         $certification->addPeerTeamMembers($data->user_ids);
         return $valid_users;
+    }
+
+    public static function removePeerTeamMember(int $certification_id, int $user_id)
+    {
+        $certification = CertificationService::findCertificationOrFail($certification_id)
+            ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
+        $member = PeerTeamMemberService::findOrFail($certification->id, $user_id);
+        $member->delete();
+        return [
+            ...$member,
+            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+        ];
+    }
+
+    public static function changePeerTeamMemberRole(int $certification_id, int $user_id, ChangeMemberRoleForm $data)
+    {
+        $certification = CertificationService::findCertificationOrFail($certification_id)
+            ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
+        $member = PeerTeamMemberService::findOrFail($certification->id, $user_id);
+        $member->changeRole($data->role)->save();
+        return [
+            ...$member,
+            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+        ];
+    }
+
+    public static function submitForPeerReview(int $certification_id)
+    {
+        $certification = CertificationService::findCertificationOrFail($certification_id);
+        $certification->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION)
+            ->validateApprovedPeerTeamComposition()
+            ->submitForPeerReview()
+            ->save();
+
+        return $certification;
     }
 
     public static function savePeerReview(int $certification_id, PeerReviewForm $data)
@@ -109,8 +187,8 @@ class CertificationService
             ->ensureAllScoresFilled(IndicatorScoreAttribute::PEER_REVIEW)
             ->calculateTotalScore(IndicatorScoreAttribute::PEER_REVIEW)
             ->setGrade()
-            ->submitPeerReview()
-            ->save();
+            ->submitPeerReview();
+        $certification->save();
 
         return $certification;
     }

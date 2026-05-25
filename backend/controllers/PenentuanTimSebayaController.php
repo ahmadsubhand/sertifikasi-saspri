@@ -7,6 +7,7 @@ use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
+use common\models\form\ChangeMemberRoleForm;
 use common\models\PeerTeamMember;
 use common\models\User;
 use common\services\CertificationService;
@@ -167,11 +168,10 @@ class PenentuanTimSebayaController extends Controller
     public function actionHapusAnggotaTimSebaya(int $user_id, int $certification_id)
     {
         try {
-            $certification = $this->findCertificationOrFail($certification_id);
-            $member = $this->findAMemberOfPeerTeam($user_id, $certification);
-            $member->delete();
-
-            Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Sebaya');
+            $member = CertificationService::removePeerTeamMember($certification_id, $user_id);
+            Yii::$app->session->setFlash(
+                'success', $member['user']['username'] . ' berhasil dikeluarkan dari Tim Sebaya'
+            );
             return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -195,13 +195,17 @@ class PenentuanTimSebayaController extends Controller
     public function actionUbahPeranAnggotaTimSebaya(int $user_id, int $certification_id)
     {
         try {
-            $certification = $this->findCertificationOrFail($certification_id);
+            $data = new ChangeMemberRoleForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('role'));    
+            }
+            $member = CertificationService::changePeerTeamMemberRole($certification_id, $user_id, $data);
 
-            $role = Yii::$app->request->post('role');
-            $member = $this->findAMemberOfPeerTeam($user_id, $certification);
-            $member->changeRole($role)->save(false);
-
-            Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
+            Yii::$app->session->setFlash(
+                'success', 
+                'Peran ' . $member['user']['username'] . ' berhasil diubah menjadi ' . strtolower(TeamRole::list()[$data->role])
+            );
             return $this->redirect(['pembentukan-tim-sebaya', 'certification_id' => $certification_id]);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -228,10 +232,7 @@ class PenentuanTimSebayaController extends Controller
     public function actionAjukanPeerReview(int $certification_id)
     {
         try {
-            $certification = $this->findCertificationOrFail($certification_id);
-            $certification->validateApprovedPeerTeamComposition();
-            $certification->submitForPeerReview()->save(false);
-
+            CertificationService::submitForPeerReview($certification_id);
             Yii::$app->session->setFlash('success', 'Sertifikasi berhasil dilanjutkan ke tahap peer review');
             return $this->redirect(['index']);
         } catch (Exception $error) {

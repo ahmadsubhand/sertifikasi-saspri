@@ -12,7 +12,9 @@ use common\models\SaspriK;
 use common\models\SelfTeamMember;
 use common\models\User;
 use common\models\form\AddMembersForm;
+use common\models\form\ChangeMemberRoleForm;
 use common\services\CertificationService;
+use common\services\SaspriKService;
 use Exception;
 use yii\web\Controller;
 use Yii;
@@ -146,28 +148,17 @@ class SaspriKController extends Controller
     public function actionTambahAnggota()
     {
         try {
-            $user_ids = Yii::$app->request->post('user_ids');
-            if (!empty($user_ids)) {
-                $array_user_ids = UserHelper::convertUserIdsToArray($user_ids);
-
-                $valid_users = User::find()->availableForSaspriK()
-                    ->andWhere(['id' => $array_user_ids])
-                    ->select('username')
-                    ->column();
-
-                if (count($valid_users) !== count($array_user_ids)) {
-                    throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di SASPRI-K lain');
-                }
-
-                $saspri_k = $this->findSaspriKAsCoordinator();
-                $saspri_k->addMembers($array_user_ids);
-
-                Yii::$app->session->setFlash(
-                    'success',
-                    implode(', ', $valid_users) . ' berhasil ditambahkan ke SASPRI-K ' . $saspri_k->region_name
-                );
-                return $this->redirect(['index']);
+            $data = new AddMembersForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
             }
+            $username_users = SaspriKService::addMembers($data);
+            Yii::$app->session->setFlash(
+                'success',
+                implode(', ', $username_users) . ' berhasil ditambahkan ke SASPRI-K',
+            );
+            return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -184,13 +175,10 @@ class SaspriKController extends Controller
     public function actionHapusAnggota(int $user_id)
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $user = $this->findAMemberOfSaspriK($user_id, $saspri_k);
-            $user->removeUserFromSaspriK()->save(false);
-
+            $user = SaspriKService::removeMember($user_id);
             Yii::$app->session->setFlash(
                 'success',
-                $user->username . ' berhasil dikeluarkan dari SASPRI-K ' . $saspri_k->region_name
+                $user->username . ' berhasil dikeluarkan dari SASPRI-K',
             );
             return $this->redirect(['index']);
         } catch (Exception $error) {
@@ -297,14 +285,10 @@ class SaspriKController extends Controller
     public function actionHapusAnggotaTimMandiri(int $user_id)
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $certification = $this->findOrCreateOnGoingCertification($saspri_k);
-            $this->ensureSelfTeamCanBeModified($certification);
-
-            $member = $this->findAMemberOfSelfTeam($user_id, $certification);
-            $member->delete();
-
-            Yii::$app->session->setFlash('success', $member->user->username . ' berhasil dikeluarkan dari Tim Mandiri');
+            $member = CertificationService::removeSelfTeamMember($user_id);
+            Yii::$app->session->setFlash(
+                'success', $member['user']['username'] . ' berhasil dikeluarkan dari Tim Mandiri'
+            );
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -326,15 +310,17 @@ class SaspriKController extends Controller
     public function actionUbahPeranAnggotaTimMandiri(int $user_id)
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $certification = $this->findOrCreateOnGoingCertification($saspri_k);
-            $this->ensureSelfTeamCanBeModified($certification);
+            $data = new ChangeMemberRoleForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('role'));    
+            }
+            $member = CertificationService::changeSelfTeamMemberRole($user_id, $data);
 
-            $role = Yii::$app->request->post('role');
-            $member = $this->findAMemberOfSelfTeam($user_id, $certification);
-            $member->changeRole($role)->save(false);
-
-            Yii::$app->session->setFlash('success', 'Peran ' . $member->user->username . ' berhasil diubah menjadi ' . TeamRole::list()[$role]);
+            Yii::$app->session->setFlash(
+                'success', 
+                'Peran ' . $member['user']['username'] . ' berhasil diubah menjadi ' . strtolower(TeamRole::list()[$data->role])
+            );
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -356,17 +342,7 @@ class SaspriKController extends Controller
     public function actionAjukanSertifikasi()
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $certification = $saspri_k->onGoingCertification;
-            if (!$certification) {
-                throw new NotFoundHttpException('Tidak ada sertifikasi yang sedang berlangsung');
-            }
-            if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-                throw new ConflictHttpException('Sertifikasi sudah pernah diajukan');
-            }
-            $certification->validateApprovedSelfTeamComposition();
-            $certification->submitForSelfReview()->save(false);
-
+            CertificationService::submitForSelfReview();
             Yii::$app->session->setFlash('success', 'Sertifikasi berhasil diajukan');
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
@@ -376,10 +352,7 @@ class SaspriKController extends Controller
                     return $this->goHome();
                 } elseif ($error instanceof NotFoundHttpException) {
                     return $this->redirect(['index']);
-                } elseif (
-                    $error instanceof ConflictHttpException ||
-                    $error instanceof UnprocessableEntityHttpException
-                ) {
+                } elseif ($error instanceof UnprocessableEntityHttpException) {
                     return $this->redirect(['pengajuan-sertifikasi']);
                 }
             }
