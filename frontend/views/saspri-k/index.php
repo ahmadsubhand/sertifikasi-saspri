@@ -5,6 +5,7 @@ use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\Pjax;
 
 /** @var \common\models\SaspriK $saspri_k 
  * @var \common\models\Certification $valid_certificate
@@ -117,58 +118,62 @@ $shingles = [
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <div class="px-4">
         <p class=" fw-bold">Riwayat Sertifikasi </p>
-
-        <table class="table text-center">
-          <thead>
-            <tr>
-              <th scope="col">No</th>
-              <th scope="col">Tingkatan</th>
-              <th scope="col">Tanggal Pengajuan</th>
-              <th scope="col">Tanggal Penerbitan</th>
-              <th scope="col">Status</th>
-              <th scope="col">Predikat</th>
-              <th scope="col">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($completed_certifications as $key => $value) : ?>
+        <?php Pjax::begin() ?>
+        <div id="sapri-cert-hist-card">
+          <table class="table text-center">
+            <thead>
               <tr>
-                <td scope="row"><?php echo $certification_offset + (int)$key + 1 ?></th>
-                <td><?= Html::encode(CertificateLevel::list()[$value->level]) ?></td>
-                <td><?= Html::encode($value->created_at ? date('d-m-Y', $value->created_at)
-                      : '-')  ?></td>
-                <td><?= Html::encode($value->issued_at ? date('d-m-Y', strtotime($value->issued_at))
-                      : '-')  ?></td>
-                <td><?= Html::encode(CertificationStatus::list()[$value->status]) ?></td>
-                <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
-                <td>
-                  <div>
-                    <a href="<?php echo Url::to(['/saspri-k/detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <th scope="col">No</th>
+                <th scope="col">Tingkatan</th>
+                <th scope="col">Tanggal Pengajuan</th>
+                <th scope="col">Tanggal Penerbitan</th>
+                <th scope="col">Status</th>
+                <th scope="col">Predikat</th>
+                <th scope="col">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($completed_certifications as $key => $value) : ?>
+                <tr>
+                  <td scope="row"><?php echo $certification_offset + (int)$key + 1 ?></th>
+                  <td><?= Html::encode(CertificateLevel::list()[$value->level]) ?></td>
+                  <td><?= Html::encode($value->created_at ? date('d-m-Y', $value->created_at)
+                        : '-')  ?></td>
+                  <td><?= Html::encode($value->issued_at ? date('d-m-Y', strtotime($value->issued_at))
+                        : '-')  ?></td>
+                  <td><?= Html::encode(CertificationStatus::list()[$value->status]) ?></td>
+                  <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
+                  <td>
+                    <div>
+                      <a href="<?php echo Url::to(['/saspri-k/detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
 
-                    <?php if (str_contains(strtolower($value->status), 'comp')): ?>
-                      <a href="<?php echo Url::to(['#', 'id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-download"></i></a>
-                    <?php endif ?>
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach ?>
-            <?php if (empty($completed_certifications)): ?>
-              <tr>
-                <td colspan="5" class="text-center">Belum ada Riwayat Sertifikasi.</td>
-              </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
-        <nav aria-label="Certification History Pagination" class="align-items-center d-flex flex-row mt-3">
-          <ul class="pagination mx-auto w-fit">
-            <li class="page-item <?= $cert_prev_link === null ? 'disabled' : '' ?>">
-              <a class="page-link" href="<?= $cert_prev_link ?>">Sebelumnya</a>
-            </li>
-            <li class="page-item <?= $cert_next_link === null ? 'disabled' : '' ?>">
-              <a class="page-link" href="<?= $cert_next_link ?>">Berikutnya</a>
-            </li>
-          </ul>
-        </nav>
+                      <?php if (str_contains(strtolower($value->status), 'comp')): ?>
+                        <a href="<?php echo Url::to(['#', 'id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-download"></i></a>
+                      <?php endif ?>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach ?>
+              <?php if (empty($completed_certifications)): ?>
+                <tr>
+                  <td colspan="5" class="text-center">Belum ada Riwayat Sertifikasi.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+          <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
+            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
+              href="<?= $cert_prev_link ?>"
+              data-container="sapri-cert-hist-card">
+              <i class="fa-solid fa-angles-left"></i> Sebelumnya
+            </a>
+            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_next_link === null ? 'disabled' : '' ?>"
+              href="<?= $cert_next_link ?>"
+              data-container="sapri-cert-hist-card">
+              Berikutnya <i class="fa-solid fa-angles-right"></i>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -193,56 +198,60 @@ $shingles = [
               Anggota</button>
           </form>
         </div>
-
-        <table class="table text-center">
-          <thead>
-            <tr>
-              <th scope="col">No</th>
-              <th scope="col">Nama Anggota</th>
-              <th scope="col">Nomor Telpon</th>
-              <th scope="col">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($saspri_k_members as $key => $member) : ?>
-              <tr class="member-container" data-page-index="<?= $key ?>">
-                <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
-                <td><?= Html::encode($member->username) ?></td>
-                <!-- kok nomer gk keluar slur? -->
-                <td><?= Html::encode($member->phone_number) ?></td>
-                <td>
-                  <div>
-                    <?= Html::a('<i class="fa-solid fa-minus"></i>', ['hapus-anggota', 'user_id' => $member->id], [
-                      'class' => 's-btn-red btn btn-sm',
-                      'data' => [
-                        'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                        'method' => 'delete',
-                      ],
-                    ]) ?>
-                    <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
-                      'class' => 's-btn-main btn btn-sm',
-                    ]) ?>
-                  </div>
-                </td>
-              </tr>
-            <?php endforeach ?>
-            <?php if (empty($saspri_k_members)): ?>
+        <?php Pjax::begin() ?>
+        <div id="sapri-member-card">
+          <table class="table text-center">
+            <thead>
               <tr>
-                <td colspan="5" class="text-center">Belum ada anggota SASPRI-K.</td>
+                <th scope="col">No</th>
+                <th scope="col">Nama Anggota</th>
+                <th scope="col">Nomor Telpon</th>
+                <th scope="col">Aksi</th>
               </tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
-        <nav aria-label="Member Pagination" class="align-items-center d-flex flex-row mt-3">
-          <ul class="pagination mx-auto w-fit">
-            <li class="page-item <?= $user_prev_link === null ? 'disabled' : '' ?>">
-              <a class="page-link" href="<?= $user_prev_link ?>">Sebelumnya</a>
-            </li>
-            <li class="page-item <?= $user_next_link === null ? 'disabled' : '' ?>">
-              <a class="page-link" href="<?= $user_next_link ?>">Berikutnya</a>
-            </li>
-          </ul>
-        </nav>
+            </thead>
+            <tbody>
+              <?php foreach ($saspri_k_members as $key => $member) : ?>
+                <tr class="member-container" data-page-index="<?= $key ?>">
+                  <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
+                  <td><?= Html::encode($member->username) ?></td>
+                  <td><?= Html::encode($member->phone_number) ?></td>
+                  <td>
+                    <div>
+                      <?= Html::a('<i class="fa-solid fa-minus"></i>', ['hapus-anggota', 'user_id' => $member->id], [
+                        'class' => 's-btn-red btn btn-sm',
+                        'data' => [
+                          'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                          'method' => 'delete',
+                        ],
+                      ]) ?>
+                      <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
+                        'class' => 's-btn-main btn btn-sm',
+                      ]) ?>
+                    </div>
+                  </td>
+                </tr>
+              <?php endforeach ?>
+              <?php if (empty($saspri_k_members)): ?>
+                <tr>
+                  <td colspan="5" class="text-center">Belum ada anggota SASPRI-K.</td>
+                </tr>
+              <?php endif; ?>
+            </tbody>
+          </table>
+          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+            <a class="p-2 btn-sm btn s-btn-sec pager-btn <?= $user_prev_link === null ? 'disabled' : '' ?>"
+              data-container="#saspri-member-card"
+              href="<?= Url::to($user_prev_link) ?>">
+              <i class="fa-solid fa-angles-left"></i> Sebelumnya
+            </a>
+            <a class="p-2 btn-sm btn s-btn-main pager-btn <?= $user_next_link === null ? 'disabled' : '' ?>"
+              data-container="#saspri-member-card" href="<?= Url::to($user_next_link) ?>">
+              Berikutnya <i class="fa-solid fa-angles-right"></i>
+            </a>
+
+          </div>
+        </div>
+        <?php Pjax::end() ?>
       </div>
     </div>
   </div>
