@@ -30,7 +30,7 @@ use yii\web\IdentityInterface;
  * 
  * @property AuthAssignment $role
  * @property SaspriK $saspriKAsCoordinator
- * @property SaspriK $saspriKAsNewCoordinator
+ * @property SaspriK $saspriKAsCoordinatorCandidate
  * @property SaspriK $saspriK
  */
 class User extends ActiveRecord implements IdentityInterface

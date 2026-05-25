@@ -46,7 +46,7 @@ class UserQuery extends \yii\db\ActiveQuery
     public function availableForSelfTeam(SaspriK $saspri_k, ?Certification $certification): self
     {
         $existing_member_ids = $certification
-            ? $certification->getSelfTeamMembers()
+            ? $certification->getFullSelfTeamMembers()
             ->select('user_id')
             ->column()
             : [];
@@ -59,7 +59,7 @@ class UserQuery extends \yii\db\ActiveQuery
     public function availableForPeerTeam(Certification $certification): self
     {
         $existing_member_ids = $certification
-            ->getPeerTeamMembers()
+            ->getFullPeerTeamMembers()
             ->select('user_id')
             ->column();
 

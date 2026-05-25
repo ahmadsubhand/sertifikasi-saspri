@@ -29,6 +29,11 @@ class PeerTeamMember extends \yii\db\ActiveRecord
         return 'peer_team_member';
     }
 
+    public static function label()
+    {
+        return 'Tim Sebaya';
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -96,9 +101,13 @@ class PeerTeamMember extends \yii\db\ActiveRecord
             throw new BadRequestHttpException('Peran tidak valid');
         }
         if (UserHelper::isUserAnAdmin($this->user_id) && $role !== TeamRole::FACILITATOR) {
-            throw new BadRequestHttpException('Admin hanya boleh menjadi ' . TeamRole::list()[TeamRole::FACILITATOR] . ' dalam Tim Sebaya');
+            throw new BadRequestHttpException(
+                'Admin hanya boleh menjadi ' . strtolower(TeamRole::list()[TeamRole::FACILITATOR]) . ' dalam Tim Sebaya'
+            );
         } else if ($role === TeamRole::FACILITATOR && !UserHelper::isUserAnAdmin($this->user_id)) {
-            throw new BadRequestHttpException('Hanya Admin yang boleh menjadi ' . TeamRole::list()[TeamRole::FACILITATOR] . ' dalam Tim Sebaya');
+            throw new BadRequestHttpException(
+                'Hanya Admin yang boleh menjadi ' . strtolower(TeamRole::list()[TeamRole::FACILITATOR]) . ' dalam Tim Sebaya'
+            );
         }
 
         $this->status = ApprovalStatus::PENDING;

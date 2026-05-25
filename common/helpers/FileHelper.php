@@ -17,4 +17,20 @@ class FileHelper
             unlink($directory);
         }
     }
+
+    public static $allowed_extensions = [
+        'pdf',
+
+        'jpg',
+        'jpeg',
+        'png',
+
+        'doc',
+        'docx',
+
+        'xls',
+        'xlsx',
+
+        'csv',
+    ];
 }

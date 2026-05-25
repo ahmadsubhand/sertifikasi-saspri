@@ -28,6 +28,11 @@ class SelfTeamMember extends \yii\db\ActiveRecord
         return 'self_team_member';
     }
 
+    public static function label()
+    {
+        return 'Tim Mandiri';
+    }
+
     /**
      * {@inheritdoc}
      */

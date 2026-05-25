@@ -163,6 +163,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                         <?php if (isset($subGroup->indicators)): ?>
                             <?php foreach ($subGroup->indicators as $index => $indicator): ?>
                                 <?php
+                                $scoreModel = $indicator->indicatorScores[0] ?? null;
                                 $finalScore = $scoreModel->final_score ?? 0;
                                 ?>
                                 <tr>
@@ -269,7 +270,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
             <div class="modal-body">
                 <div class="mb-3">
                     <label class="form-label fw-bold">Alasan Penolakan</label>
-                    <textarea name="request_rejection_reason" class="form-control" rows="4" placeholder="Masukkan alasan penolakan agar wali dapat memperbaikinya..." required></textarea>
+                    <textarea name="rejection_reason" class="form-control" rows="4" placeholder="Masukkan alasan penolakan agar wali dapat memperbaikinya..." required></textarea>
                 </div>
             </div>
             <div class="modal-footer">

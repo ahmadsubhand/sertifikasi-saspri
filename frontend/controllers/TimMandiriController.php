@@ -4,12 +4,18 @@ namespace frontend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
+use common\enums\RequestResponse;
 use common\enums\UserRole;
 use common\enums\TeamRole;
+use common\helpers\CertificationHelper;
 use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
+use common\models\form\RequestResponseForm;
+use common\models\form\SelfReviewForm;
 use common\models\SelfTeamMember;
+use common\services\CertificationService;
+use common\services\SelfTeamMemberService;
 use Exception;
 use Yii;
 use yii\db\ActiveQuery;
@@ -116,35 +122,21 @@ class TimMandiriController extends Controller
         ]);
     }
 
-    public function actionSetuju(int $self_team_member_id)
+    public function actionTanggapiPermintaanBergabung(int $self_team_member_id)
     {
         try {
-            $member = $this->findPendingSelfTeamMemberOrFail($self_team_member_id);
-            $member->approveRequest()->save(false);
-
-            Yii::$app->session->setFlash('success', 'Berhasil menyetujui permintaan bergabung Tim Mandiri');
-            return $this->redirect(['index']);
-        } catch (Exception $error) {
-            if ($error instanceof HttpException) {
-                Yii::$app->session->setFlash('error', $error->getMessage());
-                if (
-                    $error instanceof NotFoundHttpException ||
-                    $error instanceof UnprocessableEntityHttpException
-                ) {
-                    return $this->redirect(['index']);
-                }
+            $data = new RequestResponseForm();
+            $data->load(Yii::$app->request->post(), '');
+            if ($data->validate()) {
+                SelfTeamMemberService::joinRequestResponse($self_team_member_id, $data);
+            } else {
+                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
             }
-            throw $error;
-        }
-    }
 
-    public function actionTolak(int $self_team_member_id)
-    {
-        try {
-            $member = $this->findPendingSelfTeamMemberOrFail($self_team_member_id);
-            $member->rejectRequest()->save(false);
-
-            Yii::$app->session->setFlash('success', 'Berhasil menolak permintaan bergabung Tim Mandiri');
+            Yii::$app->session->setFlash(
+                'success', 
+                'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) .  ' permintaan bergabung Tim Mandiri'
+            );
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -163,8 +155,10 @@ class TimMandiriController extends Controller
     public function actionSelfReview(int $certification_id, int $page = 1)
     {
         try {
-            $member = $this->checkSelfReviewPermission($certification_id);
-            $certification = $this->findCertificationOrFail($certification_id);
+            $member = TeamHelper::checkSelfReviewPermission($certification_id);
+            $certification = CertificationHelper::findCertificationOrFail(
+                $certification_id, CertificationStatus::SELF_REVIEW
+            );
             [
                 'root_groups' => $root_groups,
                 'current_root_group' => $current_root_group,
@@ -199,9 +193,13 @@ class TimMandiriController extends Controller
     public function actionSimpanSementaraSelfReview(int $certification_id, int $page = 1)
     {
         try {
-            $this->checkSelfReviewPermission($certification_id);
-            $this->findCertificationOrFail($certification_id)
-                ->saveSelfReviewScores(Yii::$app->request->post('indicator_scores', []));
+            $data = new SelfReviewForm();
+            $data->load(Yii::$app->request->post(), '');
+            if ($data->validate()) {
+                CertificationService::saveSelfReview($certification_id, $data);
+            } else {
+                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            }
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
@@ -234,13 +232,13 @@ class TimMandiriController extends Controller
     public function actionFinalisasiSelfReview(int $certification_id)
     {
         try {
-            $member = $this->checkSelfReviewPermission($certification_id);
-            TeamHelper::isMemberALeader($member);
-
-            $this->findCertificationOrFail($certification_id)
-                ->saveSelfReviewScores(Yii::$app->request->post('indicator_scores'))
-                ->submitSelfReview()
-                ->save(false);
+            $data = new SelfReviewForm();
+            $data->load(Yii::$app->request->post(), '');
+            if ($data->validate()) {
+                CertificationService::finalizeSelfReview($certification_id, $data);
+            } else {
+                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            }
 
             Yii::$app->session->setFlash('success', 'Self Review berhasil difinalisasi');
             return $this->redirect(['index']);
@@ -276,7 +274,7 @@ class TimMandiriController extends Controller
         try {
             $cert = Certification::findOne(['id' => $case_id]);
             if ($cert->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-                $this->checkSelfReviewPermission($case_id);
+                TeamHelper::checkSelfReviewPermission($case_id);
             } else {
                 $member = SelfTeamMember::find()
                     ->where([
@@ -322,58 +320,5 @@ class TimMandiriController extends Controller
             }
             throw $error;
         }
-    }
-
-    private function findPendingSelfTeamMemberOrFail(int $self_team_member_id): SelfTeamMember
-    {
-        $member = SelfTeamMember::find()
-            ->alias('stm')
-            ->joinWith('certification')
-            ->where([
-                'stm.id' => $self_team_member_id,
-                'stm.user_id' => Yii::$app->user->id,
-            ])
-            ->one();
-
-        if (!$member) {
-            throw new NotFoundHttpException('Data tidak ditemukan atau Anda bukan anggota Tim Mandiri ini');
-        }
-        if ($member->certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-            throw new UnprocessableEntityHttpException('Permintaan sudah tidak dapat diubah karena status sertifikasi sudah berjalan');
-        }
-        if ($member->status !== ApprovalStatus::PENDING) {
-            throw new UnprocessableEntityHttpException('Permintaan ini sudah direspon sebelumnya');
-        }
-
-        return $member;
-    }
-
-    private function checkSelfReviewPermission(int $certification_id): SelfTeamMember
-    {
-        $member = SelfTeamMember::find()
-            ->where([
-                'certification_id' => $certification_id,
-                'user_id' => Yii::$app->user->id,
-                'status' => ApprovalStatus::APPROVED,
-            ])
-            ->one();
-        if (!$member) {
-            throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Mandiri');
-        }
-        return $member;
-    }
-
-    protected function findCertificationOrFail(int $certification_id): Certification
-    {
-        $certification = Certification::findOne($certification_id);
-        if (!$certification) {
-            throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
-        }
-        if ($certification->status !== CertificationStatus::SELF_REVIEW) {
-            throw new UnprocessableEntityHttpException(
-                'Sertifikasi tidak dalam tahap ' . CertificationStatus::list()[CertificationStatus::SELF_REVIEW]
-            );
-        }
-        return $certification;
     }
 }
