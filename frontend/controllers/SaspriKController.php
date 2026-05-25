@@ -6,15 +6,13 @@ use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\helpers\UserHelper;
-use common\models\Certification;
-use common\models\SaspriK;
-use common\models\SelfTeamMember;
 use common\models\User;
 use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\CoordinatorChangeForm;
 use common\services\CertificationService;
 use common\services\SaspriKService;
+use common\services\UserService;
 use Exception;
 use yii\web\Controller;
 use Yii;
@@ -66,7 +64,7 @@ class SaspriKController extends Controller
         ?int $certification_offset = 0
     ) {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
 
             $certs = $saspri_k->getCertifications()
                 ->where(['status' => CertificationStatus::COMPLETED])
@@ -113,7 +111,7 @@ class SaspriKController extends Controller
         try {
             Yii::$app->response->format = Response::FORMAT_JSON;
 
-            $saspri_k = $this->findSaspriKAsCoordinator();
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $users = $saspri_k->getUsers()
                 ->where(['!=', 'id', $saspri_k->coordinator_id])
                 ->andWhere(['like', 'username', $q])
@@ -151,7 +149,7 @@ class SaspriKController extends Controller
             $data = new AddMembersForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));    
             }
             $username_users = SaspriKService::addMembers($data);
             Yii::$app->session->setFlash(
@@ -197,8 +195,8 @@ class SaspriKController extends Controller
     public function actionPengajuanSertifikasi()
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            $certification = $this->findOrCreateOnGoingCertification($saspri_k);
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+            $certification = $saspri_k->findOrCreateOnGoingCertification();
 
             return $this->render('pengajuanSertifikasi', [
                 'saspri_k' => $saspri_k,
@@ -231,7 +229,7 @@ class SaspriKController extends Controller
         try {
             Yii::$app->response->format = Response::FORMAT_JSON;
 
-            $saspri_k = $this->findSaspriKAsCoordinator();
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $certification = $saspri_k->onGoingCertification;
             $users = User::find()->availableForSelfTeam($saspri_k, $certification)
                 ->andWhere(['like', 'username', $q])
@@ -255,7 +253,7 @@ class SaspriKController extends Controller
             $data = new AddMembersForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));    
             }
             $username_users = CertificationService::addSelfTeamMembers($data);
 
@@ -313,7 +311,7 @@ class SaspriKController extends Controller
             $data = new ChangeMemberRoleForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('role'));    
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors)); 
             }
             $member = CertificationService::changeSelfTeamMemberRole($user_id, $data);
 
@@ -363,7 +361,7 @@ class SaspriKController extends Controller
     public function actionDetail(int $case_id)
     {
         try {
-            $sasprik = $this->findSaspriKAsCoordinator();
+            $sasprik = UserService::findSaspriKAsCoordinatorOrFail();
             $cert = $sasprik->getCertifications()->where(['id' => $case_id])->one();
             if (!$cert) {
                 throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
@@ -405,7 +403,7 @@ class SaspriKController extends Controller
     public function actionPergantianWali()
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
 
             return $this->render('pergantianWali', [
                 'saspri_k' => $saspri_k,
@@ -448,58 +446,5 @@ class SaspriKController extends Controller
             }
             throw $error;
         }
-    }
-
-
-    private function findSaspriKAsCoordinator()
-    {
-        $saspri_k = User::findOne(['id' => Yii::$app->user->id])
-            ->saspriKAsCoordinator;
-        if (!$saspri_k) {
-            throw new ForbiddenHttpException('Hanya wali yang boleh mengakses halaman ini');
-        }
-        return $saspri_k;
-    }
-
-    private function findAMemberOfSaspriK(int $user_id, SaspriK $saspri_k): User
-    {
-        $user = $saspri_k->getUsers()->where(['id' => $user_id])->one();
-        if (!$user) {
-            throw new NotFoundHttpException('User tidak ditemukan dalam SASPRI-K' . $saspri_k->region_name);
-        }
-        return $user;
-    }
-
-    private function findOrCreateOnGoingCertification(SaspriK $saspri_k)
-    {
-        try {
-            $certification = $saspri_k->onGoingCertification ?: $saspri_k->createNewCertificationRequest();
-            return $certification;
-        } catch (Exception $error) {
-            if ($error instanceof UnprocessableEntityHttpException) {
-                throw new UnprocessableEntityHttpException($error->getMessage());
-            }
-            throw $error;
-        }
-    }
-
-    private function ensureSelfTeamCanBeModified(Certification $certification)
-    {
-        if ($certification->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-            throw new UnprocessableEntityHttpException(
-                'Tim Mandiri hanya dapat diubah sebelum proses sertifikasi dimulai'
-            );
-        }
-    }
-
-    private function findAMemberOfSelfTeam(int $user_id, Certification $certification): SelfTeamMember
-    {
-        $member = $certification->getSelfTeamMembers()
-            ->where(['user_id' => $user_id])
-            ->one();
-        if (!$member) {
-            throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Mandiri');
-        }
-        return $member;
     }
 }

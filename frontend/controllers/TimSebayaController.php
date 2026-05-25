@@ -7,8 +7,6 @@ use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
 use common\enums\TeamRole;
 use common\enums\UserRole;
-use common\helpers\CertificationHelper;
-use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\PeerReviewForm;
@@ -127,11 +125,10 @@ class TimSebayaController extends Controller
         try {
             $data = new RequestResponseForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                PeerTeamMemberService::joinRequestResponse($peer_team_member_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            PeerTeamMemberService::joinRequestResponse($peer_team_member_id, $data);
 
             Yii::$app->session->setFlash(
                 'success', 
@@ -155,15 +152,16 @@ class TimSebayaController extends Controller
     public function actionPeerReview(int $certification_id, int $page = 1)
     {
         try {
-            $member = TeamHelper::checkPeerReviewPermission($certification_id);
-            $certification = CertificationHelper::findCertificationOrFail(
-                $certification_id, CertificationStatus::PEER_REVIEW
-            );
+            $member = CertificationService::findPeerTeamMember($certification_id, Yii::$app->user->id)
+                ->checkPeerReviewPermission();
+
+            $certification = CertificationService::findOrFail($certification_id)
+                ->validateCertificationStatus(CertificationStatus::PEER_REVIEW);
             [
                 'root_groups' => $root_groups,
                 'current_root_group' => $current_root_group,
                 'current_child_groups' => $current_child_groups
-            ] = TeamHelper::getAllIndicators($certification, $page);
+            ] = $certification->getAllIndicators($page);
 
             return $this->render('peerReview', [
                 'is_leader' => $member->role === TeamRole::LEADER,
@@ -194,11 +192,10 @@ class TimSebayaController extends Controller
         try {
             $data = new PeerReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::savePeerReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            CertificationService::savePeerReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
@@ -233,11 +230,10 @@ class TimSebayaController extends Controller
         try {
             $data = new PeerReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::finalizePeerReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            CertificationService::finalizePeerReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Peer Review berhasil difinalisasi');
             return $this->redirect(['index']);
@@ -273,7 +269,8 @@ class TimSebayaController extends Controller
         try {
             $cert = Certification::findOne(['id' => $case_id]);
             if ($cert->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
-                TeamHelper::checkPeerReviewPermission($case_id);
+                CertificationService::findPeerTeamMember($case_id, Yii::$app->user->id)
+                    ->checkPeerReviewPermission();
             } else {
                 $member = PeerTeamMember::find()
                     ->where([

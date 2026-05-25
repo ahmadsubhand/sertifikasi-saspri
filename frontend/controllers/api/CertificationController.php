@@ -4,10 +4,10 @@ namespace frontend\controllers\api;
 
 use common\helpers\UserHelper;
 use common\models\Certification;
+use common\services\CertificationService;
 use yii\db\ActiveQuery;
 use yii\filters\VerbFilter;
 use yii\rest\ActiveController;
-use yii\web\NotFoundHttpException;
 
 class CertificationController extends ActiveController
 {
@@ -37,28 +37,19 @@ class CertificationController extends ActiveController
 
     public function actionDetail(int $certification_id)
     {
-        $certification = $this->findCertificationOrFail($certification_id);
-        if (!$certification) {
-            throw new NotFoundHttpException('Certification not found');
-        }
+        $certification = CertificationService::findOrFail($certification_id);
         return $certification;
     }
 
     public function actionSaspriK(int $certification_id)
     {
-        $certification = $this->findCertificationOrFail($certification_id);
-        if (!$certification) {
-            throw new NotFoundHttpException('Certification not found');
-        }
+        $certification = CertificationService::findOrFail($certification_id);
         return $certification->saspriK;
     }
 
     public function actionSelfTeam(int $certification_id, ?int $limit = 5, ?int $offset = 0)
     {
-        $certification = $this->findCertificationOrFail($certification_id);
-        if (!$certification) {
-            throw new NotFoundHttpException('Certification not found');
-        }
+        $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getSelfTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
                 $query->select(UserHelper::$basicSelect);
@@ -73,7 +64,7 @@ class CertificationController extends ActiveController
 
     public function actionPeerTeam(int $certification_id, ?int $limit = 5, ?int $offset = 0)
     {
-        $certification = $this->findCertificationOrFail($certification_id);
+        $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getPeerTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
                 $query->select(UserHelper::$basicSelect);
@@ -84,14 +75,5 @@ class CertificationController extends ActiveController
             ->asArray()
             ->all();
         return $members;
-    }
-
-    protected function findCertificationOrFail(int $id)
-    {
-        $certification = Certification::findOne($id);
-        if (!$certification) {
-            throw new NotFoundHttpException('Certification not found');
-        }
-        return $certification;
     }
 }

@@ -4,8 +4,6 @@ namespace backend\controllers;
 
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
-use common\helpers\CertificationHelper;
-use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\ExternalReviewForm;
@@ -74,15 +72,14 @@ class PenerbitanSertifikasiController extends Controller
     public function actionExternalReview(int $certification_id, int $page = 1)
     {
         try {
-            $certification = CertificationHelper::findCertificationOrFail(
-                $certification_id, CertificationStatus::EXTERNAL_REVIEW
-            );
+            $certification = CertificationService::findOrFail($certification_id)
+                ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW);
 
             [
                 'root_groups' => $root_groups,
                 'current_root_group' => $current_root_group,
                 'current_child_groups' => $current_child_groups
-            ] = TeamHelper::getAllIndicators($certification, $page);
+            ] = $certification->getAllIndicators($page);
 
             return $this->render('externalReview', [
                 'certification' => $certification,
@@ -111,11 +108,10 @@ class PenerbitanSertifikasiController extends Controller
         try {
             $data = new ExternalReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::saveExternalReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            CertificationService::saveExternalReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
@@ -149,11 +145,10 @@ class PenerbitanSertifikasiController extends Controller
         try {
             $data = new ExternalReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::finalizeExternalReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            CertificationService::finalizeExternalReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Penerbitan Sertifikasi berhasil difinalisasi');
             return $this->redirect(['index']);

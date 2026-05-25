@@ -5,6 +5,8 @@ namespace common\models;
 use common\enums\ApprovalStatus;
 use common\enums\TeamRole;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is the model class for table "self_team_member".
@@ -101,6 +103,24 @@ class SelfTeamMember extends \yii\db\ActiveRecord
     public function rejectRequest()
     {
         $this->status = ApprovalStatus::REJECTED;
+        return $this;
+    }
+
+    public function checkSelfReviewPermission()
+    {
+        if ($this->status !== ApprovalStatus::APPROVED) {
+            throw new ForbiddenHttpException('Anda bukan anggota dari Tim Mandiri');
+        }
+        return $this;
+    }
+
+    public function checkFinalizationPermission()
+    {
+        if ($this->status !== ApprovalStatus::APPROVED) {
+            throw new UnprocessableEntityHttpException(
+                'Hanya ' . strtolower(TeamRole::list()[TeamRole::LEADER]) . ' yang boleh melakukan finalisasi'
+            );
+        }
         return $this;
     }
 }

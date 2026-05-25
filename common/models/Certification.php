@@ -389,6 +389,21 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function getAllIndicators(int $page)
+    {
+        $root_groups = $this->assessment->rootGroups;
+        $current_root_group = $this->assessment
+            ->getCurrentRootGroupOrFail($page, $root_groups);
+        /** @var IndicatorGroup[] $current_child_groups */
+        $current_child_groups = $current_root_group->getChildGroupsWithScore($this->id)->all();
+
+        return [
+           'root_groups' => $root_groups,
+           'current_root_group' => $current_root_group,
+           'current_child_groups' => $current_child_groups,
+        ];
+    }
+
     public function saveScores(array $indicator_scores, string $score_attribute)
     {
         if (!in_array($score_attribute, IndicatorScoreAttribute::values())) {

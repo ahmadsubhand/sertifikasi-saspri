@@ -7,8 +7,6 @@ use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
 use common\enums\UserRole;
 use common\enums\TeamRole;
-use common\helpers\CertificationHelper;
-use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\RequestResponseForm;
@@ -127,11 +125,10 @@ class TimMandiriController extends Controller
         try {
             $data = new RequestResponseForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                SelfTeamMemberService::joinRequestResponse($self_team_member_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            SelfTeamMemberService::joinRequestResponse($self_team_member_id, $data);
 
             Yii::$app->session->setFlash(
                 'success', 
@@ -155,15 +152,16 @@ class TimMandiriController extends Controller
     public function actionSelfReview(int $certification_id, int $page = 1)
     {
         try {
-            $member = TeamHelper::checkSelfReviewPermission($certification_id);
-            $certification = CertificationHelper::findCertificationOrFail(
-                $certification_id, CertificationStatus::SELF_REVIEW
-            );
+            $member = CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
+                ->checkSelfReviewPermission();
+
+            $certification = CertificationService::findOrFail($certification_id)
+                ->validateCertificationStatus(CertificationStatus::SELF_REVIEW);
             [
                 'root_groups' => $root_groups,
                 'current_root_group' => $current_root_group,
                 'current_child_groups' => $current_child_groups
-            ] = TeamHelper::getAllIndicators($certification, $page);
+            ] = $certification->getAllIndicators($page);
 
             return $this->render('selfReview', [
                 'is_leader' => $member->role === TeamRole::LEADER,
@@ -195,11 +193,10 @@ class TimMandiriController extends Controller
         try {
             $data = new SelfReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::saveSelfReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
-            }
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
+            } 
+            CertificationService::saveSelfReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
@@ -234,11 +231,10 @@ class TimMandiriController extends Controller
         try {
             $data = new SelfReviewForm();
             $data->load(Yii::$app->request->post(), '');
-            if ($data->validate()) {
-                CertificationService::finalizeSelfReview($certification_id, $data);
-            } else {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
+            CertificationService::finalizeSelfReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Self Review berhasil difinalisasi');
             return $this->redirect(['index']);
@@ -274,7 +270,8 @@ class TimMandiriController extends Controller
         try {
             $cert = Certification::findOne(['id' => $case_id]);
             if ($cert->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-                TeamHelper::checkSelfReviewPermission($case_id);
+                CertificationService::findSelfTeamMember($case_id, Yii::$app->user->id)
+                    ->checkSelfReviewPermission();
             } else {
                 $member = SelfTeamMember::find()
                     ->where([

@@ -4,7 +4,6 @@ namespace common\services;
 
 use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
-use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
@@ -12,18 +11,51 @@ use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
 use common\models\form\SelfReviewForm;
+use common\models\PeerTeamMember;
+use common\models\SelfTeamMember;
 use common\models\User;
+use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 
 class CertificationService
 {
-    public static function findCertificationOrFail(int $id) {
+    public static function findOrFail(int $id) {
         $certification = Certification::findOne($id);
         if (!$certification) {
             throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
         }
         return $certification;
+    }
+
+    public static function findSelfTeamMember(int $certification_id, int $user_id): SelfTeamMember
+    {
+        $member = SelfTeamMember::find()
+            ->where([
+                'user_id' => $user_id,
+                'certification_id' => $certification_id,
+            ])
+            ->joinWith('user')
+            ->one();
+        if (!$member) {
+            throw new NotFoundHttpException('Anggota tidak ditemukan atau bukan anggota Tim Mandiri ini');
+        }
+        return $member;
+    }
+
+    public static function findPeerTeamMember(int $certification_id, int $user_id): PeerTeamMember
+    {
+        $member = PeerTeamMember::find()
+            ->where([
+                'user_id' => $user_id,
+                'certification_id' => $certification_id,
+            ])
+            ->joinWith('user')
+            ->one();
+        if (!$member) {
+            throw new NotFoundHttpException('Anggota tidak ditemukan atau bukan anggota Tim Sebaya ini');
+        }
+        return $member;
     }
 
     public static function addSelfTeamMembers(AddMembersForm $data)
@@ -52,7 +84,7 @@ class CertificationService
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
-        $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
+        $member = CertificationService::findSelfTeamMember($certification->id, $user_id);
         $member->delete();
         return [
             ...$member,
@@ -65,7 +97,7 @@ class CertificationService
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
-        $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
+        $member = CertificationService::findSelfTeamMember($certification->id, $user_id);
         $member->changeRole($data->role)->save();
         return [
             ...$member,
@@ -90,8 +122,10 @@ class CertificationService
 
     public static function saveSelfReview(int $certification_id, SelfReviewForm $data)
     {
-        TeamHelper::checkSelfReviewPermission($certification_id);
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
+            ->checkSelfReviewPermission();
+
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::SELF_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::SELF_REVIEW);
 
@@ -100,10 +134,11 @@ class CertificationService
 
     public static function finalizeSelfReview(int $certification_id, SelfReviewForm $data)
     {
-        $member = TeamHelper::checkSelfReviewPermission($certification_id);
-        TeamHelper::isMemberALeader($member);
+        CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
+            ->checkSelfReviewPermission()
+            ->checkFinalizationPermission();
 
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::SELF_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::SELF_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::SELF_REVIEW)
@@ -115,7 +150,7 @@ class CertificationService
 
     public static function addPeerTeamMembers(int $certification_id, AddMembersForm $data)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
 
         $valid_users = User::find()->availableForPeerTeam($certification)
@@ -133,9 +168,9 @@ class CertificationService
 
     public static function removePeerTeamMember(int $certification_id, int $user_id)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
-        $member = PeerTeamMemberService::findOrFail($certification->id, $user_id);
+        $member = CertificationService::findPeerTeamMember($certification->id, $user_id);
         $member->delete();
         return [
             ...$member,
@@ -145,9 +180,9 @@ class CertificationService
 
     public static function changePeerTeamMemberRole(int $certification_id, int $user_id, ChangeMemberRoleForm $data)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
-        $member = PeerTeamMemberService::findOrFail($certification->id, $user_id);
+        $member = CertificationService::findPeerTeamMember($certification->id, $user_id);
         $member->changeRole($data->role)->save();
         return [
             ...$member,
@@ -157,7 +192,7 @@ class CertificationService
 
     public static function submitForPeerReview(int $certification_id)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id);
+        $certification = CertificationService::findOrFail($certification_id);
         $certification->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION)
             ->validateApprovedPeerTeamComposition()
             ->submitForPeerReview()
@@ -168,8 +203,10 @@ class CertificationService
 
     public static function savePeerReview(int $certification_id, PeerReviewForm $data)
     {
-        TeamHelper::checkPeerReviewPermission($certification_id);
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        CertificationService::findPeerTeamMember($certification_id, Yii::$app->user->id)
+            ->checkPeerReviewPermission();
+
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PEER_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::PEER_REVIEW);
 
@@ -178,10 +215,11 @@ class CertificationService
 
     public static function finalizePeerReview(int $certification_id, PeerReviewForm $data)
     {
-        $member = TeamHelper::checkPeerReviewPermission($certification_id);
-        TeamHelper::isMemberALeader($member);
+        CertificationService::findPeerTeamMember($certification_id, Yii::$app->user->id)
+            ->checkPeerReviewPermission()
+            ->checkFinalizationPermission();
 
-        $certification = CertificationService::findCertificationOrFail($certification_id)
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PEER_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::PEER_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::PEER_REVIEW)
@@ -195,7 +233,7 @@ class CertificationService
 
     public static function saveExternalReview(int $certification_id, ExternalReviewForm $data)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id)    
+        $certification = CertificationService::findOrFail($certification_id)    
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
@@ -204,7 +242,7 @@ class CertificationService
 
     public static function finalizeExternalReview(int $certification_id, ExternalReviewForm $data)
     {
-        $certification = CertificationService::findCertificationOrFail($certification_id)    
+        $certification = CertificationService::findOrFail($certification_id)    
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)

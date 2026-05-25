@@ -6,6 +6,8 @@ use common\enums\ApprovalStatus;
 use common\enums\TeamRole;
 use common\helpers\UserHelper;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * This is the model class for table "peer_team_member".
@@ -85,13 +87,13 @@ class PeerTeamMember extends \yii\db\ActiveRecord
 
     public function approveRequest()
     {
-        $this->status = \common\enums\ApprovalStatus::APPROVED;
+        $this->status = ApprovalStatus::APPROVED;
         return $this;
     }
 
     public function rejectRequest()
     {
-        $this->status = \common\enums\ApprovalStatus::REJECTED;
+        $this->status = ApprovalStatus::REJECTED;
         return $this;
     }
 
@@ -112,6 +114,24 @@ class PeerTeamMember extends \yii\db\ActiveRecord
 
         $this->status = ApprovalStatus::PENDING;
         $this->role = $role;
+        return $this;
+    }
+
+    public function checkPeerReviewPermission()
+    {
+        if ($this->status !== ApprovalStatus::APPROVED) {
+            throw new ForbiddenHttpException('Anda bukan anggota dari Tim Sebaya');
+        }
+        return $this;
+    }
+
+    public function checkFinalizationPermission()
+    {
+        if ($this->status !== ApprovalStatus::APPROVED) {
+            throw new UnprocessableEntityHttpException(
+                'Hanya ' . strtolower(TeamRole::list()[TeamRole::LEADER]) . ' yang boleh melakukan finalisasi'
+            );
+        }
         return $this;
     }
 }
