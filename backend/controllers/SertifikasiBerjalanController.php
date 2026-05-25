@@ -34,11 +34,12 @@ class SertifikasiBerjalanController extends Controller
     }
 
     public function actionIndex(
+        ?string $wilayah = null,
         ?int $province_id = null,
         ?int $regency_id = null,
         ?int $district_id = null,
         ?string $level = null,
-        ?int $limit = 10, 
+        ?int $limit = 20, 
         ?int $offset = 0
     ) {
         $query = Certification::find()
@@ -54,6 +55,9 @@ class SertifikasiBerjalanController extends Controller
                 ]
             ]);
 
+        if ($wilayah) {
+            $query->andWhere(['like', 'LOWER(region_name)', strtolower($wilayah)]);
+        }
         if ($province_id) {
             $query->andWhere(['province.id' => $province_id]);
         }

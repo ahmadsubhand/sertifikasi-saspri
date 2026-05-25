@@ -9,6 +9,7 @@
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 use yii\helpers\ArrayHelper;
+use yii\widgets\Pjax;
 
 $this->title = $assessment->title;
 // $this->params['breadcrumbs'][] = ['label' => 'Asesmen', 'url' => ['index']];
@@ -92,12 +93,21 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
   </div>
   <!-- groups -->
   <?php foreach ($root_groups as $root): ?>
+    <?php
+    $sum = 0;
+    foreach ($root->childGroups as $child) {
+      $sum = $sum + $child->weight;
+    }
+    ?>
     <div class="card bg-white px-2 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100 mb-4">
       <div class="card-header text-black d-flex bg-white justify-content-between align-items-center">
         <a id="parRoot<?= $root->id ?>" class="text-decoration-none" data-bs-toggle="collapse" href="#collapseRoot<?= $root->id ?>" role="button" aria-expanded="true" aria-controls="collapseRoot<?= $root->id ?>">
-          <div class="d-flex gap-3">
-            <h5 class="mb-0 text-black">Group [<?= Html::encode($root->code) ?>] <?= Html::encode($root->label) ?></h5>
-            <i class="fa-solid fa-chevron-up text-black h-fit me-2 my-auto"></i>
+          <div>
+            <div class="d-flex gap-3">
+              <h5 class="mb-0 text-black">Group [<?= Html::encode($root->code) ?>] <?= Html::encode($root->label) ?></h5>
+              <i class="fa-solid fa-chevron-up text-black h-fit me-2 my-auto"></i>
+            </div>
+            <span class="fw-light text-primary">bobot Group: <?= Html::encode($root->weight) ?>% | <span data-bs-toggle="tooltip" data-bs-placement="top" title="Pastikan bobot subgroup mencapai 100"> bobot subgroup <?= $sum ?>/100 </span></span>
           </div>
           <div class="btn-group btn-group-sm">
             <a class="btn btn-primary rounded-start-2" onclick='edit_group(<?= json_encode($root->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</a>
@@ -132,7 +142,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
         <?php foreach ($root->childGroups as $child): ?>
           <div class="card mb-3 s-border-main ms-4 shadow-sm">
             <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?></span>
+              <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?> <span class="fw-light"> | bobot subgroup: <?= Html::encode($child->weight) ?></span></span>
               <div class="btn-group btn-group-sm">
                 <button class="btn btn-primary" onclick='edit_group(<?= json_encode($child->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
                 <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $child->id], [
@@ -397,12 +407,10 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     if (onLocal[e.id] === true) {
       e.classList.add('show')
       const par = document.getElementById(e.getAttribute('parent-link'))
-      console.log(par)
       par.setAttribute('aria-expanded', 'true')
     } else if (onLocal[e.id] === false) {
       e.classList.remove('show')
       const par = document.getElementById(e.getAttribute('parent-link'))
-      console.log(par)
       par.setAttribute('aria-expanded', 'false')
     }
   })
@@ -418,4 +426,5 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
     })
   })
+
 </script>

@@ -21,7 +21,6 @@ $province_id = null;
 $regency_id = null;
 $regencies = [];
 $districts = [];
-
 if ($saspri_k && $saspri_k->district_id) {
     $district = $saspri_k->district;
     if ($district) {
@@ -99,7 +98,6 @@ $model = $saspri_k ?: new \common\models\SaspriK();
         </div>
 
         <div class="col-sm-6">
-
             <?= $form->field($model, 'number_of_groups')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Kelompok Yang Dibina') ?>
             <?= $form->field($model, 'number_of_active_members')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Anggota Aktif') ?>
             <?= $form->field($model, 'total_livestock_count')->textInput(['type' => 'number', 'class' => 'form-control border-black', 'disabled' => $is_pending])->label('Jumlah Total Ternak Anggota Aktif') ?>

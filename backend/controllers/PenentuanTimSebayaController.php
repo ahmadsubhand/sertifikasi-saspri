@@ -51,7 +51,7 @@ class PenentuanTimSebayaController extends Controller
         ];
     }
 
-    public function actionIndex(?int $limit = 10, ?int $offset = 0)
+    public function actionIndex(?int $limit = 20, ?int $offset = 0)
     {
         $certs = Certification::find()
             ->where(['status' => CertificationStatus::PENDING_PEER_TEAM_FORMATION])
