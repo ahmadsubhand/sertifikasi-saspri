@@ -2,7 +2,6 @@
 
 namespace frontend\controllers;
 
-use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
@@ -13,6 +12,7 @@ use common\models\SelfTeamMember;
 use common\models\User;
 use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
+use common\models\form\CoordinatorChangeForm;
 use common\services\CertificationService;
 use common\services\SaspriKService;
 use Exception;
@@ -424,16 +424,12 @@ class SaspriKController extends Controller
     public function actionAjukanPergantianWali()
     {
         try {
-            $saspri_k = $this->findSaspriKAsCoordinator();
-            if ($saspri_k->change_status === ApprovalStatus::PENDING) {
-                throw new UnprocessableEntityHttpException(
-                    'Pergantian wali sudah pernah diajukan dan masih dalam proses tinjauan SASPRI-Nasional'
-                );
+            $data = new CoordinatorChangeForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
-            $new_coordinator = $this->findAMemberOfSaspriK(Yii::$app->request->post('new_coordinator_id'), $saspri_k);
-
-            $reason = Yii::$app->request->post('change_request_reason');
-            $saspri_k->requestCoordinatorChange($new_coordinator->id, $reason)->save(false);
+            SaspriKService::changeCoordinator($data);
 
             Yii::$app->session->setFlash('success', 'Pergantian wali berhasil diajukan');
             return $this->redirect(['pergantian-wali']);
@@ -444,6 +440,7 @@ class SaspriKController extends Controller
                     return $this->goHome();
                 } elseif (
                     $error instanceof NotFoundHttpException ||
+                    $error instanceof BadRequestHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['pergantian-wali']);

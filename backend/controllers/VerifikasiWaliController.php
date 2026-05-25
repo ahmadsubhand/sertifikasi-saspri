@@ -3,12 +3,16 @@
 namespace backend\controllers;
 
 use common\enums\ApprovalStatus;
+use common\enums\RequestResponse;
 use common\helpers\TeamHelper;
-use common\models\Certification;
+use common\helpers\UserHelper;
+use common\models\form\ExternalReviewForm;
+use common\models\form\RequestResponseForm;
 use common\models\SaspriK;
-use common\models\User;
+use common\services\SaspriKService;
 use Exception;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -45,22 +49,39 @@ class VerifikasiWaliController extends Controller
             ->where(['change_status' => ApprovalStatus::PENDING]);
 
         $registrations = $registration_query
-            ->with(['coordinator', 'district'])
+            ->with([
+                'coordinator' => function (ActiveQuery $query) {
+                    $query->select(UserHelper::$basicSelect);
+                },
+                'district'
+            ])
             ->orderBy(['updated_at' => SORT_ASC])
             ->limit($limit + 1)
             ->offset($offset_registration)
             ->all();
         $registration_has_next = count($registrations) > $limit;
-        if ($registration_has_next) array_pop($registrations);
+        if ($registration_has_next) {
+            array_pop($registrations);
+        }
 
         $changes = $change_query
-            ->with(['coordinator', 'newCoordinator', 'district'])
+            ->with([
+                'coordinator' => function (ActiveQuery $query) {
+                    $query->select(UserHelper::$basicSelect);
+                },
+                'newCoordinator' => function (ActiveQuery $query) {
+                    $query->select(UserHelper::$basicSelect);
+                },
+                'district'
+            ])
             ->orderBy(['updated_at' => SORT_ASC])
             ->limit($limit + 1)
             ->offset($offset_change)
             ->all();
         $change_has_next = count($changes) > $limit;
-        if ($change_has_next) array_pop($changes);
+        if ($change_has_next) {
+            array_pop($changes);
+        }
 
         return $this->render('index', [
             'registration_requests' => $registrations,
@@ -102,28 +123,16 @@ class VerifikasiWaliController extends Controller
     public function actionGantiWali(int $saspri_k_id)
     {
         try {
-            $saspri_k = $this->findSaspriKWithRequestChangeOrFail($saspri_k_id);
-
-            $message = '';
-            $action = Yii::$app->request->post('action');
-            if ($action === 'approve') {
-                $old_coordinator = User::findOne($saspri_k->coordinator_id);
-                $old_coordinator->demoteFromCoordinator();
-
-                $new_coordinator = User::findOne($saspri_k->new_coordinator_id);
-                $new_coordinator->promoteToCoordinator();
-
-                $saspri_k->approveCoordinatorChange()->save(false);
-                $message = 'Pergantian wali berhasil disetujui';
-            } elseif ($action === 'reject') {
-                $reason = Yii::$app->request->post('change_rejection_reason');
-                $saspri_k->rejectCoordinatorChange($reason)->save(false);
-                $message = 'Pergantian wali berhasil ditolak';
-            } else {
-                throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
+            $data = new RequestResponseForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('action'));
             }
+            SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
 
-            Yii::$app->session->setFlash('success', $message);
+            Yii::$app->session->setFlash(
+                'success', 'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) . ' pergantian wali'
+            );
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -180,10 +189,12 @@ class VerifikasiWaliController extends Controller
     public function actionSimpanSementaraPermintaanPendaftaran(int $saspri_k_id, int $page = 1)
     {
         try {
-            $saspri_k = $this->findSaspriKWithRegistrationOrFail($saspri_k_id);
-            /** @var Certification $certification */
-            $certification = $saspri_k->getCertifications()->one();
-            $certification->saveExternalReviewScores(Yii::$app->request->post('indicator_scores', []));
+            $data = new ExternalReviewForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+            }
+            SaspriKService::saveRegistration($saspri_k_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
             $targetPage = Yii::$app->request->post('target_page', $page);
@@ -215,39 +226,43 @@ class VerifikasiWaliController extends Controller
     public function actionDaftarkanWali(int $saspri_k_id)
     {
         try {
-            $saspri_k = $this->findSaspriKWithRegistrationOrFail($saspri_k_id);
+            $request = Yii::$app->request->post();
 
-            $action = Yii::$app->request->post('action');
-            if ($action === 'approve') {
-                /** @var Certification $certification */
-                $certification = $saspri_k->getCertifications()->one();
-                $certification->saveExternalReviewScores(Yii::$app->request->post('indicator_scores', []))
-                    ->submitExternalReview()
-                    ->calculateTotalScore('final_score')
-                    ->setGrade()
-                    ->generateCertificationCode()
-                    ->setNextCertificationDueDateToNow()
-                    ->save(false);
-
-                $coordinator = $saspri_k->coordinator;
-                $coordinator->promoteToCoordinator();
-                $saspri_k->addMembers([$coordinator->id]);
-
-                $saspri_k->approveRegistration()->save(false);
-                $message = 'Pendaftaran wali berhasil disetujui';
-            } elseif ($action === 'reject') {
-                $reason = Yii::$app->request->post('request_rejection_reason');
-                $saspri_k->rejectRegistration($reason)->save(false);
-                $message = 'Pendaftaran wali berhasil ditolak';
-            } else {
-                throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
+            $data = new RequestResponseForm();
+            $data->load($request, '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException($data->getFirstError('action'));
             }
 
-            Yii::$app->session->setFlash('success', $message);
+            if ($data->action === RequestResponse::APPROVE) {
+                $scores = new ExternalReviewForm();
+                $scores->load($request, '');
+                if (!$scores->validate()) {
+                    throw new BadRequestHttpException($scores->getFirstError('indicator_scores'));
+                }
+    
+                SaspriKService::saveRegistration($saspri_k_id, $scores);
+            }
+
+            SaspriKService::registrationRequestResponse($saspri_k_id, $data);
+
+            Yii::$app->session->setFlash(
+                'success', 
+                'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) . ' pendaftaran wali'
+            );
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof UnprocessableEntityHttpException) {
+                    if (str_contains($error->getMessage(), 'tolak')) {
+                        return $this->redirect([
+                            'permintaan-pendaftaran-wali',
+                            'saspri_k_id' => $saspri_k_id,
+                        ]);
+                    }
+                    return $this->redirect(['index']);
+                }
                 if (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException

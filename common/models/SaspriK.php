@@ -75,7 +75,6 @@ class SaspriK extends \yii\db\ActiveRecord
     {
         return [
             [['request_rejection_reason', 'new_coordinator_id', 'change_request_reason', 'change_rejection_reason'], 'default', 'value' => null],
-            [['change_status'], 'default', 'value' => 'pending'],
             [['coordinator_id', 'district_id', 'region_name', 'address', 'cooperative_name', 'number_of_groups', 'number_of_active_members', 'livestock_type', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count'], 'required'],
             [['coordinator_id', 'district_id', 'number_of_groups', 'number_of_active_members', 'total_livestock_count', 'breeding_livestock_count', 'productive_heifer_count', 'new_coordinator_id'], 'integer'],
             [['region_name', 'address', 'cooperative_name', 'livestock_type', 'request_status', 'request_rejection_reason', 'change_status', 'change_request_reason', 'change_rejection_reason'], 'string', 'max' => 255],
@@ -94,17 +93,17 @@ class SaspriK extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'coordinator_id' => 'Coordinator ID',
-            'district_id' => 'District ID',
-            'region_name' => 'Region Name',
-            'address' => 'Address',
-            'cooperative_name' => 'Cooperative Name',
-            'number_of_groups' => 'Number Of Groups',
-            'number_of_active_members' => 'Number Of Active Members',
-            'livestock_type' => 'Livestock Type',
-            'total_livestock_count' => 'Total Livestock Count',
-            'breeding_livestock_count' => 'Breeding Livestock Count',
-            'productive_heifer_count' => 'Productive Heifer Count',
+            'coordinator_id' => 'Wali',
+            'district_id' => 'Kecamatan',
+            'region_name' => 'Nama SASPRI-K',
+            'address' => 'Alamat Sekretariat',
+            'cooperative_name' => 'Nama Koperasi',
+            'number_of_groups' => 'Jumlah Kelompok yang Dibina',
+            'number_of_active_members' => 'Jumlah Anggota Aktif',
+            'livestock_type' => 'Ternak yang Diusahakan',
+            'total_livestock_count' => 'Jumlah Total Ternak Anggota Aktif',
+            'breeding_livestock_count' => 'Jumlah Ternak Indukan (Pernah Beranak)',
+            'productive_heifer_count' => 'Jumlah Total Ternak dara Produktif (Siap Kawin)',
             'request_status' => 'Request Status',
             'request_rejection_reason' => 'Request Rejection Reason',
             'change_status' => 'Change Status',
@@ -356,6 +355,16 @@ class SaspriK extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function isCoordinatorChangePending() {
+        if ($this->change_status !== ApprovalStatus::PENDING) {
+            throw new UnprocessableEntityHttpException(
+                'Tidak ditemukan permintaan pergantian wali oleh SASPRI-K ' . $this->region_name .
+                ' atau permintaan sudah pernah ditanggapi'
+            );
+        }
+        return $this;
+    }
+
     public function approveCoordinatorChange(): self
     {
         $this->coordinator_id = $this->new_coordinator_id;
@@ -378,6 +387,16 @@ class SaspriK extends \yii\db\ActiveRecord
         $this->coordinator_id = $coordinator_id;
         $this->request_status = ApprovalStatus::PENDING;
         $this->request_rejection_reason = null;
+        return $this;
+    }
+
+    public function isRequestRegistrationPending() {
+        if ($this->request_status !== ApprovalStatus::PENDING) {
+            throw new UnprocessableEntityHttpException(
+                'Tidak ditemukan permintaan pendaftaran wali SASPRI-K ' . $this->region_name .
+                ' atau permintaan sudah pernah ditanggapi'
+            );
+        }
         return $this;
     }
 

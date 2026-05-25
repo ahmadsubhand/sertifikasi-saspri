@@ -111,7 +111,7 @@ $model = $saspri_k ?: new \common\models\SaspriK();
         <div class="col-sm-12">
             <div class="d-flex justify-content-between mt-4">
                 <p class="fw-bold">Dokumen Pendukung</p>
-                <button type="button" id="add-row" class="btn btn-sm text-white" <?= $ispending ?? 'disabled' ?> style="background-color: #6B78B9;">
+                <button type="button" id="add-row" class="btn btn-sm text-white" <?= $is_pending ?? 'disabled' ?> style="background-color: #6B78B9;">
                     <i class="fa-solid fa-plus"></i> Tambah Dokumen
                 </button>
             </div>
@@ -120,13 +120,13 @@ $model = $saspri_k ?: new \common\models\SaspriK();
                     <div class="doc-row row mb-3">
                         <div class="col-sm-6">
                             <label class="form-label">Kategori / Nama Dokumen</label>
-                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $ispending ?? 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
+                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
                         </div>
                         <div class="col-sm-5">
                             <label class="form-label">Unggah Dokumen</label>
-                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= $ispending ?? 'disabled' ?> required>
+                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= $is_pending ?? 'disabled' ?> required>
                         </div>
-                        <div class="col-sm-1 d-flex align-items-end" <?= $ispending ?? 'disabled' ?>>
+                        <div class="col-sm-1 d-flex align-items-end" <?= $is_pending ?? 'disabled' ?>>
                             <button type="button" class="rem-row btn btn-danger w-100">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -137,15 +137,15 @@ $model = $saspri_k ?: new \common\models\SaspriK();
                         <div class="doc-row row mt-3">
                             <div class="col-sm-6">
                                 <label class="form-label">Kategori / Nama Dokumen</label>
-                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $ispending ?? 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
+                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
                             </div>
                             <div class="col-sm-5">
                                 <label class="form-label">Ganti Dokumen</label>
-                                <input class="form-control border-black" type="file" <?= $ispending ?? 'disabled' ?>  name="saspri_k_documents[]" required>
+                                <input class="form-control border-black" type="file" <?= $is_pending ?? 'disabled' ?>  name="saspri_k_documents[]" required>
 
                             </div>
                             <div class="col-sm-1 d-flex align-items-end">
-                                <button type="button" class="rem-row btn btn-danger w-100"<?= $ispending ?? 'disabled' ?>>
+                                <button type="button" class="rem-row btn btn-danger w-100"<?= $is_pending ?? 'disabled' ?>>
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>

@@ -28,7 +28,7 @@ class CertificationService
 
     public static function addSelfTeamMembers(AddMembersForm $data)
     {
-        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
 
@@ -49,7 +49,7 @@ class CertificationService
 
     public static function removeSelfTeamMember(int $user_id)
     {
-        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
         $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
@@ -62,7 +62,7 @@ class CertificationService
 
     public static function changeSelfTeamMemberRole(int $user_id, ChangeMemberRoleForm $data)
     {
-        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
         $member = SelfTeamMemberService::findOrFail($certification->id, $user_id);
@@ -75,7 +75,7 @@ class CertificationService
 
     public static function submitForSelfReview()
     {
-        $saspri_k = SaspriKService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $certification = $saspri_k->onGoingCertification;
         if (!$certification) {
             throw new NotFoundHttpException('Tidak ada sertifikasi yang sedang berlangsung');
@@ -210,8 +210,8 @@ class CertificationService
             ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->setGrade()
-            ->generateCertificationCode()
             ->submitExternalReview()
+            ->generateCertificationCode()
             ->calculateNextCertificationDueDate()
             ->save();
 

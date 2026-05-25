@@ -75,9 +75,7 @@ class Certification extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // [['self_team_due_date', 'self_review_due_date', 'peer_team_due_date', 'peer_review_due_date', 'external_review_due_date', 'issued_at', 'grade', 'next_certification_due_date', 'rejection_reason'], 'default', 'value' => null],
-            // [['is_rejected'], 'default', 'value' => 0],
-            [['saspri_k_id', 'purpose', 'level', 'assessment_id', 'created_at', 'updated_at'], 'required'],
+            [['saspri_k_id', 'purpose', 'level', 'assessment_id'], 'required'],
             [['saspri_k_id', 'total_score', 'is_rejected', 'assessment_id', 'created_at', 'updated_at'], 'integer'],
             [['self_team_due_date', 'self_review_due_date', 'peer_team_due_date', 'peer_review_due_date', 'external_review_due_date', 'issued_at', 'next_certification_due_date'], 'safe'],
             [['purpose', 'status', 'level', 'code', 'grade', 'rejection_reason'], 'string', 'max' => 255],

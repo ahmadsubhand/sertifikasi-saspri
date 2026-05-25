@@ -4,13 +4,16 @@ namespace common\services;
 
 use common\enums\UserRole;
 use common\helpers\EmailHelper;
+use common\helpers\UserHelper;
 use common\models\form\LoginForm;
 use common\models\form\RegisterForm;
 use common\models\form\VerifyEmailForm;
 use common\models\User;
 use Yii;
 use yii\web\ConflictHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\UnauthorizedHttpException;
 
 class UserService
 {
@@ -79,5 +82,33 @@ class UserService
         return [
             'access_token' => $user->access_token,
         ];
+    }
+
+    public static function detail(int $user_id): User
+    {
+        $user = User::find()->where(['id' => $user_id])->select(UserHelper::$basicSelect)->one();
+        if (!$user) {
+            throw new NotFoundHttpException('Akun belum terdaftar dalam sistem');
+        }
+        return $user;
+    }
+
+    public static function me()
+    {
+        $user = User::findOne(Yii::$app->user->id);
+        if (!$user) {
+            throw new UnauthorizedHttpException('Akun belum terdaftar dalam sistem');
+        }
+        return $user;
+    }
+
+    public static function findSaspriKAsCoordinatorOrFail()
+    {
+        $saspri_k = User::findOne(['id' => Yii::$app->user->id])
+            ->saspriKAsCoordinator;
+        if (!$saspri_k) {
+            throw new ForbiddenHttpException('Hanya wali yang boleh mengakses halaman ini');
+        }
+        return $saspri_k;
     }
 }

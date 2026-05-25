@@ -4,8 +4,10 @@ namespace frontend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\UserRole;
+use common\models\form\RegisterSaspriKForm;
 use common\models\SaspriK;
 use common\models\User;
+use common\services\SaspriKService;
 use Exception;
 use Yii;
 use yii\filters\AccessControl;
@@ -14,7 +16,6 @@ use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\UnprocessableEntityHttpException;
-use yii\web\UploadedFile;
 
 class DaftarWaliController extends Controller
 {
@@ -61,38 +62,16 @@ class DaftarWaliController extends Controller
     public function actionDaftarSaspriK()
     {
         try {
-            $documents = UploadedFile::getInstancesByName('saspri_k_documents');
-            if (empty($documents)) {
-                throw new BadRequestHttpException(
-                    'Wajib menyertakan dokumen pendukung minimal sertifikasi tingkat Natalia'
-                );
+            $data = new RegisterSaspriKForm();
+            $data->load(Yii::$app->request->post(), 'SaspriK');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
-
-            $types = Yii::$app->request->post('SaspriK')['saspri_k_documents'];
-            if (count($documents) !== count($types)) {
-                throw new BadRequestHttpException('Tipe dokumen wajib disertakan');
-            }
-
-            $saspri_k = $this->findSaspriKOrFail() ?: new SaspriK();
-            if ($saspri_k->request_status === ApprovalStatus::PENDING) {
-                throw new UnprocessableEntityHttpException(
-                    'SASPRI-Kawasan sudah pernah didaftarkan dan masih dalam proses tinjauan SASPRI-Nasional'
-                );
-            }
-
-            $saspri_k->load(Yii::$app->request->post());
-            $saspri_k->requestRegistration(Yii::$app->user->id)->save(false);
-
-            $saspri_k->deleteOldDocuments();
-            $saspri_k->uploadNewDocuments($documents, $types);
-
-            if (!$saspri_k->getCertifications()->exists()) {
-                $saspri_k->createCertificationForNewSaspriK()->save(false);
-            }
+            $saspri_k = SaspriKService::register($data);
 
             Yii::$app->session->setFlash(
                 'success',
-                'SASPRI-Kawasan ' . $saspri_k->district->name .
+                'SASPRI-Kawasan ' . $saspri_k['district']['name'] .
                 ' berhasil didaftarkan. Sedang menunggu proses verifikasi SASPRI-Nasional'
             );
             return $this->redirect(['index']);
