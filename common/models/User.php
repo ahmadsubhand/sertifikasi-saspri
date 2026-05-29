@@ -5,7 +5,6 @@ namespace common\models;
 use common\enums\UserRole;
 use common\models\query\UserQuery;
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
