@@ -171,6 +171,15 @@ $model = $saspri_k ?: new \common\models\SaspriK();
     </div>
 
     <?php ActiveForm::end() ?>
+    <div class="w-100">
+        <?= Html::a('Batalkan Pendaftaran', ['batalkan-pendaftaran-saspri-k'], [
+            'class' => 'btn w-100 py-2 fw-bold btn-danger',
+            'data' => [
+                'confirm' => 'Apakah Anda yakin ingin membatalkan pendaftaran ini?',
+                'method' => 'delete',
+            ],
+        ]) ?>
+    </div>
 </div>
 
 <?php

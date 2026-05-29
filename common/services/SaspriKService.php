@@ -48,8 +48,8 @@ class SaspriKService
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
 
         $valid_users = User::find()->availableForSaspriK()
-            ->andWhere(['id' => $data->user_ids])
-            ->select('username')
+            ->andWhere([User::tableName() . '.id' => $data->user_ids])
+            ->select(User::tableName(). '.username')
             ->column();
 
         if (count($valid_users) !== count($data->user_ids)) {
@@ -121,6 +121,27 @@ class SaspriKService
             ...$saspri_k,
             'district' => $saspri_k->district,
         ];
+    }
+
+    public static function cancel()
+    {
+        $saspri_k = null;
+        try {
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        } catch (Exception $error) {
+            if ($error instanceof ForbiddenHttpException) {
+                throw new NotFoundHttpException('Anda belum mendaftar sebagai Wali SASPRI-K');
+            } else {
+                throw $error;
+            }
+        }
+        
+        if ($saspri_k->request_status === ApprovalStatus::APPROVED) {
+            throw new UnprocessableEntityHttpException('SASPRI-K yang telah disetujui tidak bisa dibatalkan');
+        }
+
+        $saspri_k->delete();
+        return $saspri_k;
     }
 
     public static function saveRegistration(int $saspri_k_id, ExternalReviewForm $data)

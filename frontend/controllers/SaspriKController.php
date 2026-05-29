@@ -135,7 +135,7 @@ class SaspriKController extends Controller
 
         $users = User::find()->availableForSaspriK()
             ->andWhere(['like', 'username', $q])
-            ->select(['id', 'username'])
+            ->select([User::tableName() . '.id', 'username'])
             ->limit(10)
             ->asArray()
             ->all();
