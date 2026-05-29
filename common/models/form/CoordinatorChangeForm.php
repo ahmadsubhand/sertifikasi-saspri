@@ -23,4 +23,15 @@ class CoordinatorChangeForm extends Model
             ['change_request_reason', 'string', 'max' => 1000],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'new_coordinator_id' => 'Wali Baru',
+            'change_request_reason' => 'Alasan Perubahan',
+        ];
+    }
 }

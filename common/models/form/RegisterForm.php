@@ -35,4 +35,16 @@ class RegisterForm extends Model
             ['password', 'string', 'min' => 8],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Nama Pengguna',
+            'email' => 'Email',
+            'password' => 'Kata Sandi',
+        ];
+    }
 }

@@ -30,4 +30,18 @@ class IndicatorOptionForm extends Model
             [['weight'], 'integer', 'min' => 0, 'max' => 100],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'indicator_id' => 'Indikator',
+            'code' => 'Kode',
+            'label' => 'Label',
+            'order' => 'Urutan',
+            'weight' => 'Bobot',
+        ];
+    }
 }

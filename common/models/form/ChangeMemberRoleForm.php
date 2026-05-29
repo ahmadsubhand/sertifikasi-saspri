@@ -18,4 +18,14 @@ class ChangeMemberRoleForm extends Model
             ['role', 'in', 'range' => TeamRole::values()],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'role' => 'Peran',
+        ];
+    }
 }

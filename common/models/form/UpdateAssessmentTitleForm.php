@@ -16,4 +16,14 @@ class UpdateAssessmentTitleForm extends Model
             [['title'], 'string', 'max' => 255],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'title' => 'Judul',
+        ];
+    }
 }

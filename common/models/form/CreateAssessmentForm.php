@@ -27,4 +27,15 @@ class CreateAssessmentForm extends Model
             ['level', 'in', 'range' => CertificateLevel::values()],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'title' => 'Judul',
+            'level' => 'Tingkat',
+        ];
+    }
 }

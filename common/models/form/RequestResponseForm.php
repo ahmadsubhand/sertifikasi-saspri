@@ -26,4 +26,15 @@ class RequestResponseForm extends Model
             ['rejection_reason', 'string'],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'action' => 'Tindakan',
+            'rejection_reason' => 'Alasan Penolakan',
+        ];
+    }
 }

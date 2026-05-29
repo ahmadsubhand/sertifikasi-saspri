@@ -16,4 +16,14 @@ class VerifyEmailForm extends Model
             ['token', 'required'],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'token' => 'Token',
+        ];
+    }
 }

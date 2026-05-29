@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'language' => 'id-ID',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',

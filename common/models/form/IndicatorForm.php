@@ -26,4 +26,17 @@ class IndicatorForm extends Model
             [['code', 'label'], 'string', 'max' => 255],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'indicator_group_id' => 'Grup Indikator',
+            'code' => 'Kode',
+            'label' => 'Label',
+            'order' => 'Urutan',
+        ];
+    }
 }

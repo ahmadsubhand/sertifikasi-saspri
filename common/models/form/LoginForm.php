@@ -25,4 +25,15 @@ class LoginForm extends Model
             ['password', 'required'],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'username' => 'Nama Pengguna',
+            'password' => 'Kata Sandi',
+        ];
+    }
 }

@@ -18,4 +18,14 @@ class ChangeLevelForm extends Model
             ['level', 'in', 'range' => CertificateLevel::values()],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'level' => 'Tingkat',
+        ];
+    }
 }

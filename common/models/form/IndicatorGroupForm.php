@@ -31,4 +31,18 @@ class IndicatorGroupForm extends Model
             [['weight'], 'integer', 'min' => 0, 'max' => 100],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'parent_group_id' => 'Grup Induk',
+            'code' => 'Kode',
+            'label' => 'Label',
+            'order' => 'Urutan',
+            'weight' => 'Bobot',
+        ];
+    }
 }
