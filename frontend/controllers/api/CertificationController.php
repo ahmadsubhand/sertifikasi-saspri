@@ -39,14 +39,16 @@ class CertificationController extends ActiveController
                 'index' => ['GET'],
                 'detail' => ['GET'],
                 'saspri-k' => ['GET'],
-                'self-team' => ['GET'],
-                'peer-team' => ['GET'],
+                'self-team-members' => ['GET'],
+                'peer-team-members' => ['GET'],
+                'full-self-team-members' => ['GET'],
                 'add-self-team-members' => ['POST'],
                 'remove-self-team-member' => ['DELETE'],
                 'change-self-team-member-role' => ['POST'],
                 'submit-for-self-review' => ['POST'],
                 'save-self-review' => ['POST'],
                 'finalize-self-review' => ['POST'],
+                'full-peer-team-members' => ['GET'],
                 'add-peer-team-members' => ['POST'],
                 'remove-peer-team-member' => ['DELETE'],
                 'change-peer-team-member-role' => ['POST'],
@@ -81,12 +83,14 @@ class CertificationController extends ActiveController
         $behaviors['access'] = [
             'class' => AccessControl::class,
             'only' => [
+                'full-self-team-members',
                 'add-self-team-members',
                 'remove-self-team-member',
                 'change-self-team-member-role',
                 'submit-for-self-review',
                 'save-self-review',
                 'finalize-self-review',
+                'full-peer-team-members',
                 'add-peer-team-members',
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
@@ -101,6 +105,7 @@ class CertificationController extends ActiveController
                     'allow' => true,
                     'roles' => [UserRole::COORDINATOR],
                     'actions' => [
+                        'full-self-team-members',
                         'add-self-team-members',
                         'remove-self-team-member',
                         'change-self-team-member-role',
@@ -111,6 +116,7 @@ class CertificationController extends ActiveController
                     'allow' => true,
                     'roles' => [UserRole::ADMIN],
                     'actions' => [
+                        'full-peer-team-members',
                         'add-peer-team-members',
                         'remove-peer-team-member',
                         'change-peer-team-member-role',
@@ -155,7 +161,7 @@ class CertificationController extends ActiveController
         return $certification->saspriK;
     }
 
-    public function actionSelfTeam(int $certification_id, ?int $limit = 5, ?int $offset = 0)
+    public function actionSelfTeamMembers(int $certification_id, ?int $limit = 5, ?int $offset = 0)
     {
         $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getSelfTeamMembers()
@@ -179,10 +185,34 @@ class CertificationController extends ActiveController
         ];
     }
 
-    public function actionPeerTeam(int $certification_id, ?int $limit = 5, ?int $offset = 0)
+    public function actionPeerTeamMembers(int $certification_id, ?int $limit = 5, ?int $offset = 0)
     {
         $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getPeerTeamMembers()
+            ->with(['user' => function (ActiveQuery $query) {
+                $query->select(UserHelper::$basicSelect);
+            }])
+            ->orderBy(['role' => SORT_ASC])
+            ->limit($limit + 1)
+            ->offset($offset)
+            ->asArray()
+            ->all();
+
+        $has_next = count($members) > $limit;
+        if ($has_next) array_pop($members);
+
+        return [
+            'members' => $members,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
+    }
+
+    public function actionFullSelfTeamMembers(int $certification_id, ?int $limit = 5, ?int $offset = 0)
+    {
+        $certification = CertificationService::findOrFail($certification_id);
+        $members = $certification->getFullSelfTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
                 $query->select(UserHelper::$basicSelect);
             }])
@@ -239,6 +269,30 @@ class CertificationController extends ActiveController
         $data = new SelfReviewForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return CertificationService::finalizeSelfReview($certification_id, $data);
+    }
+
+    public function actionFullPeerTeamMembers(int $certification_id, ?int $limit = 5, ?int $offset = 0)
+    {
+        $certification = CertificationService::findOrFail($certification_id);
+        $members = $certification->getFullPeerTeamMembers()
+            ->with(['user' => function (ActiveQuery $query) {
+                $query->select(UserHelper::$basicSelect);
+            }])
+            ->orderBy(['role' => SORT_ASC])
+            ->limit($limit + 1)
+            ->offset($offset)
+            ->asArray()
+            ->all();
+
+        $has_next = count($members) > $limit;
+        if ($has_next) array_pop($members);
+
+        return [
+            'members' => $members,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionAddPeerTeamMembers(int $certification_id)
