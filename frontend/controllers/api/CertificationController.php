@@ -59,6 +59,7 @@ class CertificationController extends ActiveController
                 'finalize-peer-review' => ['POST'],
                 'external-review' => ['GET'],
                 'save-external-review' => ['POST'],
+                'transcripts' => ['GET'],
                 'finalize-external-review' => ['POST'],
             ]
         ];
@@ -82,6 +83,7 @@ class CertificationController extends ActiveController
                 'finalize-peer-review',
                 'external-review',
                 'save-external-review',
+                'transcripts',
                 'finalize-external-review',
             ]
         ];
@@ -107,6 +109,7 @@ class CertificationController extends ActiveController
                 'finalize-peer-review',
                 'external-review',
                 'save-external-review',
+                'transcripts',
                 'finalize-external-review',
             ],
             'rules' => [
@@ -132,6 +135,7 @@ class CertificationController extends ActiveController
                         'submit-for-peer-review',
                         'external-review',
                         'save-external-review',
+                        'transcripts',
                         'finalize-external-review',
                     ],
                 ],
@@ -398,6 +402,11 @@ class CertificationController extends ActiveController
         $data = new ExternalReviewForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return CertificationService::saveExternalReview($certification_id, $data);
+    }
+
+    public function actionTranscripts(int $certification_id)
+    {
+        return CertificationService::transcripts($certification_id);
     }
 
     public function actionFinalizeExternalReview(int $certification_id)

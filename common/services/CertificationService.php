@@ -310,6 +310,22 @@ class CertificationService
         return $certification->indicatorScores;
     }
 
+    public static function transcripts(int $certification_id)
+    {
+        $certification = CertificationService::findOrFail($certification_id)    
+            ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
+            ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
+            ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
+            ->setGrade();
+        $certification->issued_at = date('Y-m-d H:i:s');
+        $certification->calculateNextCertificationDueDate();
+        $transcripts = $certification->getTranscripts();
+        return [
+            'certification' => $certification,
+            'transcripts' => $transcripts,
+        ];
+    }
+
     public static function finalizeExternalReview(int $certification_id, ExternalReviewForm $data)
     {
         $certification = CertificationService::findOrFail($certification_id)    

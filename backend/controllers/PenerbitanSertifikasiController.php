@@ -128,6 +128,32 @@ class PenerbitanSertifikasiController extends Controller
         }
     }
 
+    public function actionTranskrip(int $certification_id)
+    {
+        try {
+            return $this->render(
+                'transkrip', 
+                CertificationService::transcripts($certification_id)
+            );
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof BadRequestHttpException) {
+                    return $this->redirect([
+                        'external-review',
+                        'certification_id' => $certification_id,
+                        'page' => 1
+                    ]);
+                } elseif (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
+            }
+        }
+    }
+
     public function actionFinalisasiPenerbitanSertifikasi(int $certification_id)
     {
         try {

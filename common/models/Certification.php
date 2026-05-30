@@ -551,6 +551,54 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function getTranscripts(): array
+    {
+        $result = [];
+        $root_groups = $this->assessment->rootGroups;
+
+        foreach ($root_groups as $root_group) {
+            $root_score = 0;
+            $child_groups_data = [];
+
+            foreach ($root_group->childGroups as $sub_group) {
+                $sub_group_sum = 0;
+                $indicator_count = count($sub_group->indicators);
+
+                foreach ($sub_group->indicators as $indicator) {
+                    /** @var IndicatorScore|null $score_model */
+                    $score_model = $indicator->getIndicatorScores()
+                        ->where(['certification_id' => $this->id])
+                        ->one();
+
+                    $sub_group_sum += $score_model
+                        ? ($score_model->final_score ?? 0)
+                        : 0;
+                }
+
+                $sub_group_score = $indicator_count > 0
+                    ? ($sub_group_sum / $indicator_count) * ($sub_group->weight / 100)
+                    : 0;
+
+                $root_score += $sub_group_score;
+
+                $child_groups_data[] = [
+                    'code' => $sub_group->code,
+                    'label' => $sub_group->label,
+                    'score' => round($sub_group_score, 2),
+                ];
+            }
+
+            $result[] = [
+                'code' => $root_group->code,
+                'label' => $root_group->label,
+                'score' => round($root_score * ($root_group->weight / 100), 2),
+                'indicator_group' => $child_groups_data,
+            ];
+        }
+
+        return $result;
+    }
+
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore
     {
         $indicator = Indicator::findOne($indicator_id);
