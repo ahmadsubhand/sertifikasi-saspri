@@ -4,6 +4,7 @@ namespace common\services;
 
 use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
+use common\enums\TeamRole;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
@@ -120,6 +121,30 @@ class CertificationService
         return $certification;
     }
 
+    public static function selfReview(int $certification_id, int $page = 1)
+    {
+        $member = CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
+                ->checkSelfReviewPermission();
+
+        $certification = CertificationService::findOrFail($certification_id)
+            ->validateCertificationStatus(CertificationStatus::SELF_REVIEW);
+        [
+            'root_groups' => $root_groups,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups
+        ] = $certification->getAllIndicators($page);
+
+        return [
+            'is_leader' => $member->role === TeamRole::LEADER,
+            'saspri_k' => $certification->saspriK,
+            'certification' => $certification,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups,
+            'page' => $page,
+            'total_pages' => count($root_groups),
+        ];
+    }
+
     public static function saveSelfReview(int $certification_id, SelfReviewForm $data)
     {
         CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
@@ -201,6 +226,30 @@ class CertificationService
         return $certification;
     }
 
+    public static function peerReview(int $certification_id, int $page)
+    {
+        $member = CertificationService::findPeerTeamMember($certification_id, Yii::$app->user->id)
+            ->checkPeerReviewPermission();
+
+        $certification = CertificationService::findOrFail($certification_id)
+            ->validateCertificationStatus(CertificationStatus::PEER_REVIEW);
+        [
+            'root_groups' => $root_groups,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups
+        ] = $certification->getAllIndicators($page);
+
+        return [
+            'is_leader' => $member->role === TeamRole::LEADER,
+            'saspri_k' => $certification->saspriK,
+            'certification' => $certification,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups,
+            'page' => $page,
+            'total_pages' => count($root_groups),
+        ];
+    }
+
     public static function savePeerReview(int $certification_id, PeerReviewForm $data)
     {
         CertificationService::findPeerTeamMember($certification_id, Yii::$app->user->id)
@@ -231,6 +280,27 @@ class CertificationService
         return $certification;
     }
 
+    public static function externalReview(int $certification_id, int $page)
+    {
+        $certification = CertificationService::findOrFail($certification_id)
+            ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW);
+
+        [
+            'root_groups' => $root_groups,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups
+        ] = $certification->getAllIndicators($page);
+
+        return [
+            'saspri_k' => $certification->saspriK,
+            'certification' => $certification,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups,
+            'page' => $page,
+            'total_pages' => count($root_groups),
+        ];
+    }
+
     public static function saveExternalReview(int $certification_id, ExternalReviewForm $data)
     {
         $certification = CertificationService::findOrFail($certification_id)    
@@ -238,6 +308,22 @@ class CertificationService
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
         return $certification->indicatorScores;
+    }
+
+    public static function transcripts(int $certification_id)
+    {
+        $certification = CertificationService::findOrFail($certification_id)    
+            ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
+            ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
+            ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
+            ->setGrade();
+        $certification->issued_at = date('Y-m-d H:i:s');
+        $certification->calculateNextCertificationDueDate();
+        $transcripts = $certification->getTranscripts();
+        return [
+            'certification' => $certification,
+            'transcripts' => $transcripts,
+        ];
     }
 
     public static function finalizeExternalReview(int $certification_id, ExternalReviewForm $data)

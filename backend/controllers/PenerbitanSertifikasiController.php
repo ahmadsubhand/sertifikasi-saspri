@@ -72,22 +72,10 @@ class PenerbitanSertifikasiController extends Controller
     public function actionExternalReview(int $certification_id, int $page = 1)
     {
         try {
-            $certification = CertificationService::findOrFail($certification_id)
-                ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW);
-
-            [
-                'root_groups' => $root_groups,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups
-            ] = $certification->getAllIndicators($page);
-
-            return $this->render('externalReview', [
-                'certification' => $certification,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups,
-                'page' => $page,
-                'total_pages' => count($root_groups),
-            ]);
+            return $this->render(
+                'externalReview',
+                CertificationService::externalReview($certification_id, $page)
+            );
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -137,6 +125,32 @@ class PenerbitanSertifikasiController extends Controller
                 }
             }
             throw $error;
+        }
+    }
+
+    public function actionTranskrip(int $certification_id)
+    {
+        try {
+            return $this->render(
+                'transkrip', 
+                CertificationService::transcripts($certification_id)
+            );
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof BadRequestHttpException) {
+                    return $this->redirect([
+                        'external-review',
+                        'certification_id' => $certification_id,
+                        'page' => 1
+                    ]);
+                } elseif (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
+            }
         }
     }
 

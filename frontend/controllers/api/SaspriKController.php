@@ -45,51 +45,57 @@ class SaspriKController extends ActiveController
                 'valid-certificate' => ['GET'],
                 'latest-completed-certification' => ['GET'],
                 'certifications' => ['GET'],
-                'on-going-certification' => ['GET'],
                 'coordinator-registration' => ['GET'],
-                'coordinator-change' => ['GET'],
-                'add-members' => ['POST'],
-                'remove-member' => ['DELETE'],
-                'register' => ['POST'],
-                'cancel' => ['DELETE'],
+                'coordinator-registration-detail' => ['GET'],
                 'save-draft-registration' => ['POST'],
                 'coordinator-registration-response' => ['POST'],
-                'change-coordinator' => ['POST'],
+                'coordinator-change' => ['GET'],
+                'coordinator-change-detail' => ['GET'],
                 'coordinator-change-response' => ['POST'],
+                'on-going-certification' => ['GET'],
+                'add-members' => ['POST'],
+                'remove-member' => ['DELETE'],
+                'change-coordinator' => ['POST'],
+                'register' => ['POST'],
+                'cancel' => ['DELETE'],
             ]
         ];
 
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => [
-                'on-going-certification',
                 'coordinator-registration',
-                'coordinator-change',
-                'add-members',
-                'remove-member',
-                'register',
-                'cancel',
+                'coordinator-registration-detail',
                 'save-draft-registration',
                 'coordinator-registration-response',
-                'change-coordinator',
+                'coordinator-change',
+                'coordinator-change-detail',
                 'coordinator-change-response',
+                'on-going-certification',
+                'add-members',
+                'remove-member',
+                'change-coordinator',
+                'register',
+                'cancel',
             ]
         ];
 
         $behaviors['access'] = [
             'class' => AccessControl::class,
             'only' => [
-                'on-going-certification',
                 'coordinator-registration',
-                'coordinator-change',
-                'add-members',
-                'remove-member',
-                'register',
-                'cancel',
+                'coordinator-registration-detail',
                 'save-draft-registration',
                 'coordinator-registration-response',
-                'change-coordinator',
+                'coordinator-change',
+                'coordinator-change-detail',
                 'coordinator-change-response',
+                'on-going-certification',
+                'add-members',
+                'remove-member',
+                'change-coordinator',
+                'register',
+                'cancel',
             ],
             'rules' => [
                 [
@@ -107,9 +113,11 @@ class SaspriKController extends ActiveController
                     'roles' => [UserRole::ADMIN],
                     'actions' => [
                         'coordinator-registration',
-                        'coordinator-change',
+                        'coordinator-registration-detail',
                         'save-draft-registration',
                         'coordinator-registration-response',
+                        'coordinator-change',
+                        'coordinator-change-detail',
                         'coordinator-change-response',
                     ],
                 ],
@@ -289,6 +297,22 @@ class SaspriKController extends ActiveController
         return SaspriKService::cancel();
     }
 
+    public function actionCoordinatorRegistrationDetail(int $saspri_k_id, ?int $page = 1)
+    {
+        $data = SaspriKService::coordinatorRegistrationDetail($saspri_k_id, $page);
+
+        $data['current_child_groups'] = array_map(
+            fn ($group) => $group->toArray([], [
+                'indicators',
+                'indicators.indicatorOptions',
+                'indicators.indicatorScores',
+            ]),
+            $data['current_child_groups']
+        );
+
+        return $this->asJson($data);
+    }
+
     public function actionSaveDraftRegistration(int $saspri_k_id)
     {
         $data = new ExternalReviewForm();
@@ -316,6 +340,11 @@ class SaspriKController extends ActiveController
         $data = new CoordinatorChangeForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return SaspriKService::changeCoordinator($data);
+    }
+
+    public function actionCoordinatorChangeDetail(int $saspri_k_id)
+    {
+        return SaspriKService::coordinatorChangeDetail($saspri_k_id);
     }
 
     public function actionCoordinatorChangeResponse(int $saspri_k_id)
