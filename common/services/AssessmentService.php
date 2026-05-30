@@ -8,6 +8,7 @@ use common\models\form\ChangeLevelForm;
 use common\models\form\CreateAssessmentForm;
 use common\models\form\UpdateAssessmentTitleForm;
 use Exception;
+use yii\web\ConflictHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
@@ -30,9 +31,15 @@ class AssessmentService
             $cloned_assessment = self::findOrFail($assessment_id);
             $assessment = Assessment::clone($cloned_assessment);
         } else {
+            $already_exists = Assessment::find()->where(['title' => $data->title])->exists();
+            if ($already_exists) {
+                throw new ConflictHttpException('Asesmen dengan judul yang sama sudah ada');
+            }
+
             if (!$data) {
                 throw new Exception('New assessment need CreateAssessmentForm validation');
             }
+
             $assessment->setAttributes($data->attributes);
             $assessment->save();
         }
@@ -43,6 +50,15 @@ class AssessmentService
     public static function updateTitle(int $assessment_id, UpdateAssessmentTitleForm $data): Assessment
     {
         $assessment = self::findOrFail($assessment_id);
+
+        $already_exists = Assessment::find()
+            ->where(['title' => $data->title])
+            ->andWhere(['!=', 'id', $assessment->id])
+            ->exists();
+        if ($already_exists) {
+            throw new ConflictHttpException('Asesmen dengan judul yang sama sudah ada');
+        }
+
         $assessment->title = $data->title;
         $assessment->save();
         return $assessment;

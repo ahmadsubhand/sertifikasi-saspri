@@ -21,6 +21,7 @@ use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -83,7 +84,8 @@ class AsesmenController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if (
                     $error instanceof NotFoundHttpException ||
-                    $error instanceof BadRequestHttpException
+                    $error instanceof BadRequestHttpException ||
+                    $error instanceof ConflictHttpException
                 ) {
                     return $this->redirect(['index']);
                 }

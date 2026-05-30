@@ -6,7 +6,7 @@ use common\models\form\IndicatorForm;
 use common\models\Indicator;
 use common\models\IndicatorGroup;
 use yii\web\NotFoundHttpException;
-use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 class IndicatorService
@@ -23,8 +23,13 @@ class IndicatorService
     public static function save(?int $indicator_id, IndicatorForm $data): Indicator
     {
         $indicator = $indicator_id ? self::findOrFail($indicator_id) : new Indicator();
-        if (!$data->indicator_group_id) {
-            throw new BadRequestHttpException('Indikator wajib memiliki subgrup');
+
+        if ($indicator_id) {
+            if ($indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+                throw new UnprocessableEntityHttpException(
+                    'Indikator tidak dapat diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+                );
+            }
         }
 
         $isValidGroup = IndicatorGroup::find()
@@ -33,6 +38,15 @@ class IndicatorService
             ->exists();
         if (!$isValidGroup) {
             throw new NotFoundHttpException('Subgrup yang dipilih tidak ditemukan atau bukan subgrup yang valid');
+        }
+
+        $already_exists = Indicator::find()
+            ->where(['indicator_group_id' => $data->indicator_group_id])
+            ->andWhere(['code' => $data->code])
+            ->andFilterWhere(['!=', 'id', $indicator->id ?? null])
+            ->exists();
+        if ($already_exists) {
+            throw new ConflictHttpException('Indikator dengan kode yang sama sudah ada dalam grup ini');
         }
 
         $indicator->setAttributes($data->attributes);

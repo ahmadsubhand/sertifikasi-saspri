@@ -58,6 +58,14 @@ class m260504_034250_create_indicator_group_table extends Migration
             'id',
             'CASCADE'
         );
+
+        // unique index for column 'assessment_id' and 'code'
+        $this->createIndex(
+            'idx-indicator_group-assessment_id-code',
+            'indicator_group',
+            ['assessment_id', 'code'],
+            true,
+        );
     }
 
     /**
@@ -65,6 +73,12 @@ class m260504_034250_create_indicator_group_table extends Migration
      */
     public function safeDown()
     {
+        // drop unique index for column 'assessment_id' and 'code'
+        $this->dropIndex(
+            'idx-indicator_group-assessment_id-code',
+            'indicator_group',
+        );
+
         // drop foreign key for table `assessment`
         $this->dropForeignKey(
             'fk-assessment-assessment_id',

@@ -15,7 +15,7 @@ class m260504_034225_create_assessment_table extends Migration
     {
         $this->createTable('assessment', [
             'id' => $this->primaryKey(),
-            'title' => $this->string()->notNull(),
+            'title' => $this->string()->notNull()->unique(),
             'active_at_level' => $this->string(),
             'level' => $this->string()->notNull(),
             'created_at' => $this->integer()->notNull(),

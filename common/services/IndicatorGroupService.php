@@ -7,6 +7,7 @@ use common\models\IndicatorGroup;
 use common\models\form\IndicatorGroupForm;
 use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 class IndicatorGroupService
@@ -38,6 +39,12 @@ class IndicatorGroupService
                     ($data->code ?? $indicator_group->code) . ' adalah grup utama sehingga tidak dapat dipindahkan ke dalam grup lain'
                 );
             }
+
+            if ($indicator_group->assessment->getCertifications()->exists()) {
+                throw new UnprocessableEntityHttpException(
+                    'Grup tidak dapat ditambah/diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+                );
+            }
         }
 
         if ($data->parent_group_id) {
@@ -48,6 +55,15 @@ class IndicatorGroupService
             if (!$isValidParent) {
                 throw new NotFoundHttpException('Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid');
             }
+        }
+
+        $already_exists = IndicatorGroup::find()
+            ->where(['assessment_id' => $data->assessment_id])
+            ->andWhere(['code' => $data->code])
+            ->andFilterWhere(['!=', 'id', $indicator_group->id ?? null])
+            ->exists();
+        if ($already_exists) {
+            throw new ConflictHttpException('Grup dengan kode yang sama sudah ada dalam asesmen ini');
         }
 
         $indicator_group->assessment_id = $data->assessment_id;

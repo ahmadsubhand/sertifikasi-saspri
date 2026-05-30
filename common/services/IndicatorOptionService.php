@@ -4,6 +4,7 @@ namespace common\services;
 
 use common\models\IndicatorOption;
 use common\models\form\IndicatorOptionForm;
+use yii\web\ConflictHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
@@ -20,30 +21,48 @@ class IndicatorOptionService
     {
         IndicatorService::findOrFail($data->indicator_id);
 
-        $model = $option_id ? self::findOrFail($option_id) : new IndicatorOption();
-        $model->setAttributes($data->attributes);
+        $indicator_option = $option_id ? self::findOrFail($option_id) : new IndicatorOption();
 
-        if ($model->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+        if ($option_id) {
+            if ($indicator_option->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+                throw new UnprocessableEntityHttpException(
+                    'Opsi tidak dapat diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+                );
+            }
+        }
+
+        $already_exists = IndicatorOption::find()
+            ->where(['indicator_id' => $data->indicator_id])
+            ->andWhere(['code' => $data->code])
+            ->andFilterWhere(['!=', 'id', $indicator_option->id ?? null])
+            ->exists();
+        if ($already_exists) {
+            throw new ConflictHttpException('Opsi dengan kode yang sama sudah ada dalam indikator ini');
+        }
+
+        $indicator_option->setAttributes($data->attributes);
+
+        if ($indicator_option->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
             throw new UnprocessableEntityHttpException(
                 'Opsi tidak dapat ditambah/diubah karena asesmen sudah digunakan dalam proses sertifikasi'
             );
         }
 
-        $model->save();
-        return $model;
+        $indicator_option->save();
+        return $indicator_option;
     }
 
     public static function delete(int $id): IndicatorOption
     {
-        $model = self::findOrFail($id);
+        $indicator_option = self::findOrFail($id);
 
-        if ($model->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+        if ($indicator_option->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
             throw new UnprocessableEntityHttpException(
                 'Opsi tidak dapat dihapus karena asesmen sudah digunakan dalam proses sertifikasi'
             );
         }
 
-        $model->delete();
-        return $model;
+        $indicator_option->delete();
+        return $indicator_option;
     }
 }

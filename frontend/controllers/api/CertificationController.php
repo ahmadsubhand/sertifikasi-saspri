@@ -2,8 +2,6 @@
 
 namespace frontend\controllers\api;
 
-use common\enums\CertificateLevel;
-use common\enums\CertificationStatus;
 use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
@@ -143,67 +141,6 @@ class CertificationController extends ActiveController
         ];
 
         return $behaviors;
-    }
-
-    public function actionIndex(
-        ?string $wilayah = null,
-        ?int $province_id = null,
-        ?int $regency_id = null,
-        ?int $district_id = null,
-        ?string $level = null,
-        ?int $limit = 20, 
-        ?int $offset = 0
-    ) {
-        $query = Certification::find()
-            ->distinct()
-            ->joinWith([
-                'saspriK.district.regency.province'
-            ])
-            ->andWhere([
-                'not in',
-                'status',
-                [
-                    CertificationStatus::PENDING_SELF_TEAM_FORMATION,
-                    CertificationStatus::COMPLETED,
-                ]
-            ]);
-
-        if ($wilayah) {
-            $query->andWhere(['like', 'LOWER(region_name)', strtolower($wilayah)]);
-        }
-        if ($province_id) {
-            $query->andWhere(['province.id' => $province_id]);
-        }
-
-        if ($regency_id) {
-            $query->andWhere(['regency.id' => $regency_id]);
-        }
-
-        if ($district_id) {
-            $query->andWhere(['district.id' => $district_id]);
-        }
-
-        if (in_array($level, CertificateLevel::values())) {
-            $query->andWhere(['level' => $level]);
-        }
-
-        $certs = $query
-            ->orderBy([
-                'updated_at' => SORT_DESC
-            ])
-            ->limit($limit + 1)
-            ->offset($offset)
-            ->all();
-
-        $has_next = count($certs) > $limit;
-        if ($has_next) array_pop($certs);
-
-        return [
-            'certifications' => $certs,
-            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
-            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
-            'offset' => $offset,
-        ];
     }
 
     public function actionDetail(int $certification_id)
