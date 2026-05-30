@@ -18,6 +18,16 @@ class AddMembersForm extends Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'user_ids' => 'ID Pengguna',
+        ];
+    }
+
     public function validateUserIdsArray(string $attribute): void
     {
         if (!is_array($this->$attribute)) {

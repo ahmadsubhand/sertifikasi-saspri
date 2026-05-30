@@ -95,6 +95,26 @@ class RegisterSaspriKForm extends Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'district_id' => 'Kecamatan',
+            'region_name' => 'Nama SASPRI-K',
+            'address' => 'Alamat Sekretariat',
+            'cooperative_name' => 'Nama Koperasi',
+            'number_of_groups' => 'Jumlah Kelompok yang Dibina',
+            'number_of_active_members' => 'Jumlah Anggota Aktif',
+            'livestock_type' => 'Ternak yang Diusahakan',
+            'total_livestock_count' => 'Jumlah Total Ternak Anggota Aktif',
+            'breeding_livestock_count' => 'Jumlah Ternak Indukan (Pernah Beranak)',
+            'productive_heifer_count' => 'Jumlah Total Ternak dara Produktif (Siap Kawin)',
+            'saspri_k_documents' => 'Dokumen SASPRI-K',
+        ];
+    }
+
     public function validateDocuments(string $attribute)
     {
         if (!is_array($this->$attribute)) {

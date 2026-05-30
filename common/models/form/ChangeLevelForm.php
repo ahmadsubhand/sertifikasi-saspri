@@ -2,18 +2,20 @@
 
 namespace common\models\form;
 
+use common\enums\CertificateLevel;
 use yii\base\Model;
 
-class VerifyEmailForm extends Model
+class ChangeLevelForm extends Model
 {
     /** @var string */
-    public $token;
+    public $level = [];
 
     public function rules()
     {
         return [
-            ['token', 'string'],
-            ['token', 'required'],
+            ['level', 'string'],
+            ['level', 'required'],
+            ['level', 'in', 'range' => CertificateLevel::values()],
         ];
     }
 
@@ -23,7 +25,7 @@ class VerifyEmailForm extends Model
     public function attributeLabels()
     {
         return [
-            'token' => 'Token',
+            'level' => 'Tingkat',
         ];
     }
 }

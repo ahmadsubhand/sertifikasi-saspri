@@ -6,6 +6,7 @@ use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\RequestResponse;
+use common\helpers\UserHelper;
 use common\models\form\AddMembersForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
@@ -48,8 +49,8 @@ class SaspriKService
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
 
         $valid_users = User::find()->availableForSaspriK()
-            ->andWhere(['id' => $data->user_ids])
-            ->select('username')
+            ->andWhere([User::tableName() . '.id' => $data->user_ids])
+            ->select(User::tableName(). '.username')
             ->column();
 
         if (count($valid_users) !== count($data->user_ids)) {
@@ -67,7 +68,11 @@ class SaspriKService
         $user = SaspriKService::findMember($user_id, $saspri_k->id);
         $user->removeUserFromSaspriK()->save();
 
-        return $user;
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'phone_number' => $user->phone_number,
+        ];
     }
 
     public static function register(RegisterSaspriKForm $data)
@@ -81,7 +86,7 @@ class SaspriKService
 
         $document_types = $data->saspri_k_documents;
         if (count($document_files) !== count($document_types)) {
-            throw new BadRequestHttpException('Tipe dokumen wajib disertakan');
+            throw new BadRequestHttpException('Tipe dokumen wajib disertakan lengkap');
         }
 
         $user = UserService::me();
@@ -123,6 +128,27 @@ class SaspriKService
         ];
     }
 
+    public static function cancel()
+    {
+        $saspri_k = null;
+        try {
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        } catch (Exception $error) {
+            if ($error instanceof ForbiddenHttpException) {
+                throw new NotFoundHttpException('Anda belum mendaftar sebagai Wali SASPRI-K');
+            } else {
+                throw $error;
+            }
+        }
+        
+        if ($saspri_k->request_status === ApprovalStatus::APPROVED) {
+            throw new UnprocessableEntityHttpException('SASPRI-K yang telah disetujui tidak bisa dibatalkan');
+        }
+
+        $saspri_k->delete();
+        return $saspri_k;
+    }
+
     public static function saveRegistration(int $saspri_k_id, ExternalReviewForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isRequestRegistrationPending();
@@ -131,7 +157,7 @@ class SaspriKService
         $certification = $saspri_k->getCertifications()->one();
         $certification->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
-        return $certification;
+        return $certification->indicatorScores;
     }
 
     public static function registrationRequestResponse(int $saspri_k_id, RequestResponseForm $data)
@@ -191,6 +217,8 @@ class SaspriKService
         return [
             ...$saspri_k,
             'district' => $saspri_k->district,
+            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
+            'new_coordinator' => $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one(),
         ];
     }
 

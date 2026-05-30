@@ -40,6 +40,14 @@ class m260506_233651_create_indicator_option_table extends Migration
             'id',
             'CASCADE'
         );
+
+        // unique index for column 'indicator_id' and 'code'
+        $this->createIndex(
+            'idx-indicator_option-indicator_id-code',
+            'indicator_option',
+            ['indicator_id', 'code'],
+            true,
+        );
     }
 
     /**
@@ -47,6 +55,12 @@ class m260506_233651_create_indicator_option_table extends Migration
      */
     public function safeDown()
     {
+        // drops unique index for column 'indicator_id' and 'code'
+        $this->dropIndex(
+            'idx-indicator_option-indicator_id-code',
+            'indicator_option',
+        );
+
         // drops foreign key for table `indicator`
         $this->dropForeignKey(
             'fk-indicator_option-indicator_id',

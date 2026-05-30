@@ -50,8 +50,7 @@ class Assessment extends \yii\db\ActiveRecord
     {
         return [
             [['active_at_level', 'released_at'], 'default', 'value' => null],
-            [['title', 'level', 'created_at', 'updated_at'], 'required'],
-            [['created_at', 'updated_at', 'released_at'], 'safe'],
+            [['title', 'level'], 'required'],
             [['title', 'active_at_level', 'level'], 'string', 'max' => 255],
             [['active_at_level'], 'unique'],
         ];

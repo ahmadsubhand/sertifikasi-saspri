@@ -5,7 +5,6 @@ namespace common\models;
 use common\enums\UserRole;
 use common\models\query\UserQuery;
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -43,7 +42,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return '{{%user}}'; // kalau ganti, jangan lupa ganti juga yang UserHelper.php
     }
     
 
@@ -129,7 +128,9 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $username, 'status' => self::STATUS_ACTIVE]);
+        return static::findOne(['username' => $username, 
+            // 'status' => self::STATUS_ACTIVE
+        ]);
     }
 
     /**

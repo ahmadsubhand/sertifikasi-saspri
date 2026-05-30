@@ -15,6 +15,7 @@ use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 class DaftarWaliController extends Controller
@@ -35,6 +36,7 @@ class DaftarWaliController extends Controller
                 'class' => VerbFilter::class,
                 'actions' => [
                     'daftar-saspri-k' => ['post'],
+                    'batalkan-pendaftaran-saspri-k' => ['delete'],
                 ],
             ],
         ];
@@ -83,6 +85,30 @@ class DaftarWaliController extends Controller
                     $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionBatalkanPendaftaranSaspriK()
+    {
+        try {
+            $saspri_k = SaspriKService::cancel();
+
+            Yii::$app->session->setFlash(
+                'success',
+                'Pendaftaran SASPRI-Kawasan ' . $saspri_k['district']['name'] .
+                ' berhasil dibatalkan. Sekarang Anda tersedia untuk diundang ke dalam SASPRI-K lain'
+            );
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['index']);
+                } else if ($error instanceof UnprocessableEntityHttpException) {
+                    return $this->redirect(['saspri-k/index']);
                 }
             }
             throw $error;

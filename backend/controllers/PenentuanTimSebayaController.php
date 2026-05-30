@@ -140,7 +140,7 @@ class PenentuanTimSebayaController extends Controller
             $data = new AddMembersForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('user_ids'));    
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));   
             }
             $username_users = CertificationService::addPeerTeamMembers($certification_id, $data);
 
@@ -198,7 +198,7 @@ class PenentuanTimSebayaController extends Controller
             $data = new ChangeMemberRoleForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('role'));    
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));  
             }
             $member = CertificationService::changePeerTeamMemberRole($certification_id, $user_id, $data);
 

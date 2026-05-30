@@ -93,35 +93,67 @@ class IndicatorScore extends \yii\db\ActiveRecord
             throw new Exception('Invalid attribute name of indicator score');
         }
 
-        $value = (int) $indicator_score[$attribute_name] ?? 0;
-        if ($value < 0 || $value > 100) {
+        if (
+            (filter_var($indicator_score[$attribute_name], FILTER_VALIDATE_INT) === false) ||
+            $indicator_score[$attribute_name] < 0 ||
+            $indicator_score[$attribute_name] > 100
+        ) {
             throw new BadRequestHttpException(
-                'Terdapat penilaian yang di luar rentang 0-100'
+                ucfirst(strtolower(IndicatorScoreAttribute::list()[$attribute_name])) .
+                ' pada ' . $this->getFullIndicatorLabel() . 
+                ' harus berupa bilangan bulat positif tidak lebih dari 100'
             );
         }
-        $this->$attribute_name= $value;
+
+        $this->$attribute_name= (int) $indicator_score[$attribute_name] ?? 0;
 
         return $this;
     }
 
     public function fillStatus(?string $status)
     {
+        if ($this->peer_team_score && !$status) {
+            throw new BadRequestHttpException(
+                'Status penilaian pada ' . $this->getFullIndicatorLabel() . 
+                ' wajib diisi jika ' . 
+                strtolower(IndicatorScoreAttribute::list()[IndicatorScoreAttribute::PEER_REVIEW]) . 
+                ' sudah diisi'
+            );
+        }
+
+        if (!$this->peer_team_score && $status) {
+            throw new BadRequestHttpException(
+                ucfirst(strtolower(IndicatorScoreAttribute::list()[IndicatorScoreAttribute::PEER_REVIEW])) . 
+                ' pada ' . $this->getFullIndicatorLabel() . 
+                ' wajib diisi jika status sudah diisi '
+            );
+        }
+
         if (!$status) {
             $this->status = null;
             return $this;
         }
 
         if (!in_array($status, IndicatorStatus::values())) {
-            throw new BadRequestHttpException('Status penilaian tidak valid: ' . $status);
+            throw new BadRequestHttpException(
+                'Status penilaian pada ' . $this->getFullIndicatorLabel() . 
+                ' tidak valid'
+            );
         }
 
         if ($this->peer_team_score === $this->self_team_score) {
             if ($status !== IndicatorStatus::IDENTICAL) {
-                throw new BadRequestHttpException('Status harus ' . IndicatorStatus::list()[IndicatorStatus::IDENTICAL] . ' jika skor sama');
+                throw new BadRequestHttpException(
+                    'Status penilaian pada ' . $this->getFullIndicatorLabel() . 
+                    ' harus "' . strtolower(IndicatorStatus::list()[IndicatorStatus::IDENTICAL]) . '" jika skor sama'
+                );
             }
         } else {
             if ($status === IndicatorStatus::IDENTICAL) {
-                throw new BadRequestHttpException('Status tidak boleh ' . IndicatorStatus::list()[IndicatorStatus::IDENTICAL] . ' jika skor berbeda');
+                throw new BadRequestHttpException(
+                    'Status penilaian pada ' . $this->getFullIndicatorLabel() . 
+                    ' tidak boleh "' . strtolower(IndicatorStatus::list()[IndicatorStatus::IDENTICAL]) . '" jika skor berbeda'
+                );
             }
         }
 
@@ -138,6 +170,20 @@ class IndicatorScore extends \yii\db\ActiveRecord
             return $this;
         }
 
+        if (!in_array($file->extension, FileHelper::$allowed_extensions)) {
+            throw new BadRequestHttpException(
+                'Bukti pada ' . $this->getFullIndicatorLabel() . 
+                ' harus berupa file pdf, gambar, word, excel, atau csv'
+            );
+        }
+
+        if ($file->size > 5 * 1024 * 1024) {
+            throw new BadRequestHttpException(
+                'Ukuran bukti pada ' . $this->getFullIndicatorLabel() . 
+                ' maksimal 5MB'
+            );
+        }
+
         $relative_dir = '/uploads/evidence/' . $certification_id;
         $absolute_dir = Yii::getAlias('@frontend/web' . $relative_dir);
 
@@ -151,6 +197,21 @@ class IndicatorScore extends \yii\db\ActiveRecord
         } else {
             throw new Exception('Failed to save evidence file');
         }
+    }
+
+    public function getFullIndicatorLabel()
+    {
+        $indicator = $this->indicator;
+        $group = $indicator->indicatorGroup;
+        $parent = $group->parentGroup;
+
+        $fullIndicatorLabel = '"' .
+            $parent->code . '. ' . 
+            $group->code . '. ' .
+            $indicator->code . '. ' . 
+            $indicator->label . '"';
+
+        return $fullIndicatorLabel;
     }
 
     protected function deleteOldEvidence(): void

@@ -4,16 +4,16 @@ namespace common\models\form;
 
 use yii\base\Model;
 
-class VerifyEmailForm extends Model
+class UpdateAssessmentTitleForm extends Model
 {
     /** @var string */
-    public $token;
+    public $title;
 
     public function rules()
     {
         return [
-            ['token', 'string'],
-            ['token', 'required'],
+            [['title'], 'required'],
+            [['title'], 'string', 'max' => 255],
         ];
     }
 
@@ -23,7 +23,7 @@ class VerifyEmailForm extends Model
     public function attributeLabels()
     {
         return [
-            'token' => 'Token',
+            'title' => 'Judul',
         ];
     }
 }

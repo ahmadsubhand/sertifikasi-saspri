@@ -4,8 +4,8 @@ namespace backend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\RequestResponse;
-use common\helpers\TeamHelper;
 use common\helpers\UserHelper;
+use common\models\Certification;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RequestResponseForm;
 use common\models\SaspriK;
@@ -126,7 +126,7 @@ class VerifikasiWaliController extends Controller
             $data = new RequestResponseForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('action'));
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
             SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
 
@@ -155,12 +155,13 @@ class VerifikasiWaliController extends Controller
         try {
             $saspri_k = $this->findSaspriKWithRegistrationOrFail($saspri_k_id);
 
+            /** @var Certification $certification */
             $certification = $saspri_k->getCertifications()->one();
             [
                 'root_groups' => $root_groups,
                 'current_root_group' => $current_root_group,
                 'current_child_groups' => $current_child_groups
-            ] = TeamHelper::getAllIndicators($certification, $page);
+            ] = $certification->getAllIndicators($page);
 
             return $this->render('permintaanPendaftaranWali', [
                 'saspri_k' => $saspri_k,
@@ -192,7 +193,7 @@ class VerifikasiWaliController extends Controller
             $data = new ExternalReviewForm();
             $data->load(Yii::$app->request->post(), '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('indicator_scores'));
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
             SaspriKService::saveRegistration($saspri_k_id, $data);
 
@@ -231,14 +232,14 @@ class VerifikasiWaliController extends Controller
             $data = new RequestResponseForm();
             $data->load($request, '');
             if (!$data->validate()) {
-                throw new BadRequestHttpException($data->getFirstError('action'));
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
             }
 
             if ($data->action === RequestResponse::APPROVE) {
                 $scores = new ExternalReviewForm();
                 $scores->load($request, '');
                 if (!$scores->validate()) {
-                    throw new BadRequestHttpException($scores->getFirstError('indicator_scores'));
+                    throw new BadRequestHttpException(implode(', ', $data->firstErrors));
                 }
     
                 SaspriKService::saveRegistration($saspri_k_id, $scores);

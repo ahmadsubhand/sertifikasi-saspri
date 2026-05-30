@@ -43,6 +43,7 @@ class SertifikasiBerjalanController extends Controller
         ?int $offset = 0
     ) {
         $query = Certification::find()
+            ->distinct()
             ->joinWith([
                 'saspriK.district.regency.province'
             ])

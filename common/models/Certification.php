@@ -151,7 +151,7 @@ class Certification extends \yii\db\ActiveRecord
     public function getPeerTeamMembers()
     {
         return $this->hasMany(PeerTeamMember::class, ['certification_id' => 'id'])
-            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+            ->andWhere([PeerTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED]);
     }
 
     /**
@@ -182,7 +182,7 @@ class Certification extends \yii\db\ActiveRecord
     public function getSelfTeamMembers()
     {
         return $this->hasMany(SelfTeamMember::class, ['certification_id' => 'id'])
-            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+            ->andWhere([SelfTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED]);
     }
 
     /**
@@ -389,6 +389,21 @@ class Certification extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function getAllIndicators(int $page)
+    {
+        $root_groups = $this->assessment->rootGroups;
+        $current_root_group = $this->assessment
+            ->getCurrentRootGroupOrFail($page, $root_groups);
+        /** @var IndicatorGroup[] $current_child_groups */
+        $current_child_groups = $current_root_group->getChildGroupsWithScore($this->id)->all();
+
+        return [
+           'root_groups' => $root_groups,
+           'current_root_group' => $current_root_group,
+           'current_child_groups' => $current_child_groups,
+        ];
+    }
+
     public function saveScores(array $indicator_scores, string $score_attribute)
     {
         if (!in_array($score_attribute, IndicatorScoreAttribute::values())) {
@@ -397,13 +412,20 @@ class Certification extends \yii\db\ActiveRecord
 
         try {
             foreach ($indicator_scores as $indicator_id => $indicator_score) {
+                if (
+                    (filter_var($indicator_id, FILTER_VALIDATE_INT) === false) ||
+                    $indicator_id < 1
+                ) {
+                    throw new BadRequestHttpException('ID Indikator harus berupa bilangan bulat positif');
+                }
                 $indicator_score_model = $this->findOrCreateIndicatorScore($indicator_id);
+                
                 $indicator_score_model->fillScore($indicator_score ?? [], $score_attribute);
                 if ($score_attribute === IndicatorScoreAttribute::SELF_REVIEW) {
                     $indicator_score_model->handleEvidenceUpload($this->id);
                 }
                 if ($score_attribute === IndicatorScoreAttribute::PEER_REVIEW) {
-                    $indicator_score_model->fillStatus($indicator_score['status'] ?? null);
+                    $indicator_score_model->fillStatus($indicator_score['status']);
                 }
                 $indicator_score_model->save();
             }
@@ -433,9 +455,13 @@ class Certification extends \yii\db\ActiveRecord
         }
         
         foreach ($existing_scores as $existing_score) {
+            $fullIndicatorLabel = $existing_score->getFullIndicatorLabel();
+
             if (!$existing_score->$score_attribute) {
                 throw new BadRequestHttpException(
-                    'Seluruh indikator wajib diberikan penilaian sebelum finalisasi'
+                    ucfirst(strtolower(IndicatorScoreAttribute::list()[$score_attribute])) .
+                    ' pada ' . $fullIndicatorLabel . 
+                    ' masih kosong'
                 );
             }
 
@@ -444,7 +470,7 @@ class Certification extends \yii\db\ActiveRecord
                 !$existing_score->status
             ) {
                 throw new BadRequestHttpException(
-                    'Seluruh status wajib diisi sebelum finalisasi'
+                    'Status pada ' . $fullIndicatorLabel . ' masih kosong'
                 );
             }
         }

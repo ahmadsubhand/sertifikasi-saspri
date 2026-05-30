@@ -1,8 +1,6 @@
 <?php
 
 namespace common\models\form;
-
-use common\enums\IndicatorScoreAttribute;
 use yii\base\Model;
 
 class ExternalReviewForm extends Model
@@ -18,47 +16,30 @@ class ExternalReviewForm extends Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'indicator_scores' => 'Skor Indikator',
+        ];
+    }
+
     public function validateIndicatorScores(string $attribute)
     {
         if (!is_array($this->$attribute)) {
-            $this->addError($attribute, 'Parameter indicator scores harus berupa array');
+            $this->addError($attribute, 'Parameter indicator_scores harus berupa array');
             return;
         }
 
-        foreach ($this->$attribute as $indicator_score_id => $indicator_score) {
+        foreach ($this->$attribute as $indicator_id => $indicator_score) {
             if (!is_array($indicator_score)) {
                 $this->addError(
                     $attribute,
-                    "Format di dalam indicator scores {$indicator_score_id} tidak valid"
+                    "Format di dalam indicator_scores dengan id indicator {$indicator_id} tidak valid"
                 );
                 continue;
-            }
-
-            if (!array_key_exists(IndicatorScoreAttribute::EXTERNAL_REVIEW, $indicator_score)) {
-                $this->addError(
-                    $attribute,
-                    "Skor untuk indikator {$indicator_score_id} wajib diisi"
-                );
-                continue;
-            }
-
-            if (
-                filter_var($indicator_score[IndicatorScoreAttribute::EXTERNAL_REVIEW], FILTER_VALIDATE_INT) === false
-            ) {
-                $this->addError(
-                    $attribute,
-                    "Skor untuk indikator {$indicator_score_id} harus berupa bilangan bulat"
-                );
-                continue;
-            }
-
-            $score = (int) $indicator_score[IndicatorScoreAttribute::EXTERNAL_REVIEW];
-
-            if ($score < 0 || $score > 100) {
-                $this->addError(
-                    $attribute,
-                    "Skor untuk indikator {$indicator_score_id} harus antara 0 sampai 100"
-                );
             }
         }
     }

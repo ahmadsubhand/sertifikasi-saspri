@@ -16,14 +16,9 @@ class UserHelper
         }
     }
 
-    public static function convertUserIdsToArray(string $user_ids)
-    {
-        return array_unique(array_filter(array_map('trim', explode(',', $user_ids))));
-    }
-
     public static $basicSelect = [
-        'id',
-        'username',
-        'phone_number',
+        'user.id',
+        'user.username',
+        'user.phone_number',
     ];
 }
