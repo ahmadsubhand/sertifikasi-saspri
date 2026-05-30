@@ -6,6 +6,7 @@ use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\RequestResponse;
+use common\helpers\UserHelper;
 use common\models\form\AddMembersForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
@@ -67,7 +68,11 @@ class SaspriKService
         $user = SaspriKService::findMember($user_id, $saspri_k->id);
         $user->removeUserFromSaspriK()->save();
 
-        return $user;
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'phone_number' => $user->phone_number,
+        ];
     }
 
     public static function register(RegisterSaspriKForm $data)
@@ -81,7 +86,7 @@ class SaspriKService
 
         $document_types = $data->saspri_k_documents;
         if (count($document_files) !== count($document_types)) {
-            throw new BadRequestHttpException('Tipe dokumen wajib disertakan');
+            throw new BadRequestHttpException('Tipe dokumen wajib disertakan lengkap');
         }
 
         $user = UserService::me();
@@ -152,7 +157,7 @@ class SaspriKService
         $certification = $saspri_k->getCertifications()->one();
         $certification->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
-        return $certification;
+        return $certification->indicatorScores;
     }
 
     public static function registrationRequestResponse(int $saspri_k_id, RequestResponseForm $data)
@@ -212,6 +217,8 @@ class SaspriKService
         return [
             ...$saspri_k,
             'district' => $saspri_k->district,
+            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
+            'new_coordinator' => $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one(),
         ];
     }
 

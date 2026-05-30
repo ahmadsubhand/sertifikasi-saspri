@@ -151,7 +151,7 @@ class Certification extends \yii\db\ActiveRecord
     public function getPeerTeamMembers()
     {
         return $this->hasMany(PeerTeamMember::class, ['certification_id' => 'id'])
-            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+            ->andWhere([PeerTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED]);
     }
 
     /**
@@ -182,7 +182,7 @@ class Certification extends \yii\db\ActiveRecord
     public function getSelfTeamMembers()
     {
         return $this->hasMany(SelfTeamMember::class, ['certification_id' => 'id'])
-            ->andWhere(['status' => ApprovalStatus::APPROVED]);
+            ->andWhere([SelfTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED]);
     }
 
     /**

@@ -17,8 +17,8 @@ class UserHelper
     }
 
     public static $basicSelect = [
-        'id',
-        'username',
-        'phone_number',
+        'user.id',
+        'user.username',
+        'user.phone_number',
     ];
 }

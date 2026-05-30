@@ -5,6 +5,7 @@ namespace common\services;
 use common\models\IndicatorOption;
 use common\models\form\IndicatorOptionForm;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class IndicatorOptionService
 {
@@ -21,14 +22,27 @@ class IndicatorOptionService
 
         $model = $option_id ? self::findOrFail($option_id) : new IndicatorOption();
         $model->setAttributes($data->attributes);
-        $model->save();
 
+        if ($model->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Opsi tidak dapat ditambah/diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
+        $model->save();
         return $model;
     }
 
     public static function delete(int $id): IndicatorOption
     {
         $model = self::findOrFail($id);
+
+        if ($model->indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Opsi tidak dapat dihapus karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
         $model->delete();
         return $model;
     }

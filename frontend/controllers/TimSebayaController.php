@@ -60,6 +60,7 @@ class TimSebayaController extends Controller
         ?int $offset_completed = 0,
     ) {
         $base_query = PeerTeamMember::find()
+            ->distinct()
             ->alias('ptm')
             ->joinWith('certification c')
             ->joinWith('certification.saspriK')

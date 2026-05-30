@@ -21,7 +21,7 @@ class UserService
     {
         $user = User::findByUsername($data->username);
         if (!$user || !$user->validatePassword($data->password)) {
-            throw new NotFoundHttpException('Email atau password salah');
+            throw new NotFoundHttpException('Username atau password salah');
         }
         $user->generateAccessToken();
         $user->save();

@@ -60,6 +60,7 @@ class TimMandiriController extends Controller
         ?int $offset_completed = 0,
     ) {
         $base_query = SelfTeamMember::find()
+            ->distinct()
             ->alias('stm')
             ->joinWith('certification c')
             ->joinWith('certification.saspriK')

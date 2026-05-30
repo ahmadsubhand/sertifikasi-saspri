@@ -52,6 +52,12 @@ class IndicatorGroupService
         $indicator_group->assessment_id = $assessment_id;
         $indicator_group->setAttributes($data->attributes);
 
+        if ($indicator_group->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Grup tidak dapat ditambah/diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
         $remaining_weight = $indicator_group->countRemainingWeight();
         if ($remaining_weight < $indicator_group->weight) {
             $parent_group = $indicator_group->parentGroup;
@@ -78,6 +84,13 @@ class IndicatorGroupService
     public static function delete(int $id): IndicatorGroup
     {
         $model = self::findOrFail($id);
+        
+        if ($model->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Grup tidak dapat dihapus karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
         $model->delete();
         return $model;
     }

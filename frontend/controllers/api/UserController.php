@@ -3,17 +3,21 @@
 namespace frontend\controllers\api;
 
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\LoginForm;
 use common\models\form\RegisterForm;
 use common\models\form\VerifyEmailForm;
+use common\models\PeerTeamMember;
+use common\models\SelfTeamMember;
 use common\models\User;
 use common\services\UserService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 
@@ -88,31 +92,22 @@ class UserController extends ActiveController
     public function actionLogin()
     {
         $data = new LoginForm();
-        $data->load(Yii::$app->request->getBodyParams(), '');
-        if ($data->validate()) {
-            return UserService::login($data);
-        }
-        return $data;
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::login($data);
     }
 
     public function actionRegister()
     {
         $data = new RegisterForm();
-        $data->load(Yii::$app->request->getBodyParams(), '');
-        if ($data->validate()) {
-            return UserService::register($data);
-        }
-        return $data;
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::register($data);
     }
 
     public function actionVerifyEmail()
     {
         $data = new VerifyEmailForm();
-        $data->load(Yii::$app->request->getBodyParams(), '');
-        if ($data->validate()) {
-            return UserService::verifyEmail($data);
-        }
-        return $data;
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::verifyEmail($data);
     }
 
     public function actionMe()
@@ -141,34 +136,53 @@ class UserController extends ActiveController
     {
         $user_id = Yii::$app->user->id;
         $certifications = Certification::find()
-            ->joinWith('selfTeamMembers stm')
-            ->joinWith('peerTeamMembers ptm')
+            ->distinct()
+            ->joinWith('selfTeamMembers')
+            ->joinWith('peerTeamMembers')
             ->andWhere([
                 'or',
-                ['stm.user_id' => $user_id],
-                ['ptm.user_id' => $user_id],
+                [SelfTeamMember::tableName() . '.user_id' => $user_id],
+                [PeerTeamMember::tableName() . '.user_id' => $user_id],
             ])
             ->orderBy(['updated_at' => SORT_DESC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $certifications;
+
+        $has_next = count($certifications) > $limit;
+        if ($has_next) array_pop($certifications);
+
+        return [
+            'certifications' => $certifications,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
-    public function actionAvailableForSaspriK(?string $q = '', ?int $limit = 10)
+    public function actionAvailableForSaspriK(?string $q = '', ?int $limit = 10, ?int $offset = 0)
     {
         $users = User::find()
             ->availableForSaspriK()
             ->andWhere(['like', 'username', $q])
             ->select(UserHelper::$basicSelect)
-            ->limit($limit)
-            ->asArray()
+            ->limit($limit + 1)
+            ->offset($offset)
             ->all();
-        return $users;
+
+        $has_next = count($users) > $limit;
+        if ($has_next) array_pop($users);
+
+        return [
+            'users' => $users,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
-    public function actionAvailableForSelfTeam(?string $q = '', ?int $limit = 10)
+    public function actionAvailableForSelfTeam(?string $q = '', ?int $limit = 10, ?int $offset = 0)
     {
         $user = User::findOne(Yii::$app->user->id);
         $saspri_k = $user->saspriKAsCoordinator;
@@ -177,22 +191,40 @@ class UserController extends ActiveController
             ->availableForSelfTeam($saspri_k, $certification)
             ->andWhere(['like', 'username', $q])
             ->select(UserHelper::$basicSelect)
-            ->limit($limit)
-            ->asArray()
+            ->limit($limit + 1)
+            ->offset($offset)
             ->all();
-        return $users;
+
+        $has_next = count($users) > $limit;
+        if ($has_next) array_pop($users);
+
+        return [
+            'users' => $users,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
-    public function actionAvailableForPeerTeam(int $certification_id, ?string $q = '', ?int $limit = 10)
+    public function actionAvailableForPeerTeam(int $certification_id, ?string $q = '', ?int $limit = 10, ?int $offset = 0)
     {
         $certification = Certification::findOne(['id' => $certification_id]);
         $users = User::find()
             ->availableForPeerTeam($certification)
             ->andWhere(['like', 'username', $q])
             ->select(UserHelper::$basicSelect)
-            ->limit($limit)
-            ->asArray()
+            ->limit($limit + 1)
+            ->offset($offset)
             ->all();
-        return $users;
+
+        $has_next = count($users) > $limit;
+        if ($has_next) array_pop($users);
+
+        return [
+            'users' => $users,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 }

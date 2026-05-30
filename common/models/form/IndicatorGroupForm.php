@@ -27,7 +27,7 @@ class IndicatorGroupForm extends Model
             [['code', 'label', 'order', 'weight'], 'required'],
             [['code', 'label'], 'string', 'max' => 255],
             [['parent_group_id'], 'integer', 'min' => 0],
-            [['order'], 'integer'],
+            [['order'], 'integer', 'min' => 0],
             [['weight'], 'integer', 'min' => 0, 'max' => 100],
         ];
     }

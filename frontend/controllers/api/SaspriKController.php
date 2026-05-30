@@ -3,15 +3,24 @@
 namespace frontend\controllers\api;
 
 use common\enums\ApprovalStatus;
+use common\enums\RequestResponse;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
+use common\models\form\AddMembersForm;
+use common\models\form\CoordinatorChangeForm;
+use common\models\form\ExternalReviewForm;
+use common\models\form\RegisterSaspriKForm;
+use common\models\form\RequestResponseForm;
 use common\models\SaspriK;
 use common\models\User;
+use common\services\SaspriKService;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
 use yii\filters\auth\HttpBearerAuth;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\rest\ActiveController;
 use yii\web\NotFoundHttpException;
 
@@ -39,6 +48,14 @@ class SaspriKController extends ActiveController
                 'on-going-certification' => ['GET'],
                 'coordinator-registration' => ['GET'],
                 'coordinator-change' => ['GET'],
+                'add-members' => ['POST'],
+                'remove-member' => ['DELETE'],
+                'register' => ['POST'],
+                'cancel' => ['DELETE'],
+                'save-draft-registration' => ['POST'],
+                'coordinator-registration-response' => ['POST'],
+                'change-coordinator' => ['POST'],
+                'coordinator-change-response' => ['POST'],
             ]
         ];
 
@@ -48,6 +65,14 @@ class SaspriKController extends ActiveController
                 'on-going-certification',
                 'coordinator-registration',
                 'coordinator-change',
+                'add-members',
+                'remove-member',
+                'register',
+                'cancel',
+                'save-draft-registration',
+                'coordinator-registration-response',
+                'change-coordinator',
+                'coordinator-change-response',
             ]
         ];
 
@@ -56,7 +81,15 @@ class SaspriKController extends ActiveController
             'only' => [
                 'on-going-certification',
                 'coordinator-registration',
-                'coordinator-change'
+                'coordinator-change',
+                'add-members',
+                'remove-member',
+                'register',
+                'cancel',
+                'save-draft-registration',
+                'coordinator-registration-response',
+                'change-coordinator',
+                'coordinator-change-response',
             ],
             'rules' => [
                 [
@@ -64,6 +97,9 @@ class SaspriKController extends ActiveController
                     'roles' => [UserRole::COORDINATOR],
                     'actions' => [
                         'on-going-certification',
+                        'add-members',
+                        'remove-member',
+                        'change-coordinator',
                     ],
                 ],
                 [
@@ -72,6 +108,17 @@ class SaspriKController extends ActiveController
                     'actions' => [
                         'coordinator-registration',
                         'coordinator-change',
+                        'save-draft-registration',
+                        'coordinator-registration-response',
+                        'coordinator-change-response',
+                    ],
+                ],
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::USER],
+                    'actions' => [
+                        'register',
+                        'cancel',
                     ],
                 ]
             ]
@@ -82,52 +129,73 @@ class SaspriKController extends ActiveController
 
     public function actionDetail(int $saspri_k_id)
     {
-        $saspri_k = $this->findSaspriKOrFail($saspri_k_id);
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         return $saspri_k;
     }
 
     public function actionMembers(int $saspri_k_id, ?string $q = '', ?int $limit = 5, ?int $offset = 0)
     {
-        $saspri_k = $this->findSaspriKOrFail($saspri_k_id);
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         $users = $saspri_k->getUsers()
             ->joinWith('role r')
             ->andWhere(['like', 'username', $q])
-            ->select(UserHelper::$basicSelect)
+            ->select([
+                ...UserHelper::$basicSelect,
+                'role' => new \yii\db\Expression('MIN(r.item_name)')
+            ])
+            ->groupBy(User::tableName() . '.id')
             ->orderBy([
                 new \yii\db\Expression(
-                    "CASE WHEN r.item_name = :role THEN 0 ELSE 1 END",
+                    "MIN(CASE WHEN r.item_name = :role THEN 0 ELSE 1 END)",
                     [':role' => UserRole::COORDINATOR]
                 ),
             ])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $users;
+
+        $has_next = count($users) > $limit;
+        if ($has_next) array_pop($users);
+
+        return [
+            'members' => $users,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionValidCertificate(int $saspri_k_id)
     {
-        $saspri_k = $this->findSaspriKOrFail($saspri_k_id);
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         return $saspri_k->validCertificate;
     }
 
     public function actionLatestCompletedCertification(int $saspri_k_id)
     {
-        $saspri_k = $this->findSaspriKOrFail($saspri_k_id);
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         return $saspri_k->latestCompletedCertification;
     }
 
     public function actionCertifications(int $saspri_k_id, ?int $limit = 5, ?int $offset = 0)
     {
-        $saspri_k = $this->findSaspriKOrFail($saspri_k_id);
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         $certifications = $saspri_k->getCertifications()
             ->orderBy(['updated_at' => SORT_DESC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
-            ->asArray()
             ->all();
-        return $certifications;
+
+        $has_next = count($certifications) > $limit;
+        if ($has_next) array_pop($certifications);
+
+        return [
+            'certifications' => $certifications,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionOnGoingCertification()
@@ -142,7 +210,7 @@ class SaspriKController extends ActiveController
 
     public function actionCoordinatorRegistration(?int $limit = 5, ?int $offset = 0)
     {
-        $saspri_k = SaspriK::find()
+        $saspri_ks = SaspriK::find()
             ->where(['request_status' => ApprovalStatus::PENDING])
             ->with([
                 'coordinator' => function (ActiveQuery $query) {
@@ -151,37 +219,109 @@ class SaspriKController extends ActiveController
                 'district',
             ])
             ->orderBy(['updated_at' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $saspri_k;
+
+        $has_next = count($saspri_ks) > $limit;
+        if ($has_next) array_pop($saspri_ks);
+
+        return [
+            'registration_requests' => $saspri_ks,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionCoordinatorChange(?int $limit = 5, ?int $offset = 0)
     {
-        $saspri_k = SaspriK::find()
+        $saspri_ks = SaspriK::find()
             ->where(['change_status' => ApprovalStatus::PENDING])
             ->with([
+                'newCoordinator' => function (ActiveQuery $query) {
+                    $query->select(UserHelper::$basicSelect);
+                },
                 'coordinator' => function (ActiveQuery $query) {
                     $query->select(UserHelper::$basicSelect);
                 }, 
                 'district',
             ])
             ->orderBy(['updated_at' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $saspri_k;
+
+        $has_next = count($saspri_ks) > $limit;
+        if ($has_next) array_pop($saspri_ks);
+
+        return [
+            'change_requests' => $saspri_ks,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
-    protected function findSaspriKOrFail(int $id)
+    public function actionAddMembers()
     {
-        $saspri_k = SaspriK::findOne($id);
-        if (!$saspri_k) {
-            throw new NotFoundHttpException('SASPRI-K not found');
+        $data = new AddMembersForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::addMembers($data);
+    }
+
+    public function actionRemoveMember(int $user_id)
+    {
+        return SaspriKService::removeMember($user_id);
+    }
+
+    public function actionRegister()
+    {
+        $data = new RegisterSaspriKForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::register($data);
+    }
+
+    public function actionCancel()
+    {
+        return SaspriKService::cancel();
+    }
+
+    public function actionSaveDraftRegistration(int $saspri_k_id)
+    {
+        $data = new ExternalReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::saveRegistration($saspri_k_id, $data);
+    }
+
+    public function actionCoordinatorRegistrationResponse(int $saspri_k_id)
+    {
+        $request = Yii::$app->request->getBodyParams();
+        $data = new RequestResponseForm();
+        ModelHelper::loadAndValidateOrFail($data, $request);
+
+        if ($data->action === RequestResponse::APPROVE) {
+            $scores = new ExternalReviewForm();
+            ModelHelper::loadAndValidateOrFail($scores, $request);
+            SaspriKService::saveRegistration($saspri_k_id, $scores);
         }
-        return $saspri_k;
+
+        return SaspriKService::registrationRequestResponse($saspri_k_id, $data);
+    }
+
+    public function actionChangeCoordinator()
+    {
+        $data = new CoordinatorChangeForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::changeCoordinator($data);
+    }
+
+    public function actionCoordinatorChangeResponse(int $saspri_k_id)
+    {
+        $data = new RequestResponseForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
     }
 }

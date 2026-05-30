@@ -22,7 +22,7 @@ class AssessmentService
         return $assessment;
     }
 
-    public static function create(int $assessment_id, ?CreateAssessmentForm $data): Assessment
+    public static function create(?int $assessment_id, ?CreateAssessmentForm $data): Assessment
     {
         $assessment = new Assessment();
 

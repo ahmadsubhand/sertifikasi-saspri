@@ -129,7 +129,7 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::SELF_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::SELF_REVIEW);
 
-        return $certification;
+        return $certification->indicatorScores;
     }
 
     public static function finalizeSelfReview(int $certification_id, SelfReviewForm $data)
@@ -210,7 +210,7 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::PEER_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::PEER_REVIEW);
 
-        return $certification;
+        return $certification->indicatorScores;
     }
 
     public static function finalizePeerReview(int $certification_id, PeerReviewForm $data)
@@ -237,7 +237,7 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
-        return $certification;
+        return $certification->indicatorScores;
     }
 
     public static function finalizeExternalReview(int $certification_id, ExternalReviewForm $data)

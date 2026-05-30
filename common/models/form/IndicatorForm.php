@@ -22,7 +22,7 @@ class IndicatorForm extends Model
     {
         return [
             [['indicator_group_id', 'code', 'label', 'order'], 'required'],
-            [['indicator_group_id', 'order'], 'integer'],
+            [['indicator_group_id', 'order'], 'integer', 'min' => 0],
             [['code', 'label'], 'string', 'max' => 255],
         ];
     }

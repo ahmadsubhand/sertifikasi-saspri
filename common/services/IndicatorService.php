@@ -7,6 +7,7 @@ use common\models\form\IndicatorForm;
 use common\models\Indicator;
 use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class IndicatorService
 {
@@ -35,14 +36,27 @@ class IndicatorService
         }
 
         $indicator->setAttributes($data->attributes);
-        $indicator->save();
 
+        if ($indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Indikator tidak dapat ditambah/diubah karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
+        $indicator->save();
         return $indicator;
     }
 
     public static function delete(int $id): Indicator
     {
         $indicator = self::findOrFail($id);
+
+        if ($indicator->indicatorGroup->assessment->getCertifications()->exists()) {
+            throw new UnprocessableEntityHttpException(
+                'Indikator tidak dapat dihapus karena asesmen sudah digunakan dalam proses sertifikasi'
+            );
+        }
+
         $indicator->delete();
         return $indicator;
     }

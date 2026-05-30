@@ -176,7 +176,7 @@ class SaspriKController extends Controller
             $user = SaspriKService::removeMember($user_id);
             Yii::$app->session->setFlash(
                 'success',
-                $user->username . ' berhasil dikeluarkan dari SASPRI-K',
+                $user['username'] . ' berhasil dikeluarkan dari SASPRI-K',
             );
             return $this->redirect(['index']);
         } catch (Exception $error) {

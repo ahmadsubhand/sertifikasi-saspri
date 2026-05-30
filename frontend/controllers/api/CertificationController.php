@@ -2,11 +2,24 @@
 
 namespace frontend\controllers\api;
 
+use common\enums\CertificateLevel;
+use common\enums\CertificationStatus;
+use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
+use common\models\form\AddMembersForm;
+use common\models\form\ChangeMemberRoleForm;
+use common\models\form\ExternalReviewForm;
+use common\models\form\PeerReviewForm;
+use common\models\form\SelfReviewForm;
 use common\services\CertificationService;
+use Yii;
 use yii\db\ActiveQuery;
+use yii\filters\AccessControl;
+use yii\filters\auth\HttpBearerAuth;
 use yii\filters\VerbFilter;
+use yii\helpers\Url;
 use yii\rest\ActiveController;
 
 class CertificationController extends ActiveController
@@ -25,14 +38,172 @@ class CertificationController extends ActiveController
         $behaviors['verbs'] = [
             'class' => VerbFilter::class,
             'actions' => [
+                'index' => ['GET'],
                 'detail' => ['GET'],
                 'saspri-k' => ['GET'],
                 'self-team' => ['GET'],
                 'peer-team' => ['GET'],
+                'add-self-team-members' => ['POST'],
+                'remove-self-team-member' => ['DELETE'],
+                'change-self-team-member-role' => ['POST'],
+                'submit-for-self-review' => ['POST'],
+                'save-self-review' => ['POST'],
+                'finalize-self-review' => ['POST'],
+                'add-peer-team-members' => ['POST'],
+                'remove-peer-team-member' => ['DELETE'],
+                'change-peer-team-member-role' => ['POST'],
+                'submit-for-peer-review' => ['POST'],
+                'save-peer-review' => ['POST'],
+                'finalize-peer-review' => ['POST'],
+                'save-external-review' => ['POST'],
+                'finalize-external-review' => ['POST'],
             ]
         ];
 
+        $behaviors['authenticator'] = [
+            'class' => HttpBearerAuth::class,
+            'only' => [
+                'add-self-team-members',
+                'remove-self-team-member',
+                'change-self-team-member-role',
+                'submit-for-self-review',
+                'save-self-review',
+                'finalize-self-review',
+                'add-peer-team-members',
+                'remove-peer-team-member',
+                'change-peer-team-member-role',
+                'submit-for-peer-review',
+                'save-peer-review',
+                'finalize-peer-review',
+                'save-external-review',
+                'finalize-external-review',
+            ]
+        ];
+
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'only' => [
+                'add-self-team-members',
+                'remove-self-team-member',
+                'change-self-team-member-role',
+                'submit-for-self-review',
+                'save-self-review',
+                'finalize-self-review',
+                'add-peer-team-members',
+                'remove-peer-team-member',
+                'change-peer-team-member-role',
+                'submit-for-peer-review',
+                'save-peer-review',
+                'finalize-peer-review',
+                'save-external-review',
+                'finalize-external-review',
+            ],
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::COORDINATOR],
+                    'actions' => [
+                        'add-self-team-members',
+                        'remove-self-team-member',
+                        'change-self-team-member-role',
+                        'submit-for-self-review',
+                    ],
+                ],
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::ADMIN],
+                    'actions' => [
+                        'add-peer-team-members',
+                        'remove-peer-team-member',
+                        'change-peer-team-member-role',
+                        'submit-for-peer-review',
+                        'save-external-review',
+                        'finalize-external-review',
+                    ],
+                ],
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::USER],
+                    'actions' => [
+                        'save-self-review',
+                        'finalize-self-review',
+                        'save-peer-review',
+                        'finalize-peer-review',
+                    ],
+                ],
+                [
+                    'allow' => true,
+                    'roles' => ['@'],
+                    'actions' => [
+                        'save-peer-review',
+                        'finalize-peer-review',
+                    ],
+                ],
+            ],
+        ];
+
         return $behaviors;
+    }
+
+    public function actionIndex(
+        ?string $wilayah = null,
+        ?int $province_id = null,
+        ?int $regency_id = null,
+        ?int $district_id = null,
+        ?string $level = null,
+        ?int $limit = 20, 
+        ?int $offset = 0
+    ) {
+        $query = Certification::find()
+            ->distinct()
+            ->joinWith([
+                'saspriK.district.regency.province'
+            ])
+            ->andWhere([
+                'not in',
+                'status',
+                [
+                    CertificationStatus::PENDING_SELF_TEAM_FORMATION,
+                    CertificationStatus::COMPLETED,
+                ]
+            ]);
+
+        if ($wilayah) {
+            $query->andWhere(['like', 'LOWER(region_name)', strtolower($wilayah)]);
+        }
+        if ($province_id) {
+            $query->andWhere(['province.id' => $province_id]);
+        }
+
+        if ($regency_id) {
+            $query->andWhere(['regency.id' => $regency_id]);
+        }
+
+        if ($district_id) {
+            $query->andWhere(['district.id' => $district_id]);
+        }
+
+        if (in_array($level, CertificateLevel::values())) {
+            $query->andWhere(['level' => $level]);
+        }
+
+        $certs = $query
+            ->orderBy([
+                'updated_at' => SORT_DESC
+            ])
+            ->limit($limit + 1)
+            ->offset($offset)
+            ->all();
+
+        $has_next = count($certs) > $limit;
+        if ($has_next) array_pop($certs);
+
+        return [
+            'certifications' => $certs,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionDetail(int $certification_id)
@@ -55,11 +226,20 @@ class CertificationController extends ActiveController
                 $query->select(UserHelper::$basicSelect);
             }])
             ->orderBy(['role' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $members;
+
+        $has_next = count($members) > $limit;
+        if ($has_next) array_pop($members);
+
+        return [
+            'members' => $members,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
     }
 
     public function actionPeerTeam(int $certification_id, ?int $limit = 5, ?int $offset = 0)
@@ -70,10 +250,109 @@ class CertificationController extends ActiveController
                 $query->select(UserHelper::$basicSelect);
             }])
             ->orderBy(['role' => SORT_ASC])
-            ->limit($limit)
+            ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
-        return $members;
+
+        $has_next = count($members) > $limit;
+        if ($has_next) array_pop($members);
+
+        return [
+            'members' => $members,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)], true) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
+            'offset' => $offset,
+        ];
+    }
+
+    public function actionAddSelfTeamMembers()
+    {
+        $data = new AddMembersForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::addSelfTeamMembers($data);
+    }
+
+    public function actionRemoveSelfTeamMember(int $user_id)
+    {
+        return CertificationService::removeSelfTeamMember($user_id);
+    }
+
+    public function actionChangeSelfTeamMemberRole(int $user_id)
+    {
+        $data = new ChangeMemberRoleForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::changeSelfTeamMemberRole($user_id, $data);
+    }
+
+    public function actionSubmitForSelfReview()
+    {
+        return CertificationService::submitForSelfReview();
+    }
+    
+    public function actionSaveSelfReview(int $certification_id)
+    {
+        $data = new SelfReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::saveSelfReview($certification_id, $data);
+    }
+
+    public function actionFinalizeSelfReview(int $certification_id)
+    {
+        $data = new SelfReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::finalizeSelfReview($certification_id, $data);
+    }
+
+    public function actionAddPeerTeamMembers(int $certification_id)
+    {
+        $data = new AddMembersForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::addPeerTeamMembers($certification_id, $data);
+    }
+
+    public function actionRemovePeerTeamMember(int $certification_id, int $user_id)
+    {
+        return CertificationService::removePeerTeamMember($certification_id, $user_id);
+    }
+
+    public function actionChangePeerTeamMemberRole(int $certification_id, int $user_id)
+    {
+        $data = new ChangeMemberRoleForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::changePeerTeamMemberRole($certification_id, $user_id, $data);
+    }
+
+    public function actionSubmitForPeerReview(int $certification_id)
+    {
+        return CertificationService::submitForPeerReview($certification_id);
+    }
+
+    public function actionSavePeerReview(int $certification_id)
+    {
+        $data = new PeerReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::savePeerReview($certification_id, $data);
+    }
+
+    public function actionFinalizePeerReview(int $certification_id)
+    {
+        $data = new PeerReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::finalizePeerReview($certification_id, $data);
+    }
+
+    public function actionSaveExternalReview(int $certification_id)
+    {
+        $data = new ExternalReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::saveExternalReview($certification_id, $data);
+    }
+
+    public function actionFinalizeExternalReview(int $certification_id)
+    {
+        $data = new ExternalReviewForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::finalizeExternalReview($certification_id, $data);
     }
 }

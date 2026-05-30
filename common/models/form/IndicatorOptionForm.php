@@ -26,7 +26,8 @@ class IndicatorOptionForm extends Model
         return [
             [['indicator_id', 'code', 'label', 'order', 'weight'], 'required'],
             [['indicator_id'], 'integer', 'min' => 0],
-            [['code', 'label', 'order'], 'string', 'max' => 255],
+            [['code', 'label'], 'string', 'max' => 255],
+            [['order'], 'integer', 'min' => 0],
             [['weight'], 'integer', 'min' => 0, 'max' => 100],
         ];
     }
