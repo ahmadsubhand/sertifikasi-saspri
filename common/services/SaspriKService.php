@@ -149,6 +149,30 @@ class SaspriKService
         return $saspri_k;
     }
 
+    public static function coordinatorRegistrationDetail(int $saspri_k_id, int $page = 1)
+    {
+        $saspri_k = SaspriKService::findSaspriKWithRegistrationOrFail($saspri_k_id);
+
+        /** @var Certification $certification */
+        $certification = $saspri_k->getCertifications()->one();
+        [
+            'root_groups' => $root_groups,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups
+        ] = $certification->getAllIndicators($page);
+
+        return [
+            'saspri_k' => $saspri_k,
+            'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
+            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
+            'certification' => $certification,
+            'current_root_group' => $current_root_group,
+            'current_child_groups' => $current_child_groups,
+            'page' => $page,
+            'total_pages' => count($root_groups),
+        ];
+    }
+
     public static function saveRegistration(int $saspri_k_id, ExternalReviewForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isRequestRegistrationPending();
@@ -222,6 +246,18 @@ class SaspriKService
         ];
     }
 
+    public static function coordinatorChangeDetail(int $saspri_k_id)
+    {
+        $saspri_k = SaspriKService::findSaspriKWithRequestChangeOrFail($saspri_k_id);
+
+        return [
+            'saspri_k' => $saspri_k,
+            'coordinator' => $saspri_k->coordinator,
+            'new_coordinator' => $saspri_k->newCoordinator,
+            'valid_certificate' => $saspri_k->validCertificate,
+        ];
+    }
+
     public static function coordinatorChangeResponse(int $saspri_k_id, RequestResponseForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isCoordinatorChangePending();
@@ -244,6 +280,36 @@ class SaspriKService
         }
 
         $saspri_k->save();
+        return $saspri_k;
+    }
+
+    protected static function findSaspriKWithRequestChangeOrFail(int $id)
+    {
+        $saspri_k = SaspriK::findOne($id);
+        if (!$saspri_k) {
+            throw new NotFoundHttpException('SASPRI-K tidak ditemukan');
+        }
+        if ($saspri_k->change_status !== ApprovalStatus::PENDING) {
+            throw new UnprocessableEntityHttpException(
+                'Tidak ditemukan permintaan pergantian wali oleh SASPRI-K ' . $saspri_k->region_name .
+                ' atau permintaan sudah pernah ditanggapi'
+            );
+        }
+        return $saspri_k;
+    }
+
+    protected static function findSaspriKWithRegistrationOrFail(int $id)
+    {
+        $saspri_k = SaspriK::findOne($id);
+        if (!$saspri_k) {
+            throw new NotFoundHttpException('SASPRI-K tidak ditemukan');
+        }
+        if ($saspri_k->request_status !== ApprovalStatus::PENDING) {
+            throw new UnprocessableEntityHttpException(
+                'Tidak ditemukan permintaan pendaftaran wali ' . $saspri_k->region_name .
+                ' atau permintaan sudah pernah ditanggapi'
+            );
+        }
         return $saspri_k;
     }
 }

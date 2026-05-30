@@ -5,7 +5,6 @@ namespace backend\controllers;
 use common\enums\ApprovalStatus;
 use common\enums\RequestResponse;
 use common\helpers\UserHelper;
-use common\models\Certification;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RequestResponseForm;
 use common\models\SaspriK;
@@ -100,12 +99,10 @@ class VerifikasiWaliController extends Controller
     public function actionPermintaanPergantianWali(int $saspri_k_id)
     {
         try {
-            $saspri_k = $this->findSaspriKWithRequestChangeOrFail($saspri_k_id);
-
-            return $this->render('permintaanPergantianWali', [
-                'saspri_k' => $saspri_k,
-                'valid_certificate' => $saspri_k->validCertificate,
-            ]);
+            return $this->render(
+                'permintaanPergantianWali',
+                SaspriKService::coordinatorChangeDetail($saspri_k_id),
+            );
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -153,26 +150,10 @@ class VerifikasiWaliController extends Controller
     public function actionPermintaanPendaftaranWali(int $saspri_k_id, ?int $page = 1)
     {
         try {
-            $saspri_k = $this->findSaspriKWithRegistrationOrFail($saspri_k_id);
-
-            /** @var Certification $certification */
-            $certification = $saspri_k->getCertifications()->one();
-            [
-                'root_groups' => $root_groups,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups
-            ] = $certification->getAllIndicators($page);
-
-            return $this->render('permintaanPendaftaranWali', [
-                'saspri_k' => $saspri_k,
-                'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
-                'coordinator' => $saspri_k->coordinator,
-                'certification' => $certification,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups,
-                'page' => $page,
-                'total_pages' => count($root_groups),
-            ]);
+            return $this->render(
+                'permintaanPendaftaranWali',
+                SaspriKService::coordinatorRegistrationDetail($saspri_k_id, $page)
+            );
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -278,35 +259,5 @@ class VerifikasiWaliController extends Controller
             }
             throw $error;
         }
-    }
-
-    protected function findSaspriKWithRequestChangeOrFail(int $id)
-    {
-        $saspri_k = SaspriK::findOne($id);
-        if (!$saspri_k) {
-            throw new NotFoundHttpException('SASPRI-K tidak ditemukan');
-        }
-        if ($saspri_k->change_status !== ApprovalStatus::PENDING) {
-            throw new UnprocessableEntityHttpException(
-                'Tidak ditemukan permintaan pergantian wali oleh SASPRI-K ' . $saspri_k->region_name .
-                ' atau permintaan sudah pernah ditanggapi'
-            );
-        }
-        return $saspri_k;
-    }
-
-    protected function findSaspriKWithRegistrationOrFail(int $id)
-    {
-        $saspri_k = SaspriK::findOne($id);
-        if (!$saspri_k) {
-            throw new NotFoundHttpException('SASPRI-K tidak ditemukan');
-        }
-        if ($saspri_k->request_status !== ApprovalStatus::PENDING) {
-            throw new UnprocessableEntityHttpException(
-                'Tidak ditemukan permintaan pendaftaran wali ' . $saspri_k->region_name .
-                ' atau permintaan sudah pernah ditanggapi'
-            );
-        }
-        return $saspri_k;
     }
 }
