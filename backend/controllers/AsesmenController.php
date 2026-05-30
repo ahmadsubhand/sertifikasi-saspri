@@ -193,8 +193,11 @@ class AsesmenController extends Controller
     {
         try {
             $data = new IndicatorGroupForm();
-            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post('IndicatorGroup'));
-            $indicator_group = IndicatorGroupService::save($assessment_id, $indicator_group_id, $data);
+            ModelHelper::loadAndValidateOrFail($data, [
+                ...Yii::$app->request->post('IndicatorGroup'),
+                'assessment_id' => $assessment_id
+            ]);
+            $indicator_group = IndicatorGroupService::save($indicator_group_id, $data);
 
             Yii::$app->session->setFlash('success', 'Grup ' . $indicator_group->code . ' berhasil disimpan');
             return $this->redirect(['kelola', 'assessment_id' => $assessment_id]);
@@ -219,7 +222,7 @@ class AsesmenController extends Controller
         try {
             $data = new IndicatorForm();
             ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post('Indicator'));
-            $indicator = IndicatorService::save($assessment_id, $indicator_id, $data);
+            $indicator = IndicatorService::save($indicator_id, $data);
             
             Yii::$app->session->setFlash(
                 'success', 

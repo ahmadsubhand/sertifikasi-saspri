@@ -2,9 +2,9 @@
 
 namespace common\services;
 
-use common\models\Assessment;
 use common\models\form\IndicatorForm;
 use common\models\Indicator;
+use common\models\IndicatorGroup;
 use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
 use yii\web\UnprocessableEntityHttpException;
@@ -20,16 +20,16 @@ class IndicatorService
         return $indicator;
     }
 
-    public static function save(int $assessment_id, ?int $indicator_id, IndicatorForm $data): Indicator
+    public static function save(?int $indicator_id, IndicatorForm $data): Indicator
     {
         $indicator = $indicator_id ? self::findOrFail($indicator_id) : new Indicator();
         if (!$data->indicator_group_id) {
             throw new BadRequestHttpException('Indikator wajib memiliki subgrup');
         }
 
-        $isValidGroup = Assessment::findOne($assessment_id)
-            ->getChildGroups()
-            ->andWhere(['child.id' => $data->indicator_group_id])
+        $isValidGroup = IndicatorGroup::find()
+            ->where(['id' => $data->indicator_group_id])
+            ->andWhere(['is not', 'parent_group_id', null])
             ->exists();
         if (!$isValidGroup) {
             throw new NotFoundHttpException('Subgrup yang dipilih tidak ditemukan atau bukan subgrup yang valid');

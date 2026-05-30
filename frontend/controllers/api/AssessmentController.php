@@ -7,14 +7,8 @@ use common\helpers\ModelHelper;
 use common\models\Assessment;
 use common\models\form\ChangeLevelForm;
 use common\models\form\CreateAssessmentForm;
-use common\models\form\IndicatorForm;
-use common\models\form\IndicatorGroupForm;
-use common\models\form\IndicatorOptionForm;
 use common\models\form\UpdateAssessmentTitleForm;
 use common\services\AssessmentService;
-use common\services\IndicatorGroupService;
-use common\services\IndicatorOptionService;
-use common\services\IndicatorService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\auth\HttpBearerAuth;
@@ -44,12 +38,6 @@ class AssessmentController extends ActiveController
                 'activate' => ['POST'],
                 'change-level' => ['POST'],
                 'delete' => ['DELETE'],
-                'save-group' => ['PATCH'],
-                'delete-group' => ['DELETE'],
-                'save-indicator' => ['PATCH'],
-                'delete-indicator' => ['DELETE'],
-                'save-option' => ['PATCH'],
-                'delete-option' => ['DELETE'],
             ]
         ];
 
@@ -119,41 +107,5 @@ class AssessmentController extends ActiveController
     public function actionDelete(int $assessment_id)
     {
         return AssessmentService::delete($assessment_id);
-    }
-
-    public function actionSaveGroup(int $assessment_id, ?int $indicator_group_id = null)
-    {
-        $data = new IndicatorGroupForm();
-        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
-        return IndicatorGroupService::save($assessment_id, $indicator_group_id, $data);
-    }
-
-    public function actionDeleteGroup(int $indicator_group_id)
-    {
-        return IndicatorGroupService::delete($indicator_group_id);
-    }
-
-    public function actionSaveIndicator(int $assessment_id, ?int $indicator_id = null)
-    {
-        $data = new IndicatorForm();
-        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
-        return IndicatorService::save($assessment_id, $indicator_id, $data);
-    }
-
-    public function actionDeleteIndicator(int $indicator_id)
-    {
-        return IndicatorService::delete($indicator_id);
-    }
-
-    public function actionSaveOption(?int $indicator_option_id = null)
-    {
-        $data = new IndicatorOptionForm();
-        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
-        return IndicatorOptionService::save($indicator_option_id, $data);
-    }
-
-    public function actionDeleteOption(int $indicator_option_id)
-    {
-        return IndicatorOptionService::delete($indicator_option_id);
     }
 }

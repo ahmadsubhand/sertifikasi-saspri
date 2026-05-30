@@ -20,36 +20,37 @@ class IndicatorGroupService
         return $group;
     }
 
-    public static function save(int $assessment_id, ?int $group_id, IndicatorGroupForm $data): IndicatorGroup
+    public static function save(?int $group_id, IndicatorGroupForm $data): IndicatorGroup
     {
         $indicator_group = $group_id ? self::findOrFail($group_id) : new IndicatorGroup();
 
         if ($group_id) {
             // Mengecek parent atau child langsung dari model db,
             // bukan dari model yang sudah disisipkan input user ($indicator_group->load)
-            $parent_group_id = $data->parent_group_id;
             if ($indicator_group->parent_group_id) {
-                if (!$parent_group_id) {
+                if (!$data->parent_group_id) {
                     throw new BadRequestHttpException(
                         ($data->code ?? $indicator_group->code) . ' adalah subgrup sehinggga wajib memiliki grup utama'
                     );
-                } else {
-                    $isValidParent = Assessment::findOne($assessment_id)
-                        ->getRootGroups()
-                        ->where(['id' => $parent_group_id])
-                        ->exists();
-                    if (!$isValidParent) {
-                        throw new NotFoundHttpException('Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid');
-                    }
                 }
-            } else if (!$indicator_group->parent_group_id && $parent_group_id) {
+            } else if (!$indicator_group->parent_group_id && $data->parent_group_id) {
                 throw new BadRequestHttpException(
                     ($data->code ?? $indicator_group->code) . ' adalah grup utama sehingga tidak dapat dipindahkan ke dalam grup lain'
                 );
             }
         }
 
-        $indicator_group->assessment_id = $assessment_id;
+        if ($data->parent_group_id) {
+            $isValidParent = Assessment::findOne($data->assessment_id)
+                ->getRootGroups()
+                ->where(['id' => $data->parent_group_id])
+                ->exists();
+            if (!$isValidParent) {
+                throw new NotFoundHttpException('Grup utama yang dipilih tidak ditemukan atau bukan grup utama yang valid');
+            }
+        }
+
+        $indicator_group->assessment_id = $data->assessment_id;
         $indicator_group->setAttributes($data->attributes);
 
         if ($indicator_group->assessment->getCertifications()->exists()) {
@@ -71,7 +72,7 @@ class IndicatorGroupService
             } else {
                 throw new UnprocessableEntityHttpException(
                     'Total bobot grup utama dalam asesmen ini ' .
-                    ' tidak boleh melebihi 100. Saat ini sisa bobot yang tersedia hanya ' .
+                    'tidak boleh melebihi 100. Saat ini sisa bobot yang tersedia hanya ' .
                     $remaining_weight
                 );
             }

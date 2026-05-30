@@ -6,6 +6,9 @@ use yii\base\Model;
 
 class IndicatorGroupForm extends Model
 {
+    /** @var int */
+    public $assessment_id;
+
     /** @var int|null */
     public $parent_group_id;
 
@@ -24,10 +27,9 @@ class IndicatorGroupForm extends Model
     public function rules()
     {
         return [
-            [['code', 'label', 'order', 'weight'], 'required'],
+            [['assessment_id', 'code', 'label', 'order', 'weight'], 'required'],
             [['code', 'label'], 'string', 'max' => 255],
-            [['parent_group_id'], 'integer', 'min' => 0],
-            [['order'], 'integer', 'min' => 0],
+            [['assessment_id', 'parent_group_id', 'order'], 'integer', 'min' => 0],
             [['weight'], 'integer', 'min' => 0, 'max' => 100],
         ];
     }
