@@ -6,7 +6,6 @@ use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
 use common\enums\UserRole;
-use common\enums\TeamRole;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\RequestResponseForm;
@@ -60,7 +59,6 @@ class TimMandiriController extends Controller
         ?int $offset_completed = 0,
     ) {
         $base_query = SelfTeamMember::find()
-            ->distinct()
             ->alias('stm')
             ->joinWith('certification c')
             ->joinWith('certification.saspriK')
@@ -153,26 +151,10 @@ class TimMandiriController extends Controller
     public function actionSelfReview(int $certification_id, int $page = 1)
     {
         try {
-            $member = CertificationService::findSelfTeamMember($certification_id, Yii::$app->user->id)
-                ->checkSelfReviewPermission();
-
-            $certification = CertificationService::findOrFail($certification_id)
-                ->validateCertificationStatus(CertificationStatus::SELF_REVIEW);
-            [
-                'root_groups' => $root_groups,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups
-            ] = $certification->getAllIndicators($page);
-
-            return $this->render('selfReview', [
-                'is_leader' => $member->role === TeamRole::LEADER,
-                'saspri_k' => $certification->saspriK,
-                'certification' => $certification,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups,
-                'page' => $page,
-                'total_pages' => count($root_groups),
-            ]);
+            return $this->render(
+                'selfReview',
+                CertificationService::selfReview($certification_id, $page)
+            );
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());

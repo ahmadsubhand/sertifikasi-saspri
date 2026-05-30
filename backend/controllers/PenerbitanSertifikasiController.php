@@ -72,22 +72,10 @@ class PenerbitanSertifikasiController extends Controller
     public function actionExternalReview(int $certification_id, int $page = 1)
     {
         try {
-            $certification = CertificationService::findOrFail($certification_id)
-                ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW);
-
-            [
-                'root_groups' => $root_groups,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups
-            ] = $certification->getAllIndicators($page);
-
-            return $this->render('externalReview', [
-                'certification' => $certification,
-                'current_root_group' => $current_root_group,
-                'current_child_groups' => $current_child_groups,
-                'page' => $page,
-                'total_pages' => count($root_groups),
-            ]);
+            return $this->render(
+                'externalReview',
+                CertificationService::externalReview($certification_id, $page)
+            );
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());

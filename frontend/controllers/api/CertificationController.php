@@ -46,6 +46,7 @@ class CertificationController extends ActiveController
                 'remove-self-team-member' => ['DELETE'],
                 'change-self-team-member-role' => ['POST'],
                 'submit-for-self-review' => ['POST'],
+                'self-review' => ['GET'],
                 'save-self-review' => ['POST'],
                 'finalize-self-review' => ['POST'],
                 'full-peer-team-members' => ['GET'],
@@ -53,8 +54,10 @@ class CertificationController extends ActiveController
                 'remove-peer-team-member' => ['DELETE'],
                 'change-peer-team-member-role' => ['POST'],
                 'submit-for-peer-review' => ['POST'],
+                'peer-review' => ['GET'],
                 'save-peer-review' => ['POST'],
                 'finalize-peer-review' => ['POST'],
+                'external-review' => ['GET'],
                 'save-external-review' => ['POST'],
                 'finalize-external-review' => ['POST'],
             ]
@@ -67,14 +70,17 @@ class CertificationController extends ActiveController
                 'remove-self-team-member',
                 'change-self-team-member-role',
                 'submit-for-self-review',
+                'self-review',
                 'save-self-review',
                 'finalize-self-review',
                 'add-peer-team-members',
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
                 'submit-for-peer-review',
+                'peer-review',
                 'save-peer-review',
                 'finalize-peer-review',
+                'external-review',
                 'save-external-review',
                 'finalize-external-review',
             ]
@@ -88,6 +94,7 @@ class CertificationController extends ActiveController
                 'remove-self-team-member',
                 'change-self-team-member-role',
                 'submit-for-self-review',
+                'self-review',
                 'save-self-review',
                 'finalize-self-review',
                 'full-peer-team-members',
@@ -95,8 +102,10 @@ class CertificationController extends ActiveController
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
                 'submit-for-peer-review',
+                'peer-review',
                 'save-peer-review',
                 'finalize-peer-review',
+                'external-review',
                 'save-external-review',
                 'finalize-external-review',
             ],
@@ -121,6 +130,7 @@ class CertificationController extends ActiveController
                         'remove-peer-team-member',
                         'change-peer-team-member-role',
                         'submit-for-peer-review',
+                        'external-review',
                         'save-external-review',
                         'finalize-external-review',
                     ],
@@ -129,6 +139,7 @@ class CertificationController extends ActiveController
                     'allow' => true,
                     'roles' => [UserRole::USER],
                     'actions' => [
+                        'self-review',
                         'save-self-review',
                         'finalize-self-review',
                         'save-peer-review',
@@ -139,6 +150,7 @@ class CertificationController extends ActiveController
                     'allow' => true,
                     'roles' => ['@'],
                     'actions' => [
+                        'peer-review',
                         'save-peer-review',
                         'finalize-peer-review',
                     ],
@@ -256,6 +268,22 @@ class CertificationController extends ActiveController
     {
         return CertificationService::submitForSelfReview();
     }
+
+    public function actionSelfReview(int $certification_id, int $page = 1)
+    {
+        $data = CertificationService::selfReview($certification_id, $page);
+
+        $data['current_child_groups'] = array_map(
+            fn ($group) => $group->toArray([], [
+                'indicators',
+                'indicators.indicatorOptions',
+                'indicators.indicatorScores',
+            ]),
+            $data['current_child_groups']
+        );
+
+        return $this->asJson($data);
+    }
     
     public function actionSaveSelfReview(int $certification_id)
     {
@@ -319,6 +347,22 @@ class CertificationController extends ActiveController
         return CertificationService::submitForPeerReview($certification_id);
     }
 
+    public function actionPeerReview(int $certification_id, int $page = 1)
+    {
+        $data = CertificationService::peerReview($certification_id, $page);
+
+        $data['current_child_groups'] = array_map(
+            fn ($group) => $group->toArray([], [
+                'indicators',
+                'indicators.indicatorOptions',
+                'indicators.indicatorScores',
+            ]),
+            $data['current_child_groups']
+        );
+
+        return $this->asJson($data);
+    }
+
     public function actionSavePeerReview(int $certification_id)
     {
         $data = new PeerReviewForm();
@@ -331,6 +375,22 @@ class CertificationController extends ActiveController
         $data = new PeerReviewForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return CertificationService::finalizePeerReview($certification_id, $data);
+    }
+
+    public function actionExternalReview(int $certification_id, int $page = 1)
+    {
+        $data = CertificationService::externalReview($certification_id, $page);
+
+        $data['current_child_groups'] = array_map(
+            fn ($group) => $group->toArray([], [
+                'indicators',
+                'indicators.indicatorOptions',
+                'indicators.indicatorScores',
+            ]),
+            $data['current_child_groups']
+        );
+
+        return $this->asJson($data);
     }
 
     public function actionSaveExternalReview(int $certification_id)
