@@ -118,14 +118,23 @@ INSERT INTO saspri_k (id, coordinator_id, district_id, region_name, address, coo
 -- --------------------------------------------------------
 
 INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
-(1, 1, 1, 'level_up', 'completed', 'natalia', 95, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
-(2, 2, 1, 'level_up', 'completed', 'natalia', 82, 'b', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
-(3, 3, 1, 'level_up', 'completed', 'natalia', 86, 'ab', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(1, 1, 2, 'level_up', 'completed', 'natalia', 95, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(2, 2, 2, 'level_up', 'completed', 'natalia', 82, 'b', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(3, 3, 2, 'level_up', 'completed', 'natalia', 86, 'ab', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
 (4, 4, 1, 'level_up', 'completed', 'weania', 55, 'bc', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
 (5, 5, 1, 'level_up', 'completed', 'weania', 45, 'c', 1673308800, 1673308800, '2023-01-10', '2024-01-10'),
-(6, 6, 1, 'level_up', 'completed', 'natalia', 93, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
-(18, 4, 1, 'level_up', 'completed', 'natalia', 92, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10'),
-(19, 5, 1, 'level_up', 'completed', 'natalia', 94, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10');
+(6, 6, 2, 'level_up', 'completed', 'natalia', 93, 'a', 1673308800, 1673308800, '2023-01-10', '2025-01-10'),
+(18, 4, 2, 'level_up', 'completed', 'natalia', 92, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10'),
+(19, 5, 2, 'level_up', 'completed', 'natalia', 94, 'a', 1610236800, 1610236800, '2021-01-10', '2023-01-10');
+
+-- Indicator Scores for Historical Natalia
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score, peer_team_score, final_score, status) VALUES
+(1, 100, 100, 100, 100, 'identical'), (1, 101, 100, 100, 100, 'identical'), (1, 102, 75, 75, 75, 'identical'),
+(2, 100, 75, 75, 75, 'identical'), (2, 101, 100, 100, 100, 'identical'), (2, 102, 50, 50, 50, 'identical'),
+(3, 100, 100, 100, 100, 'identical'), (3, 101, 75, 75, 75, 'identical'), (3, 102, 75, 75, 75, 'identical'),
+(6, 100, 100, 100, 100, 'identical'), (6, 101, 100, 100, 100, 'identical'), (6, 102, 75, 75, 75, 'identical'),
+(18, 100, 100, 100, 100, 'identical'), (18, 101, 75, 75, 75, 'identical'), (18, 102, 100, 100, 100, 'identical'),
+(19, 100, 100, 100, 100, 'identical'), (19, 101, 100, 100, 100, 'identical'), (19, 102, 75, 75, 75, 'identical');
 
 -- --------------------------------------------------------
 -- Ongoing Certifications
@@ -157,11 +166,19 @@ INSERT INTO certification ( id, saspri_k_id, assessment_id, purpose, status, lev
 
 -- Initial Valid Certs for Additionals (SASPRI-K 7-11)
 INSERT INTO certification ( id, saspri_k_id, assessment_id, purpose, status, level, total_score, grade, created_at, updated_at, issued_at, next_certification_due_date) VALUES
-(13, 7, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
-(14, 8, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
-(15, 9, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
-(16, 10, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
-(17, 11, 1, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10');
+(13, 7, 2, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(14, 8, 2, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(15, 9, 2, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(16, 10, 2, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10'),
+(17, 11, 2, 'level_up', 'completed', 'natalia', 90, 'a', 1704067200, 1704844800, '2024-01-10', '2026-01-10');
+
+-- Indicator Scores for Additional Natalia
+INSERT INTO indicator_score (certification_id, indicator_id, self_team_score, peer_team_score, final_score, status) VALUES
+(13, 100, 100, 100, 100, 'identical'), (13, 101, 75, 75, 75, 'identical'), (13, 102, 100, 100, 100, 'identical'),
+(14, 100, 100, 100, 100, 'identical'), (14, 101, 75, 75, 75, 'identical'), (14, 102, 100, 100, 100, 'identical'),
+(15, 100, 100, 100, 100, 'identical'), (15, 101, 75, 75, 75, 'identical'), (15, 102, 100, 100, 100, 'identical'),
+(16, 100, 100, 100, 100, 'identical'), (16, 101, 75, 75, 75, 'identical'), (16, 102, 100, 100, 100, 'identical'),
+(17, 100, 100, 100, 100, 'identical'), (17, 101, 75, 75, 75, 'identical'), (17, 102, 100, 100, 100, 'identical');
 
 -- --------------------------------------------------------
 -- Team Members

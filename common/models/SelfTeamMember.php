@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\ApprovalStatus;
 use common\enums\TeamRole;
 use yii\web\BadRequestHttpException;
@@ -28,6 +29,18 @@ class SelfTeamMember extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'self_team_member';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
+        ];
     }
 
     public static function label()

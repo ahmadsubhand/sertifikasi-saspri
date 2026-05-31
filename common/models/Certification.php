@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\CertificationStatus;
@@ -66,6 +67,9 @@ class Certification extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
         ];
     }
 
@@ -218,10 +222,14 @@ class Certification extends \yii\db\ActiveRecord
     public function submitForSelfReview(): Certification
     {
         // Jika masih ada yang pending, maka otomatis menjadi rejected
-        SelfTeamMember::updateAll(
-            ['status' => ApprovalStatus::REJECTED],
-            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
-        );
+        /** @var SelfTeamMember[] */
+        $self_team_members = $this->getSelfTeamMembers()
+            ->where(['status' => ApprovalStatus::PENDING])
+            ->all();
+        foreach ($self_team_members as $self_team_member) {
+            $self_team_member->status = ApprovalStatus::REJECTED;
+            $self_team_member->save();
+        }
 
         $this->status = CertificationStatus::SELF_REVIEW;
         $this->self_team_due_date = date('Y-m-d H:i:s');
@@ -240,10 +248,14 @@ class Certification extends \yii\db\ActiveRecord
     public function submitForPeerReview(): Certification
     {
         // Jika masih ada yang pending, maka otomatis menjadi rejected
-        PeerTeamMember::updateAll(
-            ['status' => ApprovalStatus::REJECTED],
-            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
-        );
+        /** @var PeerTeamMember[] */
+        $peer_team_members = $this->getPeerTeamMembers()
+            ->where(['status' => ApprovalStatus::PENDING])
+            ->all();
+        foreach ($peer_team_members as $peer_team_member) {
+            $peer_team_member->status = ApprovalStatus::REJECTED;
+            $peer_team_member->save();
+        }
 
         $this->status = CertificationStatus::PEER_REVIEW;
         $this->peer_team_due_date = date('Y-m-d H:i:s');
@@ -575,23 +587,29 @@ class Certification extends \yii\db\ActiveRecord
                         : 0;
                 }
 
-                $sub_group_score = $indicator_count > 0
+                $weighted_score = $indicator_count > 0
                     ? ($sub_group_sum / $indicator_count) * ($sub_group->weight / 100)
                     : 0;
+                $final_score = $weighted_score > 0
+                    ? ($weighted_score * ($root_group->weight / 100))
+                    : 0;
 
-                $root_score += $sub_group_score;
+                $root_score += $final_score;
 
                 $child_groups_data[] = [
                     'code' => $sub_group->code,
                     'label' => $sub_group->label,
-                    'score' => round($sub_group_score, 2),
+                    'weight' => round($sub_group->weight / 100, 2),
+                    'weighted_score' => round($weighted_score, 2),
+                    'score' => round($final_score, 2),
                 ];
             }
 
             $result[] = [
                 'code' => $root_group->code,
                 'label' => $root_group->label,
-                'score' => round($root_score * ($root_group->weight / 100), 2),
+                'weight' => round($root_group->weight / 100, 2),
+                'score' => round($root_score, 2),
                 'indicator_group' => $child_groups_data,
             ];
         }

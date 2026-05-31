@@ -5,11 +5,13 @@ namespace frontend\controllers;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\User;
 use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\CoordinatorChangeForm;
+use common\models\form\UpdateSaspriKForm;
 use common\services\CertificationService;
 use common\services\SaspriKService;
 use common\services\UserService;
@@ -52,6 +54,8 @@ class SaspriKController extends Controller
                     'ubah-peran-anggota-tim-mandiri' => ['post'],
                     'ajukan-sertifikasi' => ['post'],
                     'ajukan-pergantian-wali' => ['post'],
+                    'batalkan-pergantian-wali' => ['post'],
+                    'update-data' => ['post'],
                 ],
             ],
         ];
@@ -442,6 +446,60 @@ class SaspriKController extends Controller
                     $error instanceof UnprocessableEntityHttpException
                 ) {
                     return $this->redirect(['pergantian-wali']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionBatalkanPergantianWali()
+    {
+        try {
+            SaspriKService::cancelCoordinatorChange();
+            return $this->redirect(['pergantian-wali']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                } elseif ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['pergantian-wali']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionEditData()
+    {
+        try {
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+            return $this->render('edit', [
+                'saspri_k' => $saspri_k
+            ]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionUpdateData()
+    {
+        try {
+            $data = new UpdateSaspriKForm();
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+            SaspriKService::update($data);
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
                 }
             }
             throw $error;

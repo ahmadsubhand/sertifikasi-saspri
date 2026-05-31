@@ -17,7 +17,7 @@ class m260504_034250_create_indicator_group_table extends Migration
     {
         $this->createTable('indicator_group', [
             'id' => $this->primaryKey(),
-            'assessment_id' => $this->integer(),
+            'assessment_id' => $this->integer()->notNull(),
             'parent_group_id' => $this->integer(),
             'code' => $this->string()->notNull(),
             'label' => $this->string()->notNull(),

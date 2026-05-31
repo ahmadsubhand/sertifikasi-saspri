@@ -15,6 +15,7 @@ use common\models\User;
 use common\models\Certification;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\UpdateSaspriKForm;
 use Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -128,7 +129,7 @@ class SaspriKService
         ];
     }
 
-    public static function cancel()
+    public static function cancelRegistration()
     {
         $saspri_k = null;
         try {
@@ -246,6 +247,16 @@ class SaspriKService
         ];
     }
 
+    public static function cancelCoordinatorChange()
+    {
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        if ($saspri_k->change_status === ApprovalStatus::APPROVED) {
+            throw new NotFoundHttpException('Tidak ditemukan permintaan pergantian Wali SASPRI-K');
+        }
+        $saspri_k->cancelCoordinatorChange()->save();
+        return $saspri_k;
+    }
+
     public static function coordinatorChangeDetail(int $saspri_k_id)
     {
         $saspri_k = SaspriKService::findSaspriKWithRequestChangeOrFail($saspri_k_id);
@@ -279,6 +290,14 @@ class SaspriKService
             throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
         }
 
+        $saspri_k->save();
+        return $saspri_k;
+    }
+
+    public static function update(UpdateSaspriKForm $data)
+    {
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k->setAttributes($data->attributes);
         $saspri_k->save();
         return $saspri_k;
     }

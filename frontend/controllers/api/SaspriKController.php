@@ -12,6 +12,7 @@ use common\models\form\CoordinatorChangeForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\UpdateSaspriKForm;
 use common\models\SaspriK;
 use common\models\User;
 use common\services\SaspriKService;
@@ -56,8 +57,10 @@ class SaspriKController extends ActiveController
                 'add-members' => ['POST'],
                 'remove-member' => ['DELETE'],
                 'change-coordinator' => ['POST'],
+                'cancel-coordinator-change' => ['POST'],
+                'update' => ['PUT'],
                 'register' => ['POST'],
-                'cancel' => ['DELETE'],
+                'cancel-registration' => ['DELETE'],
             ]
         ];
 
@@ -75,8 +78,10 @@ class SaspriKController extends ActiveController
                 'add-members',
                 'remove-member',
                 'change-coordinator',
+                'cancel-coordinator-change',
+                'update',
                 'register',
-                'cancel',
+                'cancel-registration',
             ]
         ];
 
@@ -94,8 +99,10 @@ class SaspriKController extends ActiveController
                 'add-members',
                 'remove-member',
                 'change-coordinator',
+                'cancel-coordinator-change',
+                'update',
                 'register',
-                'cancel',
+                'cancel-registration',
             ],
             'rules' => [
                 [
@@ -106,6 +113,8 @@ class SaspriKController extends ActiveController
                         'add-members',
                         'remove-member',
                         'change-coordinator',
+                        'cancel-coordinator-change',
+                        'update',
                     ],
                 ],
                 [
@@ -126,7 +135,7 @@ class SaspriKController extends ActiveController
                     'roles' => [UserRole::USER],
                     'actions' => [
                         'register',
-                        'cancel',
+                        'cancel-registration',
                     ],
                 ]
             ]
@@ -292,9 +301,9 @@ class SaspriKController extends ActiveController
         return SaspriKService::register($data);
     }
 
-    public function actionCancel()
+    public function actionCancelRegistration()
     {
-        return SaspriKService::cancel();
+        return SaspriKService::cancelRegistration();
     }
 
     public function actionCoordinatorRegistrationDetail(int $saspri_k_id, ?int $page = 1)
@@ -342,6 +351,11 @@ class SaspriKController extends ActiveController
         return SaspriKService::changeCoordinator($data);
     }
 
+    public function actionCancelCoordinatorChange()
+    {
+        return SaspriKService::cancelCoordinatorChange();
+    }
+
     public function actionCoordinatorChangeDetail(int $saspri_k_id)
     {
         return SaspriKService::coordinatorChangeDetail($saspri_k_id);
@@ -352,5 +366,12 @@ class SaspriKController extends ActiveController
         $data = new RequestResponseForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
+    }
+
+    public function actionUpdate()
+    {
+        $data = new UpdateSaspriKForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::update($data);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\IndicatorStatus;
 use common\helpers\FileHelper;
@@ -33,6 +34,18 @@ class IndicatorScore extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'indicator_score';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return [
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
+        ];
     }
 
     /**
