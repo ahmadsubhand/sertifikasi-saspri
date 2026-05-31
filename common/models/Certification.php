@@ -9,6 +9,7 @@ use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\TeamRole;
 use common\helpers\UserHelper;
+use Error;
 use Exception;
 use yii\behaviors\TimestampBehavior;
 use yii\web\BadRequestHttpException;
@@ -239,6 +240,10 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitSelfReview(): Certification
     {
+        // Jika sebelumnya sudah pernah ditolak
+        $this->is_rejected = 0;
+        $this->rejection_reason = null;
+
         $this->status = CertificationStatus::PENDING_PEER_TEAM_FORMATION;
         $this->self_review_due_date = date('Y-m-d H:i:s');
         $this->peer_team_due_date = date('Y-m-d H:i:s', strtotime('+1 weeks'));
@@ -265,6 +270,10 @@ class Certification extends \yii\db\ActiveRecord
 
     public function submitPeerReview(): Certification
     {
+        // Jika sebelumnya sudah pernah ditolak
+        $this->is_rejected = 0;
+        $this->rejection_reason = null;
+
         $this->status = CertificationStatus::EXTERNAL_REVIEW;
         $this->peer_review_due_date = date('Y-m-d H:i:s');
         $this->external_review_due_date = date('Y-m-d H:i:s', strtotime('+2 weeks'));
@@ -615,6 +624,23 @@ class Certification extends \yii\db\ActiveRecord
         }
 
         return $result;
+    }
+
+    public function reject(string $reason, string $previous_status): self
+    {
+        if (!in_array($previous_status, CertificationStatus::values())) {
+            throw new Error('Invalid value of previous_status. Please refer to CertificationStatus');
+        }
+
+        if ($this->is_rejected) {
+            throw new UnprocessableEntityHttpException('Proses sertifikasi sudah pernah ditolak');
+        }
+
+        $this->is_rejected = 1;
+        $this->rejection_reason = $reason;
+        $this->status = $previous_status;
+
+        return $this;
     }
 
     protected function findOrCreateIndicatorScore(int $indicator_id): IndicatorScore

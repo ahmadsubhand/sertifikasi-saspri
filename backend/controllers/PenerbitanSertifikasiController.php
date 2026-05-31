@@ -4,9 +4,11 @@ namespace backend\controllers;
 
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\ExternalReviewForm;
+use common\models\form\RejectCertificationForm;
 use common\services\CertificationService;
 use Exception;
 use Yii;
@@ -43,6 +45,7 @@ class PenerbitanSertifikasiController extends Controller
                     'ajukan-peer-review' => ['post'],
                     'simpan-sementara-penerbitan-sertifikasi' => ['post'],
                     'finalisasi-penerbitan-sertifikasi' => ['post'],
+                    'tolak-sertifikasi' => ['post'],
                 ],
             ],
         ];
@@ -222,6 +225,32 @@ class PenerbitanSertifikasiController extends Controller
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof UnprocessableEntityHttpException) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionTolakSertifikasi(int $certification_id)
+    {
+        try {
+            $data = new RejectCertificationForm();
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+            $certification = CertificationService::rejectExternalReviewRequest($certification_id, $data);
+            
+            Yii::$app->session->setFlash(
+                'success', 
+                'Sertifikasi SASPRI-K ' . $certification->saspriK->district->name . ' berhasil ditolak',
+            );
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
                     return $this->redirect(['index']);
                 }
             }

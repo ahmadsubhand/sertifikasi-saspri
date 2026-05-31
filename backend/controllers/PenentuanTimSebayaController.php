@@ -5,10 +5,11 @@ namespace backend\controllers;
 use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
-use common\models\PeerTeamMember;
+use common\models\form\RejectCertificationForm;
 use common\models\User;
 use common\services\CertificationService;
 use Exception;
@@ -46,6 +47,7 @@ class PenentuanTimSebayaController extends Controller
                     'hapus-anggota-tim-sebaya' => ['delete'],
                     'ubah-peran-anggota-tim-sebaya' => ['post'],
                     'ajukan-peer-review' => ['post'],
+                    'tolak-sertifikasi' => ['post'],
                 ],
             ],
         ];
@@ -75,7 +77,9 @@ class PenentuanTimSebayaController extends Controller
     public function actionPembentukanTimSebaya(int $certification_id)
     {
         try {
-            $certification = $this->findCertificationOrFail($certification_id);
+            $certification = CertificationService::findOrFail($certification_id)
+                ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
+
             return $this->render('pembentukanTimSebaya', [
                 'saspri_k' => $certification->saspriK,
                 'district' => $certification->saspriK->district,
@@ -111,7 +115,9 @@ class PenentuanTimSebayaController extends Controller
         try {
             Yii::$app->response->format = Response::FORMAT_JSON;
 
-            $certification = $this->findCertificationOrFail($certification_id);
+            $certification = CertificationService::findOrFail($certification_id)
+                ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
+
             $users = User::find()->availableForPeerTeam($certification)
                 ->andWhere(['like', 'username', $q])
                 ->select(['id', 'username'])
@@ -254,26 +260,29 @@ class PenentuanTimSebayaController extends Controller
         }
     }
 
-    private function findCertificationOrFail(int $id): Certification
+    public function actionTolakSertifikasi(int $certification_id)
     {
-        $certification = Certification::find()->andWhere(['id' => $id])->one();
-        if (!$certification) {
-            throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
+        try {
+            $data = new RejectCertificationForm();
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+            $certification = CertificationService::rejectPeerTeamFormationRequest($certification_id, $data);
+            
+            Yii::$app->session->setFlash(
+                'success', 
+                'Sertifikasi SASPRI-K ' . $certification->saspriK->district->name . ' berhasil ditolak',
+            );
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                }
+            }
+            throw $error;
         }
-        if ($certification->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
-            throw new UnprocessableEntityHttpException('Sertifikasi sedang tidak dalam tahap pembentukan Tim Sebaya');
-        }
-        return $certification;
-    }
-
-    private function findAMemberOfPeerTeam(int $user_id, Certification $certification): PeerTeamMember
-    {
-        $member = $certification->getPeerTeamMembers()
-            ->where(['user_id' => $user_id])
-            ->one();
-        if (!$member) {
-            throw new NotFoundHttpException('User tidak ditemukan atau bukan anggota Tim Sebaya');
-        }
-        return $member;
     }
 }

@@ -11,6 +11,7 @@ use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
+use common\models\form\RejectCertificationForm;
 use common\models\form\SelfReviewForm;
 use common\models\PeerTeamMember;
 use common\models\SelfTeamMember;
@@ -18,6 +19,7 @@ use common\models\User;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class CertificationService
 {
@@ -339,6 +341,42 @@ class CertificationService
             ->calculateNextCertificationDueDate()
             ->save();
 
+        return $certification;
+    }
+
+    public static function rejectPeerTeamFormationRequest(int $certification_id, RejectCertificationForm $data)
+    {
+        $certification = CertificationService::findOrFail($certification_id);
+        $certification->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION)
+            ->reject($data->rejection_reason, CertificationStatus::SELF_REVIEW)
+            ->save();
+        return $certification;
+    }
+
+    public static function rejectExternalReviewRequest(int $certification_id, RejectCertificationForm $data)
+    {
+        $certification = CertificationService::findOrFail($certification_id);
+        $certification->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
+            ->reject($data->rejection_reason, CertificationStatus::PEER_REVIEW)
+            ->save();
+        return $certification;
+    }
+
+    public static function cancel()
+    {
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        $certification = $saspri_k->onGoingCertification;
+
+        if (!$certification) {
+            throw new NotFoundHttpException('Tidak ada sertifikasi yang sedang berlangsung');
+        }
+        if (!$certification->is_rejected) {
+            throw new UnprocessableEntityHttpException(
+                'Anda hanya boleh membatalkan sertifikasi yang sudah ditolak oleh Admin SASPRI-N'
+            );
+        }
+
+        $certification->delete();
         return $certification;
     }
 }
