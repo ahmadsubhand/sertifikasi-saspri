@@ -1,60 +1,210 @@
-<p align="center">
-    <a href="https://github.com/yiisoft" target="_blank">
-        <img src="https://avatars0.githubusercontent.com/u/993323" height="100px">
-    </a>
-    <h1 align="center">Yii 2 Advanced Project Template</h1>
-    <br>
-</p>
+# 🚀 Setup Proyek dengan Laragon
 
-Yii 2 Advanced Project Template is a skeleton [Yii 2](https://www.yiiframework.com/) application best for
-developing complex Web applications with multiple tiers.
+Panduan ini berisi langkah-langkah untuk menjalankan aplikasi **Sertifikasi SASPRI** secara lokal menggunakan **Laragon**.
 
-The template includes three tiers: front end, back end, and console, each of which
-is a separate Yii application.
+Setelah proses instalasi selesai, aplikasi dapat diakses melalui:
 
-The template is designed to work in a team development environment. It supports
-deploying the application in different environments.
+* **Frontend:** http://frontend.test
+* **Backend:** http://backend.test
 
-Documentation is at [docs/guide/README.md](docs/guide/README.md).
+---
 
-[![Latest Stable Version](https://img.shields.io/packagist/v/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![Total Downloads](https://img.shields.io/packagist/dt/yiisoft/yii2-app-advanced.svg)](https://packagist.org/packages/yiisoft/yii2-app-advanced)
-[![build](https://github.com/yiisoft/yii2-app-advanced/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-app-advanced/actions?query=workflow%3Abuild)
+# 📋 Prasyarat
 
-DIRECTORY STRUCTURE
--------------------
+Pastikan perangkat Anda telah terinstal:
 
+* Laragon (beserta PHP, MySQL, dan Apache/Nginx)
+* Composer
+* Git
+
+---
+
+# 🛠️ Langkah-langkah Instalasi
+
+## 1. Clone Repository
+
+Buka terminal Laragon, kemudian jalankan:
+
+```bash
+git clone <URL_REPOSITORY> nama-folder-proyek
+cd nama-folder-proyek
 ```
-common
-    config/              contains shared configurations
-    mail/                contains view files for e-mails
-    models/              contains model classes used in both backend and frontend
-    tests/               contains tests for common classes    
-console
-    config/              contains console configurations
-    controllers/         contains console controllers (commands)
-    migrations/          contains database migrations
-    models/              contains console-specific model classes
-    runtime/             contains files generated during runtime
-backend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains backend configurations
-    controllers/         contains Web controller classes
-    models/              contains backend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for backend application    
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-frontend
-    assets/              contains application assets such as JavaScript and CSS
-    config/              contains frontend configurations
-    controllers/         contains Web controller classes
-    models/              contains frontend-specific model classes
-    runtime/             contains files generated during runtime
-    tests/               contains tests for frontend application
-    views/               contains view files for the Web application
-    web/                 contains the entry script and Web resources
-    widgets/             contains frontend widgets
-vendor/                  contains dependent 3rd-party packages
-environments/            contains environment-based overrides
+
+> Ganti `<URL_REPOSITORY>` dengan URL repository proyek.
+
+---
+
+## 2. Install Dependency
+
+Install seluruh dependency yang dibutuhkan aplikasi:
+
+```bash
+composer install
 ```
+
+---
+
+## 3. Inisialisasi Proyek Yii2
+
+Jalankan perintah berikut:
+
+```bash
+php init
+```
+
+Kemudian pilih:
+
+* `0` → Development Environment
+* `yes` → Konfirmasi inisialisasi
+
+Perintah ini akan membuat file konfigurasi lokal seperti:
+
+* `common/config/main-local.php`
+* `frontend/config/main-local.php`
+* `backend/config/main-local.php`
+
+---
+
+## 4. Konfigurasi Database
+
+### Buat Database
+
+Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru, misalnya:
+
+```text
+saspri_db
+```
+
+### Sesuaikan Konfigurasi Database
+
+Buka file:
+
+```text
+common/config/main-local.php
+```
+
+Lalu sesuaikan konfigurasi dsn, username, dan password berikut:
+
+```php
+'db' => [
+    'class' => \yii\db\Connection::class,
+    'dsn' => 'mysql:host=localhost;dbname=saspri_db',
+    'username' => 'root',
+    'password' => '',
+    'charset' => 'utf8',
+],
+```
+
+---
+
+## 5. Migrasi dan Seeding Database
+
+Jalankan perintah berikut untuk membuat seluruh tabel dan mengisi data awal:
+
+```bash
+php yii migrate
+php yii db/seed
+```
+
+### ⚠️ Informasi Akun Login Default
+
+Semua akun yang dibuat melalui proses seeding menggunakan password yang sama:
+
+```text
+password_0
+```
+
+Password tersebut berlaku untuk seluruh role yang tersedia, seperti:
+
+* Admin
+* Wali
+* Anggota
+
+---
+
+## 6. Setup Virtual Host Laragon
+
+Agar aplikasi dapat diakses menggunakan domain `.test`, buat symbolic link dari folder `web` Yii2 ke folder `www` milik Laragon.
+
+### Frontend
+
+Jalankan Command Prompt sebagai **Administrator**, lalu:
+
+```cmd
+mklink /D "C:\laragon\www\frontend" "C:\path\ke\proyek\frontend\web"
+```
+
+### Backend
+
+```cmd
+mklink /D "C:\laragon\www\backend" "C:\path\ke\proyek\backend\web"
+```
+
+### Contoh
+
+Jika proyek berada di:
+
+```text
+D:\Projects\saspri-app
+```
+
+Maka perintahnya menjadi:
+
+```cmd
+mklink /D "C:\laragon\www\frontend" "D:\Projects\saspri-app\frontend\web"
+
+mklink /D "C:\laragon\www\backend" "D:\Projects\saspri-app\backend\web"
+```
+
+---
+
+## 7. Restart Laragon
+
+Pastikan Laragon dalam kondisi aktif.
+
+Jika sebelumnya sudah berjalan:
+
+1. Klik **Stop All**
+2. Klik **Start All**
+
+Laragon akan secara otomatis:
+
+* Mendeteksi folder baru
+* Membuat virtual host
+* Mengatur file hosts
+* Mengaktifkan domain `.test`
+
+---
+
+# 🎉 Menjalankan Aplikasi
+
+Setelah seluruh langkah selesai, buka browser dan akses:
+
+## Frontend
+
+```text
+http://frontend.test
+```
+
+## Backend
+
+```text
+http://backend.test
+```
+
+Gunakan akun hasil seeding dengan password:
+
+```text
+password_0
+```
+
+---
+
+# 📝 Catatan
+
+Jika terjadi perubahan konfigurasi:
+
+* Jalankan ulang migration bila diperlukan.
+* Pastikan Apache/Nginx dan MySQL pada Laragon sedang berjalan.
+* Periksa kembali konfigurasi database pada `common/config/main-local.php`.
+* Pastikan symbolic link mengarah ke folder `frontend/web` dan `backend/web` yang benar.
