@@ -355,6 +355,15 @@ class SaspriK extends \yii\db\ActiveRecord
         return $this;
     }
 
+    public function cancelCoordinatorChange(): self
+    {
+        $this->new_coordinator_id = null;
+        $this->change_status = ApprovalStatus::APPROVED;
+        $this->change_request_reason = null;
+        $this->change_rejection_reason = null;
+        return $this;
+    }
+
     public function isCoordinatorChangePending() {
         if ($this->change_status !== ApprovalStatus::PENDING) {
             throw new UnprocessableEntityHttpException(

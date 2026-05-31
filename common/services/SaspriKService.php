@@ -128,7 +128,7 @@ class SaspriKService
         ];
     }
 
-    public static function cancel()
+    public static function cancelRegistration()
     {
         $saspri_k = null;
         try {
@@ -244,6 +244,16 @@ class SaspriKService
             'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
             'new_coordinator' => $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one(),
         ];
+    }
+
+    public static function cancelCoordinatorChange()
+    {
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        if ($saspri_k->change_status === ApprovalStatus::APPROVED) {
+            throw new NotFoundHttpException('Tidak ditemukan permintaan pergantian Wali SASPRI-K');
+        }
+        $saspri_k->cancelCoordinatorChange()->save();
+        return $saspri_k;
     }
 
     public static function coordinatorChangeDetail(int $saspri_k_id)
