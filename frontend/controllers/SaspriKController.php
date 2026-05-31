@@ -56,6 +56,7 @@ class SaspriKController extends Controller
                     'ajukan-pergantian-wali' => ['post'],
                     'batalkan-pergantian-wali' => ['post'],
                     'update-data' => ['post'],
+                    'batalkan-pengajuan-sertifikasi' => ['delete'],
                 ],
             ],
         ];
@@ -456,6 +457,7 @@ class SaspriKController extends Controller
     {
         try {
             SaspriKService::cancelCoordinatorChange();
+            Yii::$app->session->setFlash('success', 'Pergantian wali berhasil dibatalkan');
             return $this->redirect(['pergantian-wali']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
@@ -494,12 +496,36 @@ class SaspriKController extends Controller
             $data = new UpdateSaspriKForm();
             ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             SaspriKService::update($data);
+
+            Yii::$app->session->setFlash('success', 'Data SASPRI-K berhasil diperbarui');
             return $this->redirect(['index']);
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
+                }
+            }
+            throw $error;
+        }
+    }
+
+    public function actionBatalkanPengajuanSertifikasi()
+    {
+        try {
+            CertificationService::cancel();
+            Yii::$app->session->setFlash('success', 'Pengajuan sertifikasi berhasil dibatalkan');
+            return $this->redirect(['index']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                } else if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
                 }
             }
             throw $error;

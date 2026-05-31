@@ -45,7 +45,16 @@ class DaftarWaliController extends Controller
     public function actionIndex()
     {
         try {
-            $saspri_k = $this->findSaspriKOrFail();
+            $user = User::findOne(Yii::$app->user->id);
+            if ($user->saspri_k_id) {
+                throw new UnprocessableEntityHttpException('Anda sudah tergabung dalam SASPRI-K');
+            }
+
+            $saspri_k = SaspriK::find()
+                ->where(['coordinator_id' => $user->id])
+                ->andWhere(['!=', 'request_status', ApprovalStatus::APPROVED])
+                ->one();
+
             return $this->render('index', [
                 'saspri_k' => $saspri_k,
                 'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
@@ -113,20 +122,5 @@ class DaftarWaliController extends Controller
             }
             throw $error;
         }
-    }
-
-    protected function findSaspriKOrFail(): SaspriK|null
-    {
-        $user = User::findOne(Yii::$app->user->id);
-        if ($user->saspri_k_id) {
-            throw new UnprocessableEntityHttpException('Anda sudah tergabung dalam SASPRI-K');
-        }
-
-        $saspri_k = SaspriK::find()
-            ->where(['coordinator_id' => $user->id])
-            ->andWhere(['!=', 'request_status', ApprovalStatus::APPROVED])
-            ->one();
-
-        return $saspri_k;
     }
 }
