@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\UserRole;
 use common\models\query\UserQuery;
 use Yii;
@@ -42,7 +43,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function tableName()
     {
-        return '{{%user}}'; // kalau ganti, jangan lupa ganti juga yang UserHelper.php
+        return 'user'; // kalau ganti, jangan lupa ganti juga yang UserHelper.php
     }
     
 
@@ -62,6 +63,9 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             TimestampBehavior::class,
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
         ];
     }
 

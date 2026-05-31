@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\CertificationStatus;
@@ -66,6 +67,9 @@ class Certification extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
         ];
     }
 
@@ -218,10 +222,14 @@ class Certification extends \yii\db\ActiveRecord
     public function submitForSelfReview(): Certification
     {
         // Jika masih ada yang pending, maka otomatis menjadi rejected
-        SelfTeamMember::updateAll(
-            ['status' => ApprovalStatus::REJECTED],
-            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
-        );
+        /** @var SelfTeamMember[] */
+        $self_team_members = $this->getSelfTeamMembers()
+            ->where(['status' => ApprovalStatus::PENDING])
+            ->all();
+        foreach ($self_team_members as $self_team_member) {
+            $self_team_member->status = ApprovalStatus::REJECTED;
+            $self_team_member->save();
+        }
 
         $this->status = CertificationStatus::SELF_REVIEW;
         $this->self_team_due_date = date('Y-m-d H:i:s');
@@ -240,10 +248,14 @@ class Certification extends \yii\db\ActiveRecord
     public function submitForPeerReview(): Certification
     {
         // Jika masih ada yang pending, maka otomatis menjadi rejected
-        PeerTeamMember::updateAll(
-            ['status' => ApprovalStatus::REJECTED],
-            ['certification_id' => $this->id, 'status' => ApprovalStatus::PENDING]
-        );
+        /** @var PeerTeamMember[] */
+        $peer_team_members = $this->getPeerTeamMembers()
+            ->where(['status' => ApprovalStatus::PENDING])
+            ->all();
+        foreach ($peer_team_members as $peer_team_member) {
+            $peer_team_member->status = ApprovalStatus::REJECTED;
+            $peer_team_member->save();
+        }
 
         $this->status = CertificationStatus::PEER_REVIEW;
         $this->peer_team_due_date = date('Y-m-d H:i:s');

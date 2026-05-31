@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\behaviors\AuditLogBehavior;
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
 use common\enums\CertificateLevel;
@@ -65,6 +66,9 @@ class SaspriK extends \yii\db\ActiveRecord
     {
         return [
             TimestampBehavior::class,
+            'auditLog' => [
+                'class' => AuditLogBehavior::class,
+            ],
         ];
     }
 
@@ -287,13 +291,11 @@ class SaspriK extends \yii\db\ActiveRecord
 
     public function addMembers(array $user_ids)
     {
-        User::updateAll(
-            [
-                'saspri_k_id' => $this->id,
-                'updated_at' => time(),
-            ],
-            ['id' => $user_ids],
-        );
+        foreach ($user_ids as $user_id) {
+            $user = User::findOne(['id' => $user_id]);
+            $user->saspri_k_id = $this->id;
+            $user->save();
+        }
     }
 
     /**
