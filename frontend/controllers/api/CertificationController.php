@@ -10,6 +10,7 @@ use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
+use common\models\form\RejectCertificationForm;
 use common\models\form\SelfReviewForm;
 use common\services\CertificationService;
 use Yii;
@@ -46,6 +47,7 @@ class CertificationController extends ActiveController
                 'remove-self-team-member' => ['DELETE'],
                 'change-self-team-member-role' => ['POST'],
                 'submit-for-self-review' => ['POST'],
+                'cancel' => ['DELETE'],
                 'self-review' => ['GET'],
                 'save-self-review' => ['POST'],
                 'finalize-self-review' => ['POST'],
@@ -54,6 +56,7 @@ class CertificationController extends ActiveController
                 'remove-peer-team-member' => ['DELETE'],
                 'change-peer-team-member-role' => ['POST'],
                 'submit-for-peer-review' => ['POST'],
+                'reject-peer-team-formation-request' => ['POST'],
                 'peer-review' => ['GET'],
                 'save-peer-review' => ['POST'],
                 'finalize-peer-review' => ['POST'],
@@ -61,6 +64,7 @@ class CertificationController extends ActiveController
                 'save-external-review' => ['POST'],
                 'transcripts' => ['GET'],
                 'finalize-external-review' => ['POST'],
+                'reject-external-review-request' => ['POST']
             ]
         ];
 
@@ -71,6 +75,7 @@ class CertificationController extends ActiveController
                 'remove-self-team-member',
                 'change-self-team-member-role',
                 'submit-for-self-review',
+                'cancel',
                 'self-review',
                 'save-self-review',
                 'finalize-self-review',
@@ -78,6 +83,7 @@ class CertificationController extends ActiveController
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
                 'submit-for-peer-review',
+                'reject-peer-team-formation-request',
                 'peer-review',
                 'save-peer-review',
                 'finalize-peer-review',
@@ -85,6 +91,7 @@ class CertificationController extends ActiveController
                 'save-external-review',
                 'transcripts',
                 'finalize-external-review',
+                'reject-external-review-request',
             ]
         ];
 
@@ -96,6 +103,7 @@ class CertificationController extends ActiveController
                 'remove-self-team-member',
                 'change-self-team-member-role',
                 'submit-for-self-review',
+                'cancel',
                 'self-review',
                 'save-self-review',
                 'finalize-self-review',
@@ -104,6 +112,7 @@ class CertificationController extends ActiveController
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
                 'submit-for-peer-review',
+                'reject-peer-team-formation-request',
                 'peer-review',
                 'save-peer-review',
                 'finalize-peer-review',
@@ -111,6 +120,7 @@ class CertificationController extends ActiveController
                 'save-external-review',
                 'transcripts',
                 'finalize-external-review',
+                'reject-external-review-request',
             ],
             'rules' => [
                 [
@@ -122,6 +132,7 @@ class CertificationController extends ActiveController
                         'remove-self-team-member',
                         'change-self-team-member-role',
                         'submit-for-self-review',
+                        'cancel'
                     ],
                 ],
                 [
@@ -133,10 +144,12 @@ class CertificationController extends ActiveController
                         'remove-peer-team-member',
                         'change-peer-team-member-role',
                         'submit-for-peer-review',
+                        'reject-peer-team-formation-request',
                         'external-review',
                         'save-external-review',
                         'transcripts',
                         'finalize-external-review',
+                        'reject-external-review-request',
                     ],
                 ],
                 [
@@ -414,5 +427,24 @@ class CertificationController extends ActiveController
         $data = new ExternalReviewForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return CertificationService::finalizeExternalReview($certification_id, $data);
+    }
+
+    public function actionRejectPeerTeamFormationRequest(int $certification_id)
+    {
+        $data = new RejectCertificationForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::rejectPeerTeamFormationRequest($certification_id, $data);
+    }
+
+    public function actionRejectExternalReviewRequest(int $certification_id)
+    {
+        $data = new RejectCertificationForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return CertificationService::rejectExternalReviewRequest($certification_id, $data);
+    }
+
+    public function actionCancel()
+    {
+        return CertificationService::cancel();
     }
 }
