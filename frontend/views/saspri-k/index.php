@@ -110,7 +110,11 @@ $shingles = [
             ]); ?>
           <?php endforeach ?>
         </div>
-        <a href="<?= Url::to(['#', 'certificate_id' => $valid_certificate['id']]) ?>" class=" btn s-btn-main me-2 w-100 mt-3">Unduh Sertifikat <i class="fa-solid fa-download"></i></a>
+        <?= \yii\helpers\Html::a(
+            'Unduh Sertifikat <i class="fa-solid fa-download"></i>',
+            ['/sertifikat/download-transcript', 'certification_id' => $valid_certificate->id],
+            ['class' => 'btn s-btn-main me-2 w-100 mt-3', 'target' => '_blank', 'data-pjax' => '0']
+        ) ?>
       </div>
     </div>
   </div>

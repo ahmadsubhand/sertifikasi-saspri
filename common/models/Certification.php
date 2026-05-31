@@ -587,23 +587,29 @@ class Certification extends \yii\db\ActiveRecord
                         : 0;
                 }
 
-                $sub_group_score = $indicator_count > 0
+                $weighted_score = $indicator_count > 0
                     ? ($sub_group_sum / $indicator_count) * ($sub_group->weight / 100)
                     : 0;
+                $final_score = $weighted_score > 0
+                    ? ($weighted_score * ($root_group->weight / 100))
+                    : 0;
 
-                $root_score += $sub_group_score;
+                $root_score += $final_score;
 
                 $child_groups_data[] = [
                     'code' => $sub_group->code,
                     'label' => $sub_group->label,
-                    'score' => round($sub_group_score, 2),
+                    'weight' => round($sub_group->weight / 100, 2),
+                    'weighted_score' => round($weighted_score, 2),
+                    'score' => round($final_score, 2),
                 ];
             }
 
             $result[] = [
                 'code' => $root_group->code,
                 'label' => $root_group->label,
-                'score' => round($root_score * ($root_group->weight / 100), 2),
+                'weight' => round($root_group->weight / 100, 2),
+                'score' => round($root_score, 2),
                 'indicator_group' => $child_groups_data,
             ];
         }
