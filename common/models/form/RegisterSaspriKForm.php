@@ -41,7 +41,7 @@ class RegisterSaspriKForm extends Model
     /** @var array */
     public $saspri_k_documents = [];
 
-    public function rules()
+    protected function baseRules(): array
     {
         return [
             ['district_id', 'required'],
@@ -89,10 +89,27 @@ class RegisterSaspriKForm extends Model
                 'integer',
                 'min' => 0
             ],
-
-            ['saspri_k_documents', 'required'],
-            ['saspri_k_documents', 'validateDocuments'],
         ];
+    }
+    
+    protected function documentRules(): array
+    {
+        return [
+            ['saspri_k_documents', 'required'],
+            [
+                'saspri_k_documents',
+                'validateDocuments',
+                'skipOnEmpty' => true,
+            ],
+        ];
+    }
+
+    public function rules()
+    {
+        return array_merge(
+            $this->baseRules(),
+            $this->documentRules(),
+        );
     }
 
     /**

@@ -15,6 +15,7 @@ use common\models\User;
 use common\models\Certification;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\UpdateSaspriKForm;
 use Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -289,6 +290,14 @@ class SaspriKService
             throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
         }
 
+        $saspri_k->save();
+        return $saspri_k;
+    }
+
+    public static function update(UpdateSaspriKForm $data)
+    {
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        $saspri_k->setAttributes($data->attributes);
         $saspri_k->save();
         return $saspri_k;
     }

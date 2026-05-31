@@ -12,6 +12,7 @@ use common\models\form\CoordinatorChangeForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\UpdateSaspriKForm;
 use common\models\SaspriK;
 use common\models\User;
 use common\services\SaspriKService;
@@ -56,6 +57,8 @@ class SaspriKController extends ActiveController
                 'add-members' => ['POST'],
                 'remove-member' => ['DELETE'],
                 'change-coordinator' => ['POST'],
+                'cancel-coordinator-change' => ['POST'],
+                'update' => ['PUT'],
                 'register' => ['POST'],
                 'cancel-registration' => ['DELETE'],
             ]
@@ -76,6 +79,7 @@ class SaspriKController extends ActiveController
                 'remove-member',
                 'change-coordinator',
                 'cancel-coordinator-change',
+                'update',
                 'register',
                 'cancel-registration',
             ]
@@ -96,6 +100,7 @@ class SaspriKController extends ActiveController
                 'remove-member',
                 'change-coordinator',
                 'cancel-coordinator-change',
+                'update',
                 'register',
                 'cancel-registration',
             ],
@@ -109,6 +114,7 @@ class SaspriKController extends ActiveController
                         'remove-member',
                         'change-coordinator',
                         'cancel-coordinator-change',
+                        'update',
                     ],
                 ],
                 [
@@ -360,5 +366,12 @@ class SaspriKController extends ActiveController
         $data = new RequestResponseForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
+    }
+
+    public function actionUpdate()
+    {
+        $data = new UpdateSaspriKForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return SaspriKService::update($data);
     }
 }
