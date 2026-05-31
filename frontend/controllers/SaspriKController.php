@@ -447,4 +447,22 @@ class SaspriKController extends Controller
             throw $error;
         }
     }
+
+    public function actionBatalkanPergantianWali()
+    {
+        try {
+            SaspriKService::cancelCoordinatorChange();
+            return $this->redirect(['pergantian-wali']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                } elseif ($error instanceof NotFoundHttpException) {
+                    return $this->redirect(['pergantian-wali']);
+                }
+            }
+            throw $error;
+        }
+    }
 }
