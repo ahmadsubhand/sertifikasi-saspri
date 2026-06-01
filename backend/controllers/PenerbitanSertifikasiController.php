@@ -105,6 +105,9 @@ class PenerbitanSertifikasiController extends Controller
             CertificationService::saveExternalReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
+            if (Yii::$app->request->post('redirect_to_transcript') == '1') {
+                return $this->redirect(['transkrip', 'certification_id' => $certification_id]);
+            }
             $targetPage = Yii::$app->request->post('target_page', $page);
             return $this->redirect([
                 'external-review',
@@ -135,7 +138,7 @@ class PenerbitanSertifikasiController extends Controller
     {
         try {
             return $this->render(
-                'transkrip', 
+                'transkrip',
                 CertificationService::transcripts($certification_id)
             );
         } catch (Exception $error) {
@@ -168,7 +171,7 @@ class PenerbitanSertifikasiController extends Controller
             CertificationService::finalizeExternalReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Penerbitan Sertifikasi berhasil difinalisasi');
-            return $this->redirect(['index']);
+            return $this->redirect('index');
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());
@@ -213,7 +216,7 @@ class PenerbitanSertifikasiController extends Controller
                     },
                 ])
                 ->all();
-    
+
             return $this->render('detail', [
                 'id' => $case_id,
                 'saspri' => $saspri_k,
@@ -238,9 +241,9 @@ class PenerbitanSertifikasiController extends Controller
             $data = new RejectCertificationForm();
             ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $certification = CertificationService::rejectExternalReviewRequest($certification_id, $data);
-            
+
             Yii::$app->session->setFlash(
-                'success', 
+                'success',
                 'Sertifikasi SASPRI-K ' . $certification->saspriK->district->name . ' berhasil ditolak',
             );
             return $this->redirect(['index']);

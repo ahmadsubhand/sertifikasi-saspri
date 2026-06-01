@@ -147,12 +147,12 @@ $shingles = [
               <td><?= $member->user->saspriK ? Html::encode($member->user->saspriK->cooperative_name) : '-' ?></td>
               <td>
                 <?= Html::beginForm(
-                    [
-                      'ubah-peran-anggota-tim-sebaya',
-                      'user_id' => $member->user_id,
-                      'certification_id' => $certification->id
-                    ],
-                    'post'
+                  [
+                    'ubah-peran-anggota-tim-sebaya',
+                    'user_id' => $member->user_id,
+                    'certification_id' => $certification->id
+                  ],
+                  'post'
                 ) ?>
                 <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                   <?php foreach (\common\enums\TeamRole::list() as $value => $label): ?>
@@ -170,19 +170,19 @@ $shingles = [
               </td>
               <td>
                 <?= Html::a(
-                    '<i class="fa-solid fa-xmark"></i>',
-                    [
-                      'hapus-anggota-tim-sebaya',
-                      'user_id' => $member->user_id,
-                      'certification_id' => $certification->id,
+                  '<i class="fa-solid fa-xmark"></i>',
+                  [
+                    'hapus-anggota-tim-sebaya',
+                    'user_id' => $member->user_id,
+                    'certification_id' => $certification->id,
+                  ],
+                  [
+                    'class' => 'btn s-btn-red btn-sm',
+                    'data' => [
+                      'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                      'method' => 'delete',
                     ],
-                    [
-                      'class' => 'btn s-btn-red btn-sm',
-                      'data' => [
-                        'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                        'method' => 'delete',
-                      ],
-                    ]
+                  ]
                 ) ?>
               </td>
             </tr>
@@ -195,9 +195,10 @@ $shingles = [
         </tbody>
       </table>
 
-      <div class="mt-3">
+      <div class="mt-3 d-flex justify-content-between">
+        <button type="button" class=" btn btn-danger btn-sm me-2 mb-3" data-bs-toggle="modal" data-bs-target="#rejectModal">Tolak Sertifikasi</button>
         <?= Html::beginForm(['ajukan-peer-review', 'certification_id' => $certification->id], 'post') ?>
-        <button type="submit" class="btn s-btn-green me-2 w-100 mb-3"
+        <button type="submit" class="btn s-btn-green me-2 mb-3"
           onclick="return confirm('Apakah Anda yakin ingin memproses ke tahap Peer Review? Pastikan komposisi tim sudah benar.')">
           Selesaikan Pembentukan Tim
         </button>
@@ -205,24 +206,20 @@ $shingles = [
       </div>
     </div>
   </div>
-  <div class="p-2">
-    <div class="dropdown-divider border border-1 border-black"></div>
-  </div>
-  <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-    <div class="px-4">
-      <h2 class="h4">Penolakan Sertifikasi</h2>
-      <p class="text-muted small">
-        Tolak sertifikasi jika ada kekurangan dari SASPRI-K
-      </p>
-      <?= Html::beginForm() ?>
-      <label for="deny-reason" class="mb-0">Alasan:</label>
-      <input type="text" id="deny-reason" placeholder="Tulisa alasan penolakan sertifikasi"
-        class="form-control border border-1 shadow-sm" autocomplete="off">
-      <button type="submit" class="btn s-btn-red me-2 w-100 mb-3 my-5"
-        onclick="return confirm('Apakah Anda yakin ingin menolak sertifikasi SASPRI-K?')">
-        Tolak Sertifikasi
-      </button>
-      <?= Html::endForm() ?>
+</div>
+
+
+<!-- modal -->
+<div class="modal fade modal-lg" id="rejectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModalLabel">Penolakan Sertifikasi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <?= $this->render('/component/_reject_modal', ['step' => 'Tim Sebaya']); ?>
+      </div>
     </div>
   </div>
 </div>

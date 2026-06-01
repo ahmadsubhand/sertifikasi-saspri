@@ -91,7 +91,10 @@ $shingles = [
           <div class="w-100 d-flex justify-content-between mt-3">
             <a href="<?= Url::to(['saspri-k/pergantian-wali']) ?>" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
             <!-- possible pjax change only for top-->
-            <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a>
+            <button type="button" class=" btn s-btn-main me-2" data-bs-toggle="modal" data-bs-target="#dataEditModal">
+              Edit Data
+            </button>
+            <!-- <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a> -->
           </div>
         </div>
       </div>
@@ -110,7 +113,7 @@ $shingles = [
             ]); ?>
           <?php endforeach ?>
         </div>
-        <?= \yii\helpers\Html::a(
+        <?= Html::a(
             'Unduh Sertifikat <i class="fa-solid fa-download"></i>',
             ['/sertifikat/download-transcript', 'certification_id' => $valid_certificate->id],
             ['class' => 'btn s-btn-main me-2 w-100 mt-3', 'target' => '_blank', 'data-pjax' => '0']
@@ -181,7 +184,7 @@ $shingles = [
       </div>
     </div>
   </div>
-  <div>
+  <div class="mt-3">
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <div class="px-4">
         <p class=" fw-bold">Anggota Kawasan</p>
@@ -256,6 +259,22 @@ $shingles = [
           </div>
         </div>
         <?php Pjax::end() ?>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade my-auto modal-lg" id="dataEditModal" tabindex="-1" aria-labelledby="dataEditModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dataEditModalLabel">Edit Data Saspri <?= Html::encode($saspri_k->region_name) ?></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <?= $this->render('/component/_edit_saspri', [
+          'model'=>$saspri_k
+        ]); ?>
       </div>
     </div>
   </div>

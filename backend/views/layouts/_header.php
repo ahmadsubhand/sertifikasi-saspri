@@ -32,7 +32,7 @@ $items = [
 ];
 
 ?>
-<header id="">
+<header id="" class="bg-white border-bottom border-1 shadow-sm">
     <?php NavBar::begin(
         [
             'brandUrl' => Yii::$app->homeUrl,

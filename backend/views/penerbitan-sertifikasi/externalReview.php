@@ -173,7 +173,8 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
               <?php if ($page < $total_pages): ?>
                 <button type="submit" id="btn-next" form="penerbitan-sertifikasi-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none w-100 h-100">Berikutnya</button>
               <?php else: ?>
-                <button type="submit" id="btn-finish" form="penerbitan-sertifikasi-form" name="finish" value="1" class="btn-none">Selesai Review</button>
+                <button type="submit" id="btn-next" form="penerbitan-sertifikasi-form" name="redirect_to_transcript" value="1" class="btn-none">Selesai Review
+                </button>
               <?php endif; ?>
             </a>
           </li>
@@ -191,9 +192,10 @@ $this->registerJs(
         $('#penerbitan-sertifikasi-form').attr('action', '$finalizeAction');
     });
 
-    $('#btn-save-temp, #btn-prev, #btn-next', '#btn-pagin').on('click', function() {
+    $('#btn-save-temp, #btn-prev, #btn-next, #btn-pagin').on('click', function() {
         $('#penerbitan-sertifikasi-form').attr('action', '$saveAction');
-    });
+    });;
+
 
     function setInitialDefaultScores() {
         $('.final-score-select').each(function() {

@@ -2,7 +2,10 @@
 
 namespace frontend\controllers;
 
+use common\enums\CertificateLevel;
+use common\enums\CertificationStatus;
 use common\enums\UserRole;
+use common\models\Certification;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -12,10 +15,12 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
+use common\models\SaspriK;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\helpers\Url;
 
 /**
  * Site controller
@@ -74,11 +79,55 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
-    {
-        return $this->render('index');
-    }
+    public function actionIndex(
+        ?string $wilayah = null,
+        ?string $wali = null,
+        ?string $level = null,
+        ?int $limit = 20,
+        ?int $offset = 0
+    ) {
+        $query = SaspriK::find()->andWhere(['request_status' => 'approved'])->joinWith(['coordinator', 'validCertificate']);
+        $saspri_counter = (clone $query);
+        $certs = Certification::find()->distinct()->andWhere([
+            'not in',
+            'status',
+            [
+                CertificationStatus::PENDING_SELF_TEAM_FORMATION, // mau mulai dari sini atau sebelumnya lagi?
+                CertificationStatus::COMPLETED,
+            ]
+        ])->count();
 
+        if ($wilayah) {
+            $query->andWhere(['like', 'LOWER(region_name)', strtolower($wilayah)]);
+        }
+        if ($wali) {
+            $query->andWhere(['like', 'LOWER(user.username)', strtolower($wali)]);
+        }
+        if (in_array($level, CertificateLevel::values())) {
+            $query->andWhere(['certification.level' => $level]);
+        }
+
+        $saspri = (clone $query)
+            ->orderBy([
+                'updated_at' => SORT_DESC
+            ])
+            ->limit($limit + 1)
+            ->offset($offset)
+            ->all();
+
+        $has_next = count($saspri) > $limit;
+        if ($has_next) array_pop($saspri);
+
+        return $this->render('index', [
+            'saspris' => $saspri,
+            'active_saspri' => $saspri_counter->count(),
+            'weania_plus' => $saspri_counter->andWhere(['not in', 'certification.level', [CertificateLevel::WEANIA, CertificateLevel::NATALIA]])->count(),
+            'active_certifications_count' => $certs,
+            'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)]) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $offset + $limit]) : null,
+            'offset' => $offset,
+        ]);
+    }
     /**
      * Logs in a user.
      *
