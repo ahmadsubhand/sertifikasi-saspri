@@ -49,9 +49,9 @@ $percentages = [
       <div class="col-md-6 my-2 d-flex flex-column align-items-start align-items-md-end">
         <p class="mb-0 text-secondary small fw-semibold"><?= Html::encode(CertificationPurpose::list()[$certification->purpose] ?? '-') ?></p>
         <p class="mb-0 fs-4 d-flex align-items-center gap-2">
-          <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
+          <strong><?= Html::encode(CertificateLevel::prev()[$certification->level] ?? '-') ?></strong>
           <i class="fa-solid fa-chevron-right text-muted fs-5 mx-1"></i>
-          <strong><?= Html::encode(CertificateLevel::next()[$certification->level] ?? '-') ?></strong>
+          <strong><?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></strong>
         </p>
       </div>
 

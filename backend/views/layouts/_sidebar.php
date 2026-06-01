@@ -20,8 +20,8 @@ $currentRoute = Yii::$app->controller->getRoute();
         ]); ?> Sertifikasi</h1>
     </a>
   </div>
-  <div class="<?= str_contains($currentRoute, 'dashboard') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
-    <a href="<?php echo Url::to('/dashboard') ?>" class="text-decoration-none text-white w-100 text-white h6">
+  <div class="<?= str_contains($currentRoute, 'site') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+    <a href="<?php echo Url::to('/site') ?>" class="text-decoration-none text-white w-100 text-white h6">
       <div class=" py-2 mx-2 ">
         Dashboard
       </div>
