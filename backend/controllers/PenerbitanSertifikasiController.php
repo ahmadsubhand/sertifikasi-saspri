@@ -163,13 +163,7 @@ class PenerbitanSertifikasiController extends Controller
     public function actionFinalisasiPenerbitanSertifikasi(int $certification_id)
     {
         try {
-            $data = new ExternalReviewForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
-            CertificationService::finalizeExternalReview($certification_id, $data);
-
+            CertificationService::finalizeExternalReview($certification_id);
             Yii::$app->session->setFlash('success', 'Penerbitan Sertifikasi berhasil difinalisasi');
             return $this->redirect('index');
         } catch (Exception $error) {

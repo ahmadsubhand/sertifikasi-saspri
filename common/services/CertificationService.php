@@ -328,11 +328,10 @@ class CertificationService
         ];
     }
 
-    public static function finalizeExternalReview(int $certification_id, ExternalReviewForm $data)
+    public static function finalizeExternalReview(int $certification_id)
     {
         $certification = CertificationService::findOrFail($certification_id)    
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
-            ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->setGrade()

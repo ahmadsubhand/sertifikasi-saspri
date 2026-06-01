@@ -424,9 +424,7 @@ class CertificationController extends ActiveController
 
     public function actionFinalizeExternalReview(int $certification_id)
     {
-        $data = new ExternalReviewForm();
-        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
-        return CertificationService::finalizeExternalReview($certification_id, $data);
+        return CertificationService::finalizeExternalReview($certification_id);
     }
 
     public function actionRejectPeerTeamFormationRequest(int $certification_id)
