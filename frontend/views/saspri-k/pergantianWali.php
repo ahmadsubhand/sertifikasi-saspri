@@ -88,7 +88,7 @@ if ($saspri_k->new_coordinator_id) {
                 </div>
 
                 <div class="w-100">
-                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold" <?= $new_coordinator ? 'disabled' : '' ?>>
                         Ajukan pergantian wali
                     </button>
                 </div>

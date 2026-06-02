@@ -494,7 +494,7 @@ class SaspriKController extends Controller
     {
         try {
             $data = new UpdateSaspriKForm();
-            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post('SaspriK'));
             SaspriKService::update($data);
 
             Yii::$app->session->setFlash('success', 'Data SASPRI-K berhasil diperbarui');

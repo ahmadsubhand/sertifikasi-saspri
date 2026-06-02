@@ -30,7 +30,8 @@ if ($model && $model->district_id) {
   <!-- Nanti ini dibungkus dalam !$is_pending atau semua field di disable biar user gk ngajuin ulang klo lg pending -->
   <?php $form = ActiveForm::begin([
     'id' => 'form-edit-saspri',
-    'action' => ['#'],
+    'action' => ['update-data'],
+    // 'method' => 'post',
     'options' => ['enctype' => 'multipart/form-data']
   ]) ?>
 
