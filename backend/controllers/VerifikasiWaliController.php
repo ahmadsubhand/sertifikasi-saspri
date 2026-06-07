@@ -4,7 +4,9 @@ namespace backend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\RequestResponse;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
+use common\models\form\ChangeLevelForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RequestResponseForm;
 use common\models\SaspriK;
@@ -31,9 +33,35 @@ class VerifikasiWaliController extends Controller
                     'ganti-wali' => ['post'],
                     'daftarkan-wali' => ['post'],
                     'simpan-skor-pendaftaran' => ['post'],
+                    'ganti-level-sertifikat' => ['post'],
                 ],
             ],
         ];
+    }
+
+    public function actionGantiLevelSertifikat(int $saspri_k_id)
+    {
+        try {
+            $data = new ChangeLevelForm();
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+            SaspriKService::changeRegistrationLevel($saspri_k_id, $data);
+
+            Yii::$app->session->setFlash('success', 'Berhasil mengubah level sertifikat');
+            return $this->redirect(['permintaan-pendaftaran-wali', 'saspri_k_id' => $saspri_k_id]);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if (
+                    $error instanceof NotFoundHttpException ||
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
+                    return $this->redirect(['index']);
+                } elseif ($error instanceof BadRequestHttpException) {
+                    return $this->redirect(['permintaan-pendaftaran-wali', 'saspri_k_id' => $saspri_k_id]);
+                }
+            }
+            throw $error;
+        }
     }
 
     public function actionIndex(

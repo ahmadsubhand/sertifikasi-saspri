@@ -13,6 +13,7 @@ use common\models\form\RegisterSaspriKForm;
 use common\models\SaspriK;
 use common\models\User;
 use common\models\Certification;
+use common\models\form\ChangeLevelForm;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
 use common\models\form\UpdateSaspriKForm;
@@ -192,6 +193,16 @@ class SaspriKService
             'page' => $page,
             'total_pages' => count($root_groups),
         ];
+    }
+
+    public static function changeRegistrationLevel(int $saspri_k_id, ChangeLevelForm $data)
+    {
+        $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isRequestRegistrationPending();
+
+        /** @var Certification $certification */
+        $certification = $saspri_k->getCertifications()->one();
+        $certification->changeLevel($data->level)->save();
+        return $certification;
     }
 
     public static function saveRegistration(int $saspri_k_id, ExternalReviewForm $data)

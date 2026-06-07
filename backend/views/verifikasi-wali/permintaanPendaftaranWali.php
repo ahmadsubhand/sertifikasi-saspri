@@ -132,7 +132,12 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100 mt-3">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
             <h5 class="fw-bold mb-0">Penilaian Sertifikat: <?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h5>
-            <span class="badge bg-primary">Level <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary">Level <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGantiLevel">
+                    <i class="fa-solid fa-pen-to-square"></i> Ganti
+                </button>
+            </div>
         </div>
 
         <?php
@@ -253,6 +258,33 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
             <?php endif; ?>
 
             
+        </div>
+    </div>
+</div>
+
+<!-- Modal Ganti Level -->
+<div class="modal fade" id="modalGantiLevel" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <?= Html::beginForm(['ganti-level-sertifikat', 'saspri_k_id' => $saspri_k->id], 'post') ?>
+            <div class="modal-header">
+                <h5 class="modal-title">Ganti Level Sertifikat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Pilih Level Baru</label>
+                    <?= Html::dropDownList('level', $certification->level, CertificateLevel::list(), ['class' => 'form-select']) ?>
+                </div>
+                <div class="alert alert-warning small">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Perhatian: Penilaian yang telah dilakukan pada level yang lama akan dihapus.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+            </div>
+            <?= Html::endForm() ?>
         </div>
     </div>
 </div>

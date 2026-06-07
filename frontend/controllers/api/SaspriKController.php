@@ -8,6 +8,7 @@ use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\form\AddMembersForm;
+use common\models\form\ChangeLevelForm;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
@@ -48,6 +49,7 @@ class SaspriKController extends ActiveController
                 'certifications' => ['GET'],
                 'coordinator-registration' => ['GET'],
                 'coordinator-registration-detail' => ['GET'],
+                'change-registration-level' => ['POST'],
                 'save-draft-registration' => ['POST'],
                 'coordinator-registration-response' => ['POST'],
                 'coordinator-change' => ['GET'],
@@ -70,6 +72,7 @@ class SaspriKController extends ActiveController
             'only' => [
                 'coordinator-registration',
                 'coordinator-registration-detail',
+                'change-registration-level',
                 'save-draft-registration',
                 'coordinator-registration-response',
                 'coordinator-change',
@@ -92,6 +95,7 @@ class SaspriKController extends ActiveController
             'only' => [
                 'coordinator-registration',
                 'coordinator-registration-detail',
+                'change-registration-level',
                 'save-draft-registration',
                 'coordinator-registration-response',
                 'coordinator-change',
@@ -125,6 +129,7 @@ class SaspriKController extends ActiveController
                     'actions' => [
                         'coordinator-registration',
                         'coordinator-registration-detail',
+                        'change-registration-level',
                         'save-draft-registration',
                         'coordinator-registration-response',
                         'coordinator-change',
@@ -328,6 +333,13 @@ class SaspriKController extends ActiveController
         );
 
         return $this->asJson($data);
+    }
+
+    public function actionChangeRegistrationLevel(int $saspri_k_id)
+    {
+        $data = new ChangeLevelForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
+        return SaspriKService::changeRegistrationLevel($saspri_k_id, $data);
     }
 
     public function actionSaveDraftRegistration(int $saspri_k_id)

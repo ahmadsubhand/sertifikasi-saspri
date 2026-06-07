@@ -5,6 +5,7 @@ namespace common\models;
 use common\behaviors\AuditLogBehavior;
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\TeamRole;
@@ -639,6 +640,30 @@ class Certification extends \yii\db\ActiveRecord
         $this->is_rejected = 1;
         $this->rejection_reason = $reason;
         $this->status = $previous_status;
+
+        return $this;
+    }
+
+    public function changeLevel(string $level): self
+    {
+        if (!in_array($level, CertificateLevel::values())) {
+            throw new Error('Invalid level value: use CertificateLevel enums');
+        }
+
+        $this->level = $level;
+
+        $assessment = Assessment::findOne(['active_at_level' => $level]);
+        if (!$assessment) {
+            throw new UnprocessableEntityHttpException(
+                'Belum ada instrumen penilaian aktif untuk sertifikasi tingkat ' .
+                CertificateLevel::list()[$level]
+            );
+        }
+        $this->assessment_id = $assessment->id;
+
+        foreach ($this->indicatorScores as $indicator_score) {
+            $indicator_score->delete();
+        }
 
         return $this;
     }

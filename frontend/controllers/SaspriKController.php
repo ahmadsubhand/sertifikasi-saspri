@@ -9,6 +9,7 @@ use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\User;
 use common\models\form\AddMembersForm;
+use common\models\form\ChangeLevelForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\UpdateSaspriKForm;
@@ -57,9 +58,35 @@ class SaspriKController extends Controller
                     'batalkan-pergantian-wali' => ['post'],
                     'update-data' => ['post'],
                     'batalkan-pengajuan-sertifikasi' => ['delete'],
+                    'ganti-level-sertifikat' => ['post'],
                 ],
             ],
         ];
+    }
+
+    public function actionGantiLevelSertifikat()
+    {
+        try {
+            $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+            $data = new ChangeLevelForm();
+            $data->load(Yii::$app->request->post(), '');
+            if (!$data->validate()) {
+                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
+            }
+            SaspriKService::changeRegistrationLevel($saspri_k->id, $data);
+
+            Yii::$app->session->setFlash('success', 'Berhasil mengubah level sertifikat');
+            return $this->redirect(['pengajuan-sertifikasi']);
+        } catch (Exception $error) {
+            if ($error instanceof HttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+                if ($error instanceof ForbiddenHttpException) {
+                    return $this->goHome();
+                }
+                return $this->redirect(['pengajuan-sertifikasi']);
+            }
+            throw $error;
+        }
     }
 
     public function actionIndex(
