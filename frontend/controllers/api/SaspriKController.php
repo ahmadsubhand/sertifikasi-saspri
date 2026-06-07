@@ -60,6 +60,7 @@ class SaspriKController extends ActiveController
                 'cancel-coordinator-change' => ['POST'],
                 'update' => ['PUT'],
                 'register' => ['POST'],
+                'detail-registration' => ['GET'],
                 'cancel-registration' => ['DELETE'],
             ]
         ];
@@ -81,6 +82,7 @@ class SaspriKController extends ActiveController
                 'cancel-coordinator-change',
                 'update',
                 'register',
+                'detail-registration',
                 'cancel-registration',
             ]
         ];
@@ -136,6 +138,7 @@ class SaspriKController extends ActiveController
                     'actions' => [
                         'register',
                         'cancel-registration',
+                        'detail-registration'
                     ],
                 ]
             ]
@@ -299,6 +302,11 @@ class SaspriKController extends ActiveController
         $data = new RegisterSaspriKForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return SaspriKService::register($data);
+    }
+
+    public function actionDetailRegistration()
+    {
+        return SaspriKService::detailRegistration();
     }
 
     public function actionCancelRegistration()

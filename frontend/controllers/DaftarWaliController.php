@@ -2,11 +2,8 @@
 
 namespace frontend\controllers;
 
-use common\enums\ApprovalStatus;
 use common\enums\UserRole;
 use common\models\form\RegisterSaspriKForm;
-use common\models\SaspriK;
-use common\models\User;
 use common\services\SaspriKService;
 use Exception;
 use Yii;
@@ -45,20 +42,7 @@ class DaftarWaliController extends Controller
     public function actionIndex()
     {
         try {
-            $user = User::findOne(Yii::$app->user->id);
-            if ($user->saspri_k_id) {
-                throw new UnprocessableEntityHttpException('Anda sudah tergabung dalam SASPRI-K');
-            }
-
-            $saspri_k = SaspriK::find()
-                ->where(['coordinator_id' => $user->id])
-                ->andWhere(['!=', 'request_status', ApprovalStatus::APPROVED])
-                ->one();
-
-            return $this->render('index', [
-                'saspri_k' => $saspri_k,
-                'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
-            ]);
+            return $this->render('index', SaspriKService::detailRegistration());
         } catch (Exception $error) {
             if ($error instanceof HttpException) {
                 Yii::$app->session->setFlash('error', $error->getMessage());

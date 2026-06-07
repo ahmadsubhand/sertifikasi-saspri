@@ -102,6 +102,8 @@ class User extends ActiveRecord implements IdentityInterface
             $fields['access_token'],
         );
 
+        $fields['role'] = 'role';
+
         return [...$fields];
     }
 

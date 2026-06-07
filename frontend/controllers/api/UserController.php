@@ -112,7 +112,7 @@ class UserController extends ActiveController
 
     public function actionMe()
     {
-        $user = User::findOne(Yii::$app->user->id);
+        $user = User::find()->where(Yii::$app->user->id)->with('role')->one();
         if (!$user) {
             throw new NotFoundHttpException('User not found');
         }

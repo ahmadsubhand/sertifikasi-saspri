@@ -17,6 +17,7 @@ use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
 use common\models\form\UpdateSaspriKForm;
 use Exception;
+use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -126,6 +127,25 @@ class SaspriKService
         return [
             ...$saspri_k,
             'district' => $saspri_k->district,
+        ];
+    }
+
+    public static function detailRegistration()
+    {
+        $user = User::findOne(Yii::$app->user->id);
+        if ($user->saspri_k_id) {
+            throw new UnprocessableEntityHttpException('Anda sudah tergabung dalam SASPRI-K');
+        }
+
+        /** @var SaspriK|null */
+        $saspri_k = SaspriK::find()
+            ->where(['coordinator_id' => $user->id])
+            ->andWhere(['!=', 'request_status', ApprovalStatus::APPROVED])
+            ->one();    
+
+        return [
+            'saspri_k' => $saspri_k,
+            'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
         ];
     }
 
