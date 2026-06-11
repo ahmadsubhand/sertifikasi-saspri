@@ -155,7 +155,11 @@ class SaspriKController extends ActiveController
     public function actionDetail(int $saspri_k_id)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id);
-        return $saspri_k;
+        $district = $saspri_k->district;
+        return [
+            ...$saspri_k,
+            'district' => $district,
+        ];
     }
 
     public function actionMembers(int $saspri_k_id, ?string $q = '', ?int $limit = 5, ?int $offset = 0)

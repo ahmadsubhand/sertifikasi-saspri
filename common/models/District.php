@@ -38,6 +38,15 @@ class District extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        $fields['regency'] = 'regency';
+
+        return [...$fields];
+    }
+
     /**
      * {@inheritdoc}
      */
