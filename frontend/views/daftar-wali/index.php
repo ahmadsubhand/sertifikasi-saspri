@@ -109,22 +109,24 @@ $model = $saspri_k ?: new \common\models\SaspriK();
         <div class="col-sm-12">
             <div class="d-flex justify-content-between mt-4">
                 <p class="fw-bold">Dokumen Pendukung</p>
-                <button type="button" id="add-row" class="btn btn-sm text-white" <?= $is_pending ?? 'disabled' ?> style="background-color: #6B78B9;">
-                    <i class="fa-solid fa-plus"></i> Tambah Dokumen
-                </button>
+                <div>
+                    <button type="button" id="add-row" class="btn btn-sm text-white" <?= $is_pending ?? 'disabled' ?> style="background-color: #6B78B9;">
+                        <i class="fa-solid fa-plus"></i> Tambah
+                    </button>
+                </div>
             </div>
             <div id="doc-container">
                 <?php if (empty($documents)): ?>
                     <div class="doc-row row mb-3">
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label class="form-label">Kategori / Nama Dokumen</label>
                             <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-md-5">
                             <label class="form-label">Unggah Dokumen</label>
                             <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= $is_pending ?? 'disabled' ?> required>
                         </div>
-                        <div class="col-sm-1 d-flex align-items-end" <?= $is_pending ?? 'disabled' ?>>
+                        <div class="col-md-1 d-flex align-items-end" <?= $is_pending ?? 'disabled' ?>>
                             <button type="button" class="rem-row btn btn-danger w-100">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -132,19 +134,21 @@ $model = $saspri_k ?: new \common\models\SaspriK();
                     </div>
                 <?php else: ?>
                     <?php foreach ($documents as $doc): ?>
-                        <div class="doc-row row mt-3">
-                            <div class="col-sm-6">
+                        <div class="doc-row row mt-3 g-3">
+                            <div class=" border-secondary border-bottom my-1"></div>
+                            <div class="col-sm-6 col-12">
                                 <label class="form-label">Kategori / Nama Dokumen</label>
                                 <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
                             </div>
-                            <div class="col-sm-5">
+                            <div class="col-sm-5 col-12">
                                 <label class="form-label">Ganti Dokumen</label>
                                 <input class="form-control border-black" type="file" <?= $is_pending ?? 'disabled' ?>  name="saspri_k_documents[]" required>
 
                             </div>
-                            <div class="col-sm-1 d-flex align-items-end">
+                            <div class="col-sm-1 d-flex align-items-end col-12">
                                 <button type="button" class="rem-row btn btn-danger w-100"<?= $is_pending ?? 'disabled' ?>>
                                     <i class="fa-solid fa-trash"></i>
+                                    <span class="d-inline d-md-none ms-2">Hapus Dokumen</span>
                                 </button>
                             </div>
                         </div>
@@ -165,7 +169,7 @@ $model = $saspri_k ?: new \common\models\SaspriK();
             </div>
         </div>
 
-        <div class="w-100 my-4">
+        <div class="w-100 mt-4">
             <?= Html::submitButton($is_rejected ? 'Ajukan Ulang' : 'Daftar', ['class' => 'btn w-100 py-2 fw-bold s-btn-main', 'disabled' => $is_pending]) ?>
         </div>
     </div>

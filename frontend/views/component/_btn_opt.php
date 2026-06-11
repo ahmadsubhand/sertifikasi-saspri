@@ -9,7 +9,7 @@ use yii\helpers\Url;
 /** @var string|array $look*/
 ?>
 
-<div>
+<div class="d-flex gap-2">
   <?= Html::a('<i class="fa-solid fa-check"></i>', $yes, [
     'class' => 's-btn-green btn btn-sm',
     'data-method' => 'post',

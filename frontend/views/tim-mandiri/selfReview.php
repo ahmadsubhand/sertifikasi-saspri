@@ -41,7 +41,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <h1><?= Html::encode($this->title) ?></h1>
   <div class="text-muted d-flex align-items-center gap-2 mb-2">
     <?php if ($is_leader): ?>
@@ -62,96 +62,98 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     $saveAction = Url::to(['simpan-sementara-self-review', 'certification_id' => $certification->id, 'page' => $page]);
     $finalizeAction = Url::to(['finalisasi-self-review', 'certification_id' => $certification->id]);
     ?>
-    <form id="self-review-form" action="<?= $saveAction ?>" method="post" enctype="multipart/form-data">
-      <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-
-      <table class="table align-middle">
-        <thead>
-          <tr class="text-center">
-            <th scope="col" style="width: 50px;">No</th>
-            <th scope="col" class="text-start">Kriteria</th>
-            <th scope="col">Penilaian</th>
-            <th scope="col" style="width: 250px;">Bukti</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($current_child_groups as $subGroup): ?>
-            <tr class="table-light">
-              <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
-              <td colspan="3" class="fw-bold">
-                <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
-              </td>
+    <div class="mobile-scroll">
+      <form id="self-review-form" action="<?= $saveAction ?>" method="post" enctype="multipart/form-data">
+        <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
+  
+        <table class="table align-middle">
+          <thead>
+            <tr class="text-center">
+              <th scope="col" style="width: 50px;">No</th>
+              <th scope="col" class="text-start">Kriteria</th>
+              <th scope="col" style="min-width: 250px;">Penilaian</th>
+              <th scope="col" style="min-width: 100px;">Bukti</th>
             </tr>
-
-            <?php if (isset($subGroup->indicators)): ?>
-              <?php foreach ($subGroup->indicators as $index => $indicator): ?>
-                <tr>
-                  <td class="text-center"><?= $index + 1 ?></td>
-                  <td><?= Html::encode($indicator->label) ?></td>
-                  <td>
-                    <select
-                      name="indicator_scores[<?= $indicator->id ?>][self_team_score]"
-                      class="form-select score-select"
-                      data-subgroup-id="<?= $subGroup->id ?>">
-                      <option value="0">Pilih Penilaian</option>
-
-                      <?php foreach ($indicator->indicatorOptions as $option): ?>
-                        <?php
-                        $selected = (
-                          isset($indicator->indicatorScores[0]->self_team_score) &&
-                          $indicator->indicatorScores[0]->self_team_score == $option->weight
-                        ) ? 'selected' : '';
-                        ?>
-
-                        <option value="<?= $option->weight ?>" <?= $selected ?>>
-                          <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
-                  </td>
-                  <td>
-                    <div class="d-flex d-grid gap-1">
-                      <input class="form-control form-control-sm" type="file" name="indicator_scores[<?= $indicator->id ?>][evidence]">
-                      <?php if (isset($indicator->indicatorScores[0]) && $indicator->indicatorScores[0]->evidence_url): ?>
-                        <div class="mb-1">
-                          <a href="<?= Url::to($indicator->indicatorScores[0]->evidence_url) ?>"
-                            target="_blank" class="btn btn-sm s-btn-main"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="top"
-                            title="Lihat Bukti">
-                            <i class="fa-solid fa-eye"></i>
-                          </a>
-                        </div>
-                      <?php endif; ?>
-                    </div>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php endif; ?>
-
-            <tr>
-              <td colspan="2"></td>
-              <td class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
-              <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
-              <td></td>
+          </thead>
+          <tbody>
+            <?php foreach ($current_child_groups as $subGroup): ?>
+              <tr class="table-light">
+                <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
+                <td colspan="3" class="fw-bold">
+                  <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
+                </td>
+              </tr>
+  
+              <?php if (isset($subGroup->indicators)): ?>
+                <?php foreach ($subGroup->indicators as $index => $indicator): ?>
+                  <tr>
+                    <td class="text-center"><?= $index + 1 ?></td>
+                    <td><?= Html::encode($indicator->label) ?></td>
+                    <td>
+                      <select
+                        name="indicator_scores[<?= $indicator->id ?>][self_team_score]"
+                        class="form-select score-select"
+                        data-subgroup-id="<?= $subGroup->id ?>">
+                        <option value="0">Pilih Penilaian</option>
+  
+                        <?php foreach ($indicator->indicatorOptions as $option): ?>
+                          <?php
+                          $selected = (
+                            isset($indicator->indicatorScores[0]->self_team_score) &&
+                            $indicator->indicatorScores[0]->self_team_score == $option->weight
+                          ) ? 'selected' : '';
+                          ?>
+  
+                          <option value="<?= $option->weight ?>" <?= $selected ?>>
+                            <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </td>
+                    <td>
+                      <div class="d-flex d-grid gap-1">
+                        <input class="form-control form-control-sm" type="file" name="indicator_scores[<?= $indicator->id ?>][evidence]">
+                        <?php if (isset($indicator->indicatorScores[0]) && $indicator->indicatorScores[0]->evidence_url): ?>
+                          <div class="mb-1">
+                            <a href="<?= Url::to($indicator->indicatorScores[0]->evidence_url) ?>"
+                              target="_blank" class="btn btn-sm s-btn-main"
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              title="Lihat Bukti">
+                              <i class="fa-solid fa-eye"></i>
+                            </a>
+                          </div>
+                        <?php endif; ?>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
+  
+              <tr>
+                <td colspan="2"></td>
+                <td class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
+                <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
+                <td></td>
+              </tr>
+  
+            <?php endforeach; ?>
+  
+            <tr class="table-secondary">
+              <th colspan="2" scope="row"></th>
+              <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
+              <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
+              <th></th>
             </tr>
-
-          <?php endforeach; ?>
-
-          <tr class="table-secondary">
-            <th colspan="2" scope="row"></th>
-            <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
-            <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
-            <th></th>
-          </tr>
-        </tbody>
-      </table>
-    </form>
+          </tbody>
+        </table>
+      </form>
+    </div>
   </div>
 
-  <div class="d-flex justify-content-between w-100 mt-3">
+  <div class="d-flex justify-content-between w-100 mt-3 flex-column flex-md-row gap-2">
     <div class="d-flex align-items-center">
-      <button type="submit" id="btn-save-temp" form="self-review-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2">Simpan sementara</button>
+      <button type="submit" id="btn-save-temp" form="self-review-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2 ms-auto ms-md-0">Simpan sementara</button>
     </div>
     <div>
       <nav aria-label="pagination">

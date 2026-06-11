@@ -26,7 +26,7 @@ $percentages = [
 ?>
 
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
     <a href="/saspri-k" class=" text-decoration-none text-black fs-5 me-3">
       <i class="fa-solid fa-arrow-left"></i>
@@ -34,7 +34,7 @@ $percentages = [
     <h3 class="fw-bold mb-0">Pengajuan Sertifikasi</h3>
   </div>
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-    <div class="px-4 mx-4 row align-items-center justify-content-between">
+    <div class="px-md-4 mx-md-4 mx-1 row align-items-center justify-content-between">
       <div class="col-md-6 my-2">
         <p class="mb-0 text-secondary small fw-semibold">SASPRI-K</p>
         <p class="mb-0 fs-4">
@@ -57,7 +57,7 @@ $percentages = [
 
     </div>
   </div>
-  <div class="bg-white px-5 py-4 rounded-2 shadow border-1 border text-center">
+  <div class="bg-white px-md-5 px-2 py-4 rounded-2 shadow border-1 border text-center">
     <p class="fs-4 fw-bold">Status Sertifikasi</p>
     <div class="progress">
       <div class="progress-bar <?= $certification->status === CertificationStatus::COMPLETED ? 'bg-success' : 's-bg-main' ?>" role="progressbar" style="width: <?= $percentages[$certification->status] ?>;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -72,7 +72,7 @@ $percentages = [
   </div>
 
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-    <div class="px-4">
+    <div class="px-md-4">
       <p class=" fw-bold">Kelola Anggota Tim Mandiri</p>
       <div class="mb-4">
         <div class="user-search-container">
@@ -92,61 +92,63 @@ $percentages = [
           </button>
         </form>
       </div>
-      <table class="table self-request text-center">
-        <thead>
-          <tr>
-            <th scope="col">No</th>
-            <th scope="col">Nama Anggota</th>
-            <th scope="col">Peran</th>
-            <th scope="col">Status</th>
-            <th scope="col">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($self_team_members as $index => $member): ?>
+      <div class="mobile-scroll">
+        <table class="table self-request text-center">
+          <thead>
             <tr>
-              <tD scope="row"><?= $index + 1 ?></th>
-              <td><?= Html::encode($member->user->username) ?></td>
-              <td>
-                <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'user_id' => $member->user->id], 'post') ?>
-                <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
-                  <?php foreach (TeamRole::list() as $value => $label): ?>
-                    <?php if ($value == TeamRole::FACILITATOR) {
-                        break;
-                    } ?>
-                    <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
-                      <?= $label ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-                <?= Html::endForm() ?>
-              </td>
-              <td>
-                <span class="badge bg-<?= $member->status === 'approved' ? 'success' : ($member->status === 'pending' ? 'warning' : 'danger') ?>">
-                  <?= ApprovalStatus::list()[$member->status] ?>
-                </span>
-              </td>
-              <td>
-                <?= Html::a('<i class="fa-solid fa-xmark"></i>', ['hapus-anggota-tim-mandiri', 'user_id' => $member->user->id], [
-                  'class' => 'btn s-btn-red btn-sm',
-                  'data' => [
-                    'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                    'method' => 'delete',
-                  ],
-                ]) ?>
-                <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
-                  'class' => 's-btn-main btn btn-sm',
-                ]) ?>
-              </td>
+              <th scope="col">No</th>
+              <th scope="col">Nama Anggota</th>
+              <th scope="col" style="min-width: 8rem;">Peran</th>
+              <th scope="col">Status</th>
+              <th scope="col">Aksi</th>
             </tr>
-          <?php endforeach ?>
-          <?php if (empty($self_team_members)): ?>
-            <tr>
-              <td colspan="5" class="text-center">Belum ada anggota tim mandiri.</td>
-            </tr>
-          <?php endif; ?>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <?php foreach ($self_team_members as $index => $member): ?>
+              <tr>
+                <tD scope="row"><?= $index + 1 ?></th>
+                <td><?= Html::encode($member->user->username) ?></td>
+                <td>
+                  <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'user_id' => $member->user->id], 'post') ?>
+                  <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <?php foreach (TeamRole::list() as $value => $label): ?>
+                      <?php if ($value == TeamRole::FACILITATOR) {
+                          break;
+                      } ?>
+                      <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
+                        <?= $label ?>
+                      </option>
+                    <?php endforeach; ?>
+                  </select>
+                  <?= Html::endForm() ?>
+                </td>
+                <td>
+                  <span class="badge bg-<?= $member->status === 'approved' ? 'success' : ($member->status === 'pending' ? 'warning' : 'danger') ?>">
+                    <?= ApprovalStatus::list()[$member->status] ?>
+                  </span>
+                </td>
+                <td>
+                  <?= Html::a('<i class="fa-solid fa-xmark"></i>', ['hapus-anggota-tim-mandiri', 'user_id' => $member->user->id], [
+                    'class' => 'btn s-btn-red btn-sm',
+                    'data' => [
+                      'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
+                      'method' => 'delete',
+                    ],
+                  ]) ?>
+                  <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
+                    'class' => 's-btn-main btn btn-sm',
+                  ]) ?>
+                </td>
+              </tr>
+            <?php endforeach ?>
+            <?php if (empty($self_team_members)): ?>
+              <tr>
+                <td colspan="5" class="text-center">Belum ada anggota tim mandiri.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
   <div>

@@ -24,7 +24,7 @@ use yii\widgets\Pjax;
 // dd($peer_team_member_completed)
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <div class="">
     <h3 class="fw-bold">Kegiatan Tim Sebaya</h3>
   </div>
@@ -38,8 +38,8 @@ use yii\widgets\Pjax;
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <?php Pjax::begin() ?>
-      <div id="cert-ask-table-peer">
-        <div class="collapse show px-4" id="collapse-party">
+      <div id="cert-ask-table-peer" >
+        <div class="collapse show px-md-4 mobile-scroll" id="collapse-party">
           <table class="table self-request text-center">
             <thead>
               <tr>
@@ -82,10 +82,10 @@ use yii\widgets\Pjax;
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $request_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-ask-table-peer" href="<?= Url::to($request_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-            <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $request_next_link === null ? 'disabled' : '' ?>" data-container="#cert-ask-table-peer" href="<?= Url::to($request_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-          </div>
+        </div>
+        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $request_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-ask-table-peer" href="<?= Url::to($request_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+          <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $request_next_link === null ? 'disabled' : '' ?>" data-container="#cert-ask-table-peer" href="<?= Url::to($request_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
         </div>
       </div>
       <?php Pjax::end() ?>
@@ -101,8 +101,8 @@ use yii\widgets\Pjax;
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <?php Pjax::begin() ?>
-      <div id="cert-go-table-peer">
-        <div class="collapse show px-4" id="collapse-running">
+      <div id="cert-go-table-peer" class="">
+        <div class="collapse show px-md-4 mobile-scroll" id="collapse-running">
           <table class="table self-request text-center">
             <thead>
               <tr>
@@ -128,7 +128,7 @@ use yii\widgets\Pjax;
                   </td>
                   <td><?= Html::encode(CertificationStatus::list()[$member->certification->status]) ?></td>
                   <td>
-                    <?php if (str_contains(strtolower(CertificationStatus::list()[$member->certification->status]), 'self')) : ?>
+                    <?php if (str_contains(strtolower(CertificationStatus::list()[$member->certification->status]), 'peer')) : ?>
                       <a href="<?php echo Url::to(['tim-sebaya/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-edit"></i></a>
                     <?php else:  ?>
                       <a href="<?php echo Url::to(['tim-sebaya/detail', 'case_id' => $member->certification->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
@@ -143,10 +143,10 @@ use yii\widgets\Pjax;
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $uncompleted_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-go-table-peer" href="<?= Url::to($uncompleted_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-            <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $uncompleted_next_link === null ? 'disabled' : '' ?>" data-container="#cert-go-table-peer" href="<?= Url::to($uncompleted_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-          </div>
+        </div>
+        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $uncompleted_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-go-table-peer" href="<?= Url::to($uncompleted_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+          <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $uncompleted_next_link === null ? 'disabled' : '' ?>" data-container="#cert-go-table-peer" href="<?= Url::to($uncompleted_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
         </div>
       </div>
       <?php Pjax::end() ?>
@@ -162,8 +162,8 @@ use yii\widgets\Pjax;
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <?php Pjax::begin() ?>
-      <div id="cert-hist-table-peer">
-        <div class="collapse show px-4" id="collapse-history">
+      <div id="cert-hist-table-peer" >
+        <div class="collapse show px-md-4 mobile-scroll" id="collapse-history">
           <table class="table self-request text-center">
             <thead>
               <tr>
@@ -205,10 +205,10 @@ use yii\widgets\Pjax;
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $completed_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-hist-table-peer" href="<?= Url::to($completed_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-            <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $completed_next_link === null ? 'disabled' : '' ?>" data-container="#cert-hist-table-peer" href="<?= Url::to($completed_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-          </div>
+        </div>
+        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $completed_prev_link === null ? 'disabled' : '' ?>" data-container="#cert-hist-table-peer" href="<?= Url::to($completed_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+          <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $completed_next_link === null ? 'disabled' : '' ?>" data-container="#cert-hist-table-peer" href="<?= Url::to($completed_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
         </div>
       </div>
       <?php Pjax::end() ?>

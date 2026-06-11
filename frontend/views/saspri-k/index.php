@@ -76,7 +76,7 @@ $shingles = [
 ];
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <div class=" d-flex justify-content-between">
     <h3 class="fw-bold">SASPRI Kawasan</h3>
     <div class="d-md-none md-block">
@@ -85,8 +85,8 @@ $shingles = [
   </div>
   <div class="row">
     <div class="col-sm-8">
-      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <div class=" px-4">
+      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border ">
+        <div class=" px-md-4">
           <p class=" fw-bold">Identitas </p>
           <?php foreach ($index as $key => $dat) : ?>
             <?php echo $this->render('/component/_idline', [
@@ -109,7 +109,7 @@ $shingles = [
     <div class="col-sm-4">
       <a href="/saspri-k/pengajuan-sertifikasi" class=" btn s-btn-main me-2 w-100 mb-3 d-none d-md-block">+ Pengajuan Sertifikasi</a>
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mt-3 mt-md-0">
-        <div class="px-3">
+        <div class="px-md-3">
           <p class=" fw-bold">Sertifikat </p>
 
           <?php foreach ($certIndex as $key => $dat) : ?>
@@ -130,10 +130,10 @@ $shingles = [
   </div>
   <div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-      <div class="px-4">
+      <div class="px-md-4">
         <p class=" fw-bold">Riwayat Sertifikasi </p>
         <?php Pjax::begin() ?>
-        <div id="sapri-cert-hist-card" class=" overflow-x-scroll">
+        <div id="sapri-cert-hist-card" class=" mobile-scroll">
           <table class="table text-center">
             <thead>
               <tr>
@@ -158,7 +158,7 @@ $shingles = [
                   <td><?= Html::encode(CertificationStatus::list()[$value->status]) ?></td>
                   <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
                   <td>
-                    <div>
+                    <div class="d-flex gap-2">
                       <a href="<?php echo Url::to(['/saspri-k/detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
 
                       <?php if (str_contains(strtolower($value->status), 'comp')): ?>
@@ -175,25 +175,25 @@ $shingles = [
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
-              href="<?= $cert_prev_link ?>"
-              data-container="sapri-cert-hist-card">
-              <i class="fa-solid fa-angles-left"></i> Sebelumnya
-            </a>
-            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_next_link === null ? 'disabled' : '' ?>"
-              href="<?= $cert_next_link ?>"
-              data-container="sapri-cert-hist-card">
-              Berikutnya <i class="fa-solid fa-angles-right"></i>
-            </a>
-          </div>
+        </div>
+        <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
+            href="<?= $cert_prev_link ?>"
+            data-container="sapri-cert-hist-card">
+            <i class="fa-solid fa-angles-left"></i> Sebelumnya
+          </a>
+          <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_next_link === null ? 'disabled' : '' ?>"
+            href="<?= $cert_next_link ?>"
+            data-container="sapri-cert-hist-card">
+            Berikutnya <i class="fa-solid fa-angles-right"></i>
+          </a>
         </div>
       </div>
     </div>
   </div>
   <div class="mt-3">
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-      <div class="px-4">
+      <div class="px-md-4">
         <p class=" fw-bold">Anggota Kawasan</p>
         <div class="mb-4">
           <div class="user-search-container">
@@ -213,7 +213,7 @@ $shingles = [
           </form>
         </div>
         <?php Pjax::begin() ?>
-        <div id="sapri-member-card">
+        <div id="sapri-member-card" class="mobile-scroll">
           <table class="table text-center">
             <thead>
               <tr>
@@ -230,16 +230,18 @@ $shingles = [
                   <td><?= Html::encode($member->username) ?></td>
                   <td><?= Html::encode($member->phone_number) ?></td>
                   <td>
-                    <div>
+                    <div class="d-flex gap-2">
                       <?= Html::a('<i class="fa-solid fa-minus"></i>', ['hapus-anggota', 'user_id' => $member->id], [
                         'class' => 's-btn-red btn btn-sm',
                         'data' => [
                           'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
                           'method' => 'delete',
-                        ],
+                          ],
+                        'data-container'=>"#saspri-member-card"
                       ]) ?>
                       <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
                         'class' => 's-btn-main btn btn-sm',
+                        
                       ]) ?>
                     </div>
                   </td>
@@ -252,18 +254,17 @@ $shingles = [
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn-sm btn s-btn-sec pager-btn <?= $user_prev_link === null ? 'disabled' : '' ?>"
-              data-container="#saspri-member-card"
-              href="<?= Url::to($user_prev_link) ?>">
-              <i class="fa-solid fa-angles-left"></i> Sebelumnya
-            </a>
-            <a class="p-2 btn-sm btn s-btn-main pager-btn <?= $user_next_link === null ? 'disabled' : '' ?>"
-              data-container="#saspri-member-card" href="<?= Url::to($user_next_link) ?>">
-              Berikutnya <i class="fa-solid fa-angles-right"></i>
-            </a>
-
-          </div>
+        </div>
+        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="p-2 btn-sm btn s-btn-sec pager-btn <?= $user_prev_link === null ? 'disabled' : '' ?>"
+            data-container="#saspri-member-card"
+            href="<?= Url::to($user_prev_link) ?>">
+            <i class="fa-solid fa-angles-left"></i> Sebelumnya
+          </a>
+          <a class="p-2 btn-sm btn s-btn-main pager-btn <?= $user_next_link === null ? 'disabled' : '' ?>"
+            data-container="#saspri-member-card" href="<?= Url::to($user_next_link) ?>">
+            Berikutnya <i class="fa-solid fa-angles-right"></i>
+          </a>
         </div>
         <?php Pjax::end() ?>
       </div>

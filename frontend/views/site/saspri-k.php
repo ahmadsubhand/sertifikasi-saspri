@@ -72,14 +72,14 @@ $shingles = [
 ];
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <div class="">
     <h3 class="fw-bold">SASPRI Kawasan</h3>
   </div>
   <div class="row">
     <div class="col-sm-8">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <div class=" px-4">
+        <div class=" px-md-4 px-2">
           <p class=" fw-bold">Identitas </p>
           <?php foreach ($index as $key => $dat) : ?>
             <?php echo $this->render('/component/_idline', [
@@ -92,8 +92,8 @@ $shingles = [
       </div>
     </div>
     <div class="col-sm-4">
-      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <div class="px-3">
+      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mt-3 mt-md-0">
+        <div class="px-md-3 px-1">
           <p class=" fw-bold">Sertifikat </p>
 
           <?php foreach ($certIndex as $key => $dat) : ?>
@@ -114,10 +114,10 @@ $shingles = [
   </div>
   <div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-      <div class="px-4">
+      <div class="px-md-4">
         <p class=" fw-bold">Riwayat Sertifikasi </p>
         <?php Pjax::begin() ?>
-        <div id="sapri-cert-hist-card">
+        <div id="sapri-cert-hist-card" class="mobile-scroll">
           <table class="table text-center">
             <thead>
               <tr>
@@ -142,7 +142,7 @@ $shingles = [
                   <td><?= Html::encode(CertificationStatus::list()[$value->status]) ?></td>
                   <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
                   <td>
-                    <div>
+                    <div class="d-flex gap-2">
                       <a href="<?php echo Url::to(['detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
 
                       <?php if (str_contains(strtolower($value->status), 'comp')): ?>
@@ -159,29 +159,29 @@ $shingles = [
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
-              href="<?= $cert_prev_link ?>"
-              data-container="sapri-cert-hist-card">
-              <i class="fa-solid fa-angles-left"></i> Sebelumnya
-            </a>
-            <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_next_link === null ? 'disabled' : '' ?>"
-              href="<?= $cert_next_link ?>"
-              data-container="sapri-cert-hist-card">
-              Berikutnya <i class="fa-solid fa-angles-right"></i>
-            </a>
-          </div>
+        </div>
+        <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
+            href="<?= $cert_prev_link ?>"
+            data-container="sapri-cert-hist-card">
+            <i class="fa-solid fa-angles-left"></i> Sebelumnya
+          </a>
+          <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_next_link === null ? 'disabled' : '' ?>"
+            href="<?= $cert_next_link ?>"
+            data-container="sapri-cert-hist-card">
+            Berikutnya <i class="fa-solid fa-angles-right"></i>
+          </a>
         </div>
       </div>
     </div>
   </div>
   <div class="mt-3">
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-      <div class="px-4">
+      <div class="px-md-4">
         <p class=" fw-bold">Anggota Kawasan</p>
       
         <?php Pjax::begin() ?>
-        <div id="sapri-member-card">
+        <div id="sapri-member-card" class="mobile-scroll">
           <table class="table text-center">
             <thead>
               <tr>
@@ -205,18 +205,18 @@ $shingles = [
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn-sm btn s-btn-sec pager-btn <?= $user_prev_link === null ? 'disabled' : '' ?>"
-              data-container="#saspri-member-card"
-              href="<?= Url::to($user_prev_link) ?>">
-              <i class="fa-solid fa-angles-left"></i> Sebelumnya
-            </a>
-            <a class="p-2 btn-sm btn s-btn-main pager-btn <?= $user_next_link === null ? 'disabled' : '' ?>"
-              data-container="#saspri-member-card" href="<?= Url::to($user_next_link) ?>">
-              Berikutnya <i class="fa-solid fa-angles-right"></i>
-            </a>
+        </div>
+        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+          <a class="p-2 btn-sm btn s-btn-sec pager-btn <?= $user_prev_link === null ? 'disabled' : '' ?>"
+            data-container="#saspri-member-card"
+            href="<?= Url::to($user_prev_link) ?>">
+            <i class="fa-solid fa-angles-left"></i> Sebelumnya
+          </a>
+          <a class="p-2 btn-sm btn s-btn-main pager-btn <?= $user_next_link === null ? 'disabled' : '' ?>"
+            data-container="#saspri-member-card" href="<?= Url::to($user_next_link) ?>">
+            Berikutnya <i class="fa-solid fa-angles-right"></i>
+          </a>
 
-          </div>
         </div>
         <?php Pjax::end() ?>
       </div>
