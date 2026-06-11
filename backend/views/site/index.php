@@ -21,17 +21,17 @@ $this->title = 'Dashboard Sertifikasi';
 <div class="page-cont w-100 p-3 d-flex flex-column gap-3 asesmen-kelola">
   <h1><?= Html::encode($this->title) ?></h1>
   <div class="d-md-flex flex-lg-row text-center justify-content-around">
-    <div class="bg-white py-5 px-5 w-fit rounded-2 ">
+    <div class="bg-white py-5 border-dark-subtle shadow-sm border border-1 px-5 w-fit rounded-2 ">
       <i class="fa-solid fa-award m-4" style="font-size:6rem;"></i>
       <h2 class="h5">Sertifikasi Berjalan <br></h2>
       <p class="h2"><?= Html::encode($active_certifications_count) ?></p>
     </div>
-    <div class="bg-white py-5 px-5 w-fit rounded-2 ">
+    <div class="bg-white py-5 border-dark-subtle shadow-sm border border-1 px-5 w-fit rounded-2 ">
       <i class="fa-solid fa-people-carry-box m-4" style="font-size:6rem;"></i>
       <h2 class="h5">SASPRI-K Aktif <br></h2>
       <p class="h2"><?= Html::encode($active_saspri) ?></p>
     </div>
-    <div class="bg-white py-5 px-5 w-fit rounded-2 ">
+    <div class="bg-white py-5 border-dark-subtle shadow-sm border border-1 px-5 w-fit rounded-2 ">
       <i class="fa-solid fa-medal m-4" style="font-size:6rem;"></i>
       <h2 class="h5">SASPRI-K di Atas <br> Weania</h2>
       <p class="h2"><?= Html::encode($weania_plus) ?></p>
@@ -39,33 +39,33 @@ $this->title = 'Dashboard Sertifikasi';
   </div>
   <div class="d-md-flex gap-4 justify-content-between align-items-center align-middle mt-5">
     <h2 class="mb-0 ms-2">SASPRI-K Aktif</h2>
-    <div class="d-flex gap-4 align-content-end w-fit">
+    <div class="d-flex gap-4 align-content-end w-fit uppe">
       <div>
-        <label for="wilayah-search">Wilayah</label>
-        <input class="form-control border-black" type="text" name="wilayah-search" id="wilayah-search" style="width: 12rem;" autocomplete="off">
+        <label for="wilayah-search text-uppercase">WILAYAH</label>
+        <input class="form-control border-dark-subtle" type="text" name="wilayah-search" id="wilayah-search" style="width: 12rem;" autocomplete="off">
       </div>
       <div>
-        <label for="wali-search">Wali</label>
-        <input class="form-control border-black" type="text" name="wali-search" id="wali-search" style="width: 12rem;" autocomplete="off">
+        <label for="wali-search text-uppercase">WALI</label>
+        <input class="form-control border-dark-subtle" type="text" name="wali-search" id="wali-search" style="width: 12rem;" autocomplete="off">
       </div>
       <div>
-        <label for="level-search">Tingkatan</label>
+        <label for="level-search text-uppercase">TINGKATAN</label>
         <?= Html::dropDownList('level-search', null, CertificateLevel::list(), [
           'id' => 'level-search',
-          'class' => 'form-select border-black',
+          'class' => 'form-select border-dark-subtle',
           'prompt' => '-',
           'style' => "width:12rem;"
         ]) ?>
       </div>
     </div>
   </div>
-  <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
+  <div class="bg-white px-2 py-4 rounded-2  border-dark-subtle shadow-sm border border-1">
     <?php Pjax::begin(['id' => 'pjax-saspri-table']) ?>
     <div id="saspri-table">
       <div class="px-4">
         <table class="table align-middle text-center">
           <thead>
-            <tr>
+            <tr class=" text-uppercase">
               <th scope="col">No</th>
               <th scope="col">Wilayah</th>
               <th scope="col">Tingkatan</th>
@@ -83,7 +83,7 @@ $this->title = 'Dashboard Sertifikasi';
                 <td><?= Html::encode($saspri->coordinator->username) ?></td>
                 <td><?= Html::encode(ucfirst($saspri->address)) ?></td>
                 <td>
-                  <a href="<?= Url::to(['saspri-k', 'id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main">
+                  <a href="<?= Url::to(['saspri-k', 'saspri_id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main">
                     <i class="fa-solid fa-eye"></i>
                   </a>
                 </td>

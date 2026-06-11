@@ -12,24 +12,45 @@ AppAsset::register($this);
 $this->beginContent('@backend/views/layouts/base.php');
 ?>
 
-<div class="vh-100 d-flex overflow-hidden">
-    <!-- header -->
-    <?php if (!Yii::$app->user->isGuest) : ?>
-        <?php echo $this->render("_sidebar") ?>
-    <?php endif ?>
-    <!-- <br><br> -->
-    <!-- center -->
-    <main role="main" class="flex-grow-1 d-flex flex-column d-grid gap-3 overflow-auto position-relative">
-        <?php echo $this->render("_header") ?>
-        <div class="content-wrap">
-            <?= Breadcrumbs::widget([
-                'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-            ]) ?>
-            <div class="p-3 z-1050 position-absolute w-100">
+<div class="vh-100 d-flex flex-column overflow-hidden">
+
+    <div class="flex-shrink-0">
+        <?= $this->render("_header") ?>
+    </div>
+
+    <div class="d-flex flex-grow-1 h-100 position-relative overflow-hidden">
+
+        <?php if (!Yii::$app->user->isGuest) : ?>
+            <div class="offcanvas-lg offcanvas-start flex-shrink-0 h-100 w-fit s-sidebar-wrapper"
+                tabindex="-1"
+                id="sidebarOffcanvas"
+                aria-labelledby="sidebarOffcanvasLabel">
+
+                <div class="offcanvas-body p-0 h-100 overflow-y-auto s-bg-main">
+
+                    <?= $this->render("_sidebar") ?>
+                </div>
+            </div>
+        <?php endif ?>
+
+        <main role="main" class="w-100 h-100 overflow-auto p-4 bg-light">
+
+            <?php if (isset($this->params['breadcrumbs'])): ?>
+                <div class="mb-3">
+                    <?= Breadcrumbs::widget([
+                        'links' => $this->params['breadcrumbs'],
+                    ]) ?>
+                </div>
+            <?php endif ?>
+
+            <div class="mb-3">
                 <?= Alert::widget() ?>
             </div>
-            <?= $content ?>
-        </div>
-    </main>
+
+            <div class="pb-5"> <?= $content ?>
+            </div>
+
+        </main>
+    </div>
 </div>
 <?php $this->endContent() ?>

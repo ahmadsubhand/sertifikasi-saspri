@@ -7,7 +7,6 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
 
-
 /** @var \common\models\SaspriK $saspri_k 
  * @var \common\models\Certification $valid_certificate
  * @var \common\models\Certification[] $completed_certifications
@@ -21,9 +20,6 @@ use yii\widgets\Pjax;
  */
 
 // dd($saspri_k_members);
-
-$this->title = 'Saspri-K ' .$saspri_k->region_name;
- 
 
 $label = [
   'SASPRI-K',
@@ -77,11 +73,8 @@ $shingles = [
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
-  <div class=" d-flex justify-content-between">
+  <div class="">
     <h3 class="fw-bold">SASPRI Kawasan</h3>
-    <div class="d-md-none md-block">
-      <a href="/saspri-k/pengajuan-sertifikasi" class=" btn s-btn-main me-2 w-100 mb-3" style="font-size: small;">+ Pengajuan Sertifikasi</a>
-    </div>
   </div>
   <div class="row">
     <div class="col-sm-8">
@@ -95,20 +88,11 @@ $shingles = [
               'shingles' => $shingles[$dat] ?? ''
             ]); ?>
           <?php endforeach ?>
-          <div class="w-100 d-flex justify-content-between mt-3">
-            <a href="<?= Url::to(['saspri-k/pergantian-wali']) ?>" class=" btn s-btn-red me-2">Ajukan pergantian Wali</a>
-            <!-- possible pjax change only for top-->
-            <button type="button" class=" btn s-btn-main me-2" data-bs-toggle="modal" data-bs-target="#dataEditModal">
-              Edit Data
-            </button>
-            <!-- <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a> -->
-          </div>
         </div>
       </div>
     </div>
     <div class="col-sm-4">
-      <a href="/saspri-k/pengajuan-sertifikasi" class=" btn s-btn-main me-2 w-100 mb-3 d-none d-md-block">+ Pengajuan Sertifikasi</a>
-      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mt-3 mt-md-0">
+      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
         <div class="px-3">
           <p class=" fw-bold">Sertifikat </p>
 
@@ -133,7 +117,7 @@ $shingles = [
       <div class="px-4">
         <p class=" fw-bold">Riwayat Sertifikasi </p>
         <?php Pjax::begin() ?>
-        <div id="sapri-cert-hist-card" class=" overflow-x-scroll">
+        <div id="sapri-cert-hist-card">
           <table class="table text-center">
             <thead>
               <tr>
@@ -159,7 +143,7 @@ $shingles = [
                   <td><?= Html::encode(CertificateGrade::list()[$value->grade] ?? '-') ?></td>
                   <td>
                     <div>
-                      <a href="<?php echo Url::to(['/saspri-k/detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
+                      <a href="<?php echo Url::to(['detail', 'case_id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-magnifying-glass"></i></a>
 
                       <?php if (str_contains(strtolower($value->status), 'comp')): ?>
                         <a href="<?php echo Url::to(['#', 'id' => $value->id]) ?>" class="s-btn-main btn btn-sm"><i class="fa-solid fa-download"></i></a>
@@ -195,23 +179,7 @@ $shingles = [
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <div class="px-4">
         <p class=" fw-bold">Anggota Kawasan</p>
-        <div class="mb-4">
-          <div class="user-search-container">
-            <input type="text" id="user-search-input" placeholder="Cari anggota baru (username) ..."
-              class="form-control dropdown-toggle border border-1 shadow-sm" autocomplete="off">
-            <div id="search-dropdown" class="search-dropdown dropdown-menu shadow"></div>
-          </div>
-
-          <div id="selected-users-container" class="user-chips my-3 d-flex flex-wrap"></div>
-
-          <form id="add-members-form" method="post"
-            action="<?= Url::to(['saspri-k/tambah-anggota']) ?>">
-            <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-            <div id="selected-user-inputs"></div>
-            <button type="submit" id="submit-add-btn" class="btn btn-success mt-2" style="display: none;">Tambah
-              Anggota</button>
-          </form>
-        </div>
+      
         <?php Pjax::begin() ?>
         <div id="sapri-member-card">
           <table class="table text-center">
@@ -220,7 +188,6 @@ $shingles = [
                 <th scope="col">No</th>
                 <th scope="col">Nama Anggota</th>
                 <th scope="col">Nomor Telpon</th>
-                <th scope="col">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -229,20 +196,6 @@ $shingles = [
                   <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
                   <td><?= Html::encode($member->username) ?></td>
                   <td><?= Html::encode($member->phone_number) ?></td>
-                  <td>
-                    <div>
-                      <?= Html::a('<i class="fa-solid fa-minus"></i>', ['hapus-anggota', 'user_id' => $member->id], [
-                        'class' => 's-btn-red btn btn-sm',
-                        'data' => [
-                          'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
-                          'method' => 'delete',
-                        ],
-                      ]) ?>
-                      <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
-                        'class' => 's-btn-main btn btn-sm',
-                      ]) ?>
-                    </div>
-                  </td>
                 </tr>
               <?php endforeach ?>
               <?php if (empty($saspri_k_members)): ?>
@@ -270,117 +223,6 @@ $shingles = [
     </div>
   </div>
 </div>
-
-<div class="modal fade my-auto modal-lg" id="dataEditModal" tabindex="-1" aria-labelledby="dataEditModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="dataEditModalLabel">Edit Data Saspri <?= Html::encode($saspri_k->region_name) ?></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <?= $this->render('/component/_edit_saspri', [
-          'model'=>$saspri_k
-        ]); ?>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script>
-  // code from be
-  document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('user-search-input');
-    const dropdown = document.getElementById('search-dropdown');
-    const chipsContainer = document.getElementById('selected-users-container');
-    const hiddenInputsContainer = document.getElementById('selected-user-inputs');
-    const submitBtn = document.getElementById('submit-add-btn');
 
-    let selectedUsers = [];
-    let timeout = null;
-
-    input.addEventListener('input', function() {
-      clearTimeout(timeout);
-      const q = this.value;
-      if (q.length < 2) {
-        dropdown.style.display = 'none';
-        return;
-      }
-
-      timeout = setTimeout(() => {
-        fetch('<?= Url::to(['saspri-k/cari-user']) ?>?q=' +
-            encodeURIComponent(q))
-          .then(response => response.json())
-          .then(data => {
-            dropdown.innerHTML = '';
-            if (data.length > 0) {
-              data.forEach(user => {
-                if (selectedUsers.some(u => u.id === user.id))
-                  return;
-
-                const item = document.createElement('div');
-                item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
-                item.textContent = user.username;
-                item.onclick = () => selectUser(user);
-                dropdown.appendChild(item);
-              });
-              dropdown.style.display = 'block';
-            } else {
-              dropdown.style.display = 'none';
-            }
-          });
-      }, 300);
-    });
-
-    function selectUser(user) {
-      selectedUsers.push(user);
-      renderChips();
-      input.value = '';
-      dropdown.style.display = 'none';
-      updateHiddenInput();
-    }
-
-    function removeUser(userId) {
-      selectedUsers = selectedUsers.filter(u => u.id !== userId);
-      renderChips();
-      updateHiddenInput();
-    }
-
-    function renderChips() {
-      chipsContainer.innerHTML = '';
-      selectedUsers.forEach(user => {
-        const chip = document.createElement('div');
-        chip.className = 'chip';
-        chip.innerHTML = `
-        <div class="d-flex bg-white shadow border-1 border m-2 align-items-center p-2 btn rounded-4" style="width: fit-content;">
-          <span>${user.username}</span>
-          <span class="remove-btn ms-1" onclick="window.removeUserFromList(${user.id})">&times;</span>
-        </div>
-      `;
-        chipsContainer.appendChild(chip);
-      });
-      submitBtn.style.display = selectedUsers.length > 0 ? 'block' : 'none';
-    }
-
-    function updateHiddenInput() {
-      hiddenInputsContainer.innerHTML = '';
-      selectedUsers.forEach(user => {
-        const input = document.createElement('input');
-
-        input.type = 'hidden';
-        input.name = 'user_ids[]';
-        input.value = user.id;
-
-        hiddenInputsContainer.appendChild(input);
-      });
-    }
-
-    window.removeUserFromList = removeUser;
-
-    document.addEventListener('click', function(e) {
-      if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.style.display = 'none';
-      }
-    });
-  });
 </script>

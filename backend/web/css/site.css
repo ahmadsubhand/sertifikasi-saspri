@@ -10,7 +10,7 @@ main {
 
 aside {
   min-width: 200px;
-  background-color: #3e4856;
+  background-color: #0f172a;
 }
 aside .nav-pills .nav-link {
   border-radius: 0;
@@ -32,7 +32,8 @@ tr {
 }
 
 th {
-  background-color: #daeff0 !important;
+  background-color: #dddddd !important;
+  font-weight: light;
 }
 
 table {
@@ -55,21 +56,21 @@ table thead tr:first-child th:last-child {
   flex: 1;
 }
 .s-bg-main {
-  background-color: #6b78b9 !important;
+  background-color: #0f172a !important;
 }
 .s-border-main{
-  border: 1px solid #6b78b9;
+  border: 1px solid #0f172a;
 }
 
 .s-color-main {
-  color: #6b78b9 !important;
+  color: #0f172a !important;
 }
 .s-btn-main {
-  background-color: #6b78b9;
+  background-color: #0f172a;
   color: white;
 }
 .s-btn-main:hover {
-  background-color: #7581BD;
+  background-color: #0f172a;
   color: white;
 }
 
@@ -83,13 +84,13 @@ table thead tr:first-child th:last-child {
 }
 
 .s-btn-outline-main:hover  {
-  background-color: #6b78b9;
+  background-color: #0f172a;
   color: white;
 }
 .s-btn-outline-main{
-  border: 1px solid #6b78b9;
+  border: 1px solid #0f172a;
   background-color: white;
-  color: #6b78b9 ;
+  color: #0f172a ;
 }
 
 .s-btn-outline-sec:hover {
@@ -101,7 +102,6 @@ table thead tr:first-child th:last-child {
   background-color: #818a9a;
   color: white;
 }
-
 
 .s-btn-red {
   background-color: #dc3545;
@@ -123,7 +123,7 @@ table thead tr:first-child th:last-child {
 }
 
 .s-bg-main {
-  background-color: #6b78b9;
+  background-color: #0f172a;
 }
 .s-bg-sec {
   background-color: #818a9a;
@@ -189,6 +189,11 @@ table thead tr:first-child th:last-child {
 .w-90{
   width: 90%;
 }
+
+.acc-btn::after{
+  color: white;
+}
+
 /*  */
 .footer {
     background-color: #f5f5f5;

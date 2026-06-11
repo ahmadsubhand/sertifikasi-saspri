@@ -48,7 +48,7 @@ switch (true) {
 }
 ?>
 
-<div class="d-flex align-middle align-items-center">
+<div class="d-flex align-middle align-items-center mb-1">
   <p class="w-50 mb-1"><?php echo $label ?></p>
   <p class="mx-3 mb-1">:</p>
   <p class="w-50 mb-1 text-break"><?php echo (string)$data . " " . $shingles ?></p>
