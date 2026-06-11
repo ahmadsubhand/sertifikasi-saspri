@@ -36,6 +36,15 @@ class Regency extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        $fields = parent::fields();
+
+        $fields['province'] = 'province';
+
+        return [...$fields];
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -129,7 +129,7 @@ class SelfTeamMember extends \yii\db\ActiveRecord
 
     public function checkFinalizationPermission()
     {
-        if ($this->status !== ApprovalStatus::APPROVED) {
+        if ($this->role !== TeamRole::LEADER) {
             throw new UnprocessableEntityHttpException(
                 'Hanya ' . strtolower(TeamRole::list()[TeamRole::LEADER]) . ' yang boleh melakukan finalisasi'
             );
