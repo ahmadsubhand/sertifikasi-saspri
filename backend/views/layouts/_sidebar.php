@@ -9,7 +9,7 @@ $currentRoute = Yii::$app->controller->getRoute();
 
 ?>
 
-<aside class="flex-shrink-0 border-end s-bg-main h-100" style="width: 4.5rem;">
+<aside class="flex-shrink-0 border-md-end s-bg-main" style="width: 4.5rem;">
   <div class=" text-uppercase lh-sm mt-1">
     <div class="<?= str_contains($currentRoute, 'site') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
       <a href="<?php echo Url::to('/site') ?>" class="text-decoration-none text-white w-100 text-white h6">

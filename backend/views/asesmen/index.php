@@ -9,7 +9,7 @@ $this->title = 'Asesmen Sertifikasi SASPRI-K'
 
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
     <div class="d-flex justify-content-between w-100 align-items-center">
         <h1><?= Html::encode($this->title) ?></h1>
         <button type="button" class="btn s-btn-main" data-bs-toggle="modal" data-bs-target="#modal_buat_baru">
@@ -18,74 +18,76 @@ $this->title = 'Asesmen Sertifikasi SASPRI-K'
     </div>
 
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border p-3 d-flex flex-column gap-2 w-100">
-        <div class="px-4">
+        <div class="px-md-4 px-2">
+            <div class="mobile-scroll">
 
-            <table class="table align-middle text-center">
-                <thead>
-                    <tr>
-                        <th scope="col">No</th>
-                        <th scope="col">Judul</th>
-                        <th scope="col">Level</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Tanggal Rilis</th>
-                        <th scope="col">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($assessments as $index => $assessment): ?>
+                <table class="table align-middle text-center">
+                    <thead>
                         <tr>
-                            <td scope="row"><?= $index + 1 ?></th>
-                            <td><?= Html::encode($assessment->title) ?></td>
-                            <td><?= Html::encode(CertificateLevel::list()[$assessment->level]) ?></td>
-                            <td>
-                                <?php if ($assessment->level === $assessment->active_at_level): ?>
-                                    <span class="badge bg-success">Aktif</span>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">Nonaktif</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?=
-                                $assessment->released_at
-                                    ? date('Y-m-d', strtotime($assessment->released_at))
-                                    : '-'
-                                ?></td>
-                            <td>
-                                <div class="btn-group">
-                                    <a href="<?= \yii\helpers\Url::to(['kelola', 'assessment_id' => $assessment->id]) ?>" class="btn btn-primary btn-sm"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Kelola">
-                                        <i class="fa-solid fa-bars-progress"></i>
-                                    </a>
-                                    <a href="<?= \yii\helpers\Url::to(['buat', 'assessment_id' => $assessment->id]) ?>"
-                                        class="btn btn-outline-primary btn-sm"
-                                        data-method="post"
-                                        data-confirm="Salin asesmen ini?"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Salin">
-                                        <i class="fa-solid fa-copy"></i>
-                                    </a>
-                                    <a href="<?= \yii\helpers\Url::to(['hapus', 'assessment_id' => $assessment->id]) ?>"
-                                        class="btn btn-danger btn-sm"
-                                        data-method="delete"
-                                        data-confirm="Apakah Anda yakin ingin menghapus asesmen ini?"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Hapus">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </a>
-                                </div>
-                            </td>
+                            <th scope="col">No</th>
+                            <th scope="col" style="min-width: 150px;">Judul</th>
+                            <th scope="col">Level</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Tanggal Rilis</th>
+                            <th scope="col">Aksi</th>
                         </tr>
-                    <?php endforeach ?>
-                    <?php if (empty($assessments)): ?>
-                        <tr>
-                            <td colspan="6" class="text-center">Tidak ada asesmen.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($assessments as $index => $assessment): ?>
+                            <tr>
+                                <td scope="row"><?= $index + 1 ?></th>
+                                <td><?= Html::encode($assessment->title) ?></td>
+                                <td><?= Html::encode(CertificateLevel::list()[$assessment->level]) ?></td>
+                                <td>
+                                    <?php if ($assessment->level === $assessment->active_at_level): ?>
+                                        <span class="badge bg-success">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Nonaktif</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?=
+                                    $assessment->released_at
+                                        ? date('Y-m-d', strtotime($assessment->released_at))
+                                        : '-'
+                                    ?></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="<?= \yii\helpers\Url::to(['kelola', 'assessment_id' => $assessment->id]) ?>" class="btn btn-primary btn-sm"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Kelola">
+                                            <i class="fa-solid fa-bars-progress"></i>
+                                        </a>
+                                        <a href="<?= \yii\helpers\Url::to(['buat', 'assessment_id' => $assessment->id]) ?>"
+                                            class="btn btn-outline-primary btn-sm"
+                                            data-method="post"
+                                            data-confirm="Salin asesmen ini?"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Salin">
+                                            <i class="fa-solid fa-copy"></i>
+                                        </a>
+                                        <a href="<?= \yii\helpers\Url::to(['hapus', 'assessment_id' => $assessment->id]) ?>"
+                                            class="btn btn-danger btn-sm"
+                                            data-method="delete"
+                                            data-confirm="Apakah Anda yakin ingin menghapus asesmen ini?"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Hapus">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                        <?php if (empty($assessments)): ?>
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada asesmen.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

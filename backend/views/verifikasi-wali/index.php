@@ -16,7 +16,7 @@ use yii\widgets\Pjax;
 $this->title = 'Verifikasi Wali SASPRI-K';
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <h1><?= Html::encode($this->title) ?></h1>
 
   <!-- 1. Permintaan Pendaftaran Wali Baru -->
@@ -29,8 +29,8 @@ $this->title = 'Verifikasi Wali SASPRI-K';
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <?php Pjax::begin() ?>
-      <div id="table-new-wali">
-        <div class="collapse show px-4" id="collapse-registration">
+      <div id="table-new-wali" class="mobile-scroll">
+        <div class="collapse show px-md-4 px-2" id="collapse-registration">
           <table class="table text-center align-middle">
             <thead>
               <tr>
@@ -64,11 +64,11 @@ $this->title = 'Verifikasi Wali SASPRI-K';
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $registration_prev_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($registration_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-            <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $registration_next_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($registration_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-          </div>
         </div>
+      </div>
+      <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+        <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $registration_prev_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($registration_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+        <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $registration_next_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($registration_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
       </div>
       <?php Pjax::end() ?>
     </div>
@@ -84,7 +84,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
     </div>
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
       <?php Pjax::begin() ?>
-      <div id="table-change-wali">
+      <div id="table-change-wali" class="mobile-scroll">
         <div class="collapse show px-4" id="collapse-change">
           <table class="table text-center align-middle">
             <thead>
@@ -119,11 +119,11 @@ $this->title = 'Verifikasi Wali SASPRI-K';
               <?php endif; ?>
             </tbody>
           </table>
-          <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-            <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $change_prev_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($change_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-            <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $change_next_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($change_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-          </div>
         </div>
+      </div>
+      <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+        <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $change_prev_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($change_prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+        <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $change_next_link === null ? 'disabled' : '' ?>" data-container="#table-new-wali" href="<?= Url::to($change_next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
       </div>
       <?php Pjax::end() ?>
     </div>

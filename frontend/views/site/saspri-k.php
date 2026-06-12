@@ -80,7 +80,7 @@ $shingles = [
     <div class="col-sm-8">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
         <div class=" px-md-4 px-2">
-          <p class=" fw-bold">Identitas </p>
+          <p class=" fw-bold h5 mb-3 border-bottom pb-2">Identitas SASPRI-K</p>
           <?php foreach ($index as $key => $dat) : ?>
             <?php echo $this->render('/component/_idline', [
               'label' => $label[$key],

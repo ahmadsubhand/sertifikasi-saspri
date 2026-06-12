@@ -166,7 +166,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <div class="d-flex align-items-center">
       <button type="submit" id="btn-save-temp" form="peer-review-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2 ms-auto ms-md-0">Simpan sementara</button>
     </div>
-    <div>
+    <div class="ms-auto ms-md-0">
       <nav aria-label="pagination">
         <ul class="pagination">
           <li class="page-item <?php echo $page > 1 ? '' : 'disabled' ?>">

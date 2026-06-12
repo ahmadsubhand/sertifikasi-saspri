@@ -86,8 +86,8 @@ $shingles = [
   <div class="row">
     <div class="col-sm-8">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border ">
-        <div class=" px-md-4">
-          <p class=" fw-bold">Identitas </p>
+        <div class=" px-md-4 px-2">
+          <p class=" fw-bold h5 mb-3 border-bottom pb-2">Identitas SASPRI-K</p>
           <?php foreach ($index as $key => $dat) : ?>
             <?php echo $this->render('/component/_idline', [
               'label' => $label[$key],
@@ -101,7 +101,6 @@ $shingles = [
             <button type="button" class=" btn s-btn-main me-2" data-bs-toggle="modal" data-bs-target="#dataEditModal">
               Edit Data
             </button>
-            <!-- <a href="<?= Url::to(['#']) ?>" class=" btn s-btn-main me-2">Edit data</a> -->
           </div>
         </div>
       </div>

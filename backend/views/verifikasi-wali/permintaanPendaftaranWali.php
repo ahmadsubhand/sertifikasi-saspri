@@ -77,7 +77,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
     <div class="d-flex align-items-center">
         <a href="<?= Url::to(['index']) ?>" class="text-decoration-none text-black fs-5 me-3">
             <i class="fa-solid fa-arrow-left"></i>
@@ -89,7 +89,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
         <!-- Identitas SASPRI-K -->
         <div class="col-md-8">
             <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border h-100">
-                <div class="px-4">
+                <div class="px-md-4 px-2">
                     <p class="fw-bold h5 mb-3 border-bottom pb-2">Identitas SASPRI-K</p>
                     <?php foreach ($index as $key => $dat) : ?>
                         <?php echo $this->render('/component/_idline', [
@@ -104,8 +104,8 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
         <!-- Dokumen Terkait -->
         <div class="col-md-4">
-            <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border h-100">
-                <div class="px-3">
+            <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border h-100 mt-3 mt-md-0">
+                <div class="px-md-3 px-1">
                     <p class="fw-bold h5 mb-3 border-bottom pb-2">Dokumen Terkait</p>
                     <?php if (!empty($documents)): ?>
                         <ul class="list-group list-group-flush">
@@ -132,7 +132,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100 mt-3">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
             <h5 class="fw-bold mb-0">Penilaian Sertifikat: <?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h5>
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 flex-column flex-md-row">
                 <span class="badge bg-primary">Level <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGantiLevel">
                     <i class="fa-solid fa-pen-to-square"></i> Ganti
@@ -144,80 +144,83 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
         $saveAction = Url::to(['simpan-sementara-permintaan-pendaftaran', 'saspri_k_id' => $saspri_k->id, 'page' => $page]);
         $approveAction = Url::to(['daftarkan-wali', 'saspri_k_id' => $saspri_k->id]);
         ?>
-        <form id="pendaftaran-wali-form" action="<?= $saveAction ?>" method="post">
-            <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-            <input type="hidden" name="action" id="form-action-input" value="approve">
+        <div class="mobile-scroll">
 
-            <table class="table align-middle">
-                <thead>
-                    <tr class="text-center">
-                        <th scope="col" style="width: 50px;">No</th>
-                        <th scope="col" class="text-start">Kriteria</th>
-                        <th scope="col" style="width: 250px;">Penilaian Final</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($current_child_groups as $subGroup): ?>
-                        <tr class="table-light">
-                            <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
-                            <td colspan="5" class="fw-bold">
-                                <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
-                            </td>
+            <form id="pendaftaran-wali-form" action="<?= $saveAction ?>" method="post">
+                <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
+                <input type="hidden" name="action" id="form-action-input" value="approve">
+    
+                <table class="table align-middle">
+                    <thead>
+                        <tr class="text-center">
+                            <th scope="col" style="width: 50px;">No</th>
+                            <th scope="col" class="text-start">Kriteria</th>
+                            <th scope="col" style="width: 250px;">Penilaian Final</th>
                         </tr>
-
-                        <?php if (isset($subGroup->indicators)): ?>
-                            <?php foreach ($subGroup->indicators as $index => $indicator): ?>
-                                <?php
-                                $scoreModel = $indicator->indicatorScores[0] ?? null;
-                                $finalScore = $scoreModel->final_score ?? 0;
-                                ?>
-                                <tr>
-                                    <td class="text-center"><?= $index + 1 ?></td>
-                                    <td><?= Html::encode($indicator->label) ?></td>
-                                    <td>
-                                        <select
-                                            name="indicator_scores[<?= $indicator->id ?>][final_score]"
-                                            class="form-select score-select final-score-select"
-                                            data-subgroup-id="<?= $subGroup->id ?>"
-                                            data-indicator-id="<?= $indicator->id ?>">
-                                            <option value="0">Pilih Penilaian</option>
-
-                                            <?php foreach ($indicator->indicatorOptions as $option): ?>
-                                                <?php
-                                                $selected = ($finalScore == $option->weight) ? 'selected' : '';
-                                                ?>
-
-                                                <option value="<?= $option->weight ?>" <?= $selected ?>>
-                                                    <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <tr>
-                            <td colspan="1"></td>
-                            <td colspan="1" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
-                            <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($current_child_groups as $subGroup): ?>
+                            <tr class="table-light">
+                                <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
+                                <td colspan="5" class="fw-bold">
+                                    <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
+                                </td>
+                            </tr>
+    
+                            <?php if (isset($subGroup->indicators)): ?>
+                                <?php foreach ($subGroup->indicators as $index => $indicator): ?>
+                                    <?php
+                                    $scoreModel = $indicator->indicatorScores[0] ?? null;
+                                    $finalScore = $scoreModel->final_score ?? 0;
+                                    ?>
+                                    <tr>
+                                        <td class="text-center"><?= $index + 1 ?></td>
+                                        <td><?= Html::encode($indicator->label) ?></td>
+                                        <td>
+                                            <select
+                                                name="indicator_scores[<?= $indicator->id ?>][final_score]"
+                                                class="form-select score-select final-score-select"
+                                                data-subgroup-id="<?= $subGroup->id ?>"
+                                                data-indicator-id="<?= $indicator->id ?>">
+                                                <option value="0">Pilih Penilaian</option>
+    
+                                                <?php foreach ($indicator->indicatorOptions as $option): ?>
+                                                    <?php
+                                                    $selected = ($finalScore == $option->weight) ? 'selected' : '';
+                                                    ?>
+    
+                                                    <option value="<?= $option->weight ?>" <?= $selected ?>>
+                                                        <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+    
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="1" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
+                                <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+    
+                        <tr class="table-secondary">
+                            <th scope="row"></th>
+                            <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
+                            <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
                         </tr>
-                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </form>
+        </div>
 
-                    <tr class="table-secondary">
-                        <th scope="row"></th>
-                        <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
-                        <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
-                    </tr>
-                </tbody>
-            </table>
-        </form>
-
-        <div class="d-flex justify-content-between w-100 mt-3">
-            <div class="d-flex align-items-center gap-2">
+        <div class="d-flex justify-content-between w-100 mt-3 flex-column flex-md-row gap-2 gap-md-0">
+            <div class="d-flex align-items-center gap-2 ms-auto ms-md-0">
                 <button type="submit" id="btn-save-temp" form="pendaftaran-wali-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2">Simpan sementara</button>
             </div>
-            <div>
+            <div class="ms-auto ms-md-0">
                 <nav aria-label="pagination">
                     <ul class="pagination mb-0">
                         <li class="page-item <?php echo $page > 1 ? '' : 'disabled' ?>">
@@ -245,7 +248,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
     <!-- Final Actions -->
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border mt-3 mb-5">
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex justify-content-center gap-3 flex-column-reverse flex-md-row">
             <button type="button" class="btn btn-danger px-5 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
                 <i class="fa-solid fa-xmark me-2"></i> Tolak Pendaftaran
             </button>
@@ -254,7 +257,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                     <i class="fa-solid fa-check me-2"></i> Setujui Pendaftaran
                 </button>
             <?php else: ?>
-                <div class="text-muted small italic w-25">Selesaikan penilaian pada seluruh kategori indikator untuk mengaktifkan tombol Setuju.</div>
+                <div class="text-muted small italic width-acc">Selesaikan penilaian pada seluruh kategori indikator untuk mengaktifkan tombol Setuju.</div>
             <?php endif; ?>
 
             

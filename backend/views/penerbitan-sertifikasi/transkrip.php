@@ -26,7 +26,7 @@ $passed = $certification->grade != CertificateGrade::BC && $certification->grade
 
 ?>
 
-<div class="page-cont w-100 p-3 d-flex flex-column gap-3 asesmen-kelola">
+<div class="page-cont w-100 p-md-3 d-flex flex-column gap-3 asesmen-kelola">
   <h1><?= Html::encode($this->title) ?></h1>
   <div class="text-muted d-flex align-items-center gap-2 mb-2">
     <span class="badge bg-primary">Admin Nasional</span>
@@ -34,8 +34,8 @@ $passed = $certification->grade != CertificateGrade::BC && $certification->grade
       Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
     </div>
   </div>
-  <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border p-3 d-flex flex-column gap-2 w-100">
-    <table class="table align-middle px-4">
+  <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border p-3 d-flex flex-column gap-2 w-100 mobile-scroll">
+    <table class="table align-middle px-md-4 px-1">
       <thead>
         <tr class="text-center">
           <th scope="col" style="width: 50px;">Kode</th>
@@ -49,8 +49,8 @@ $passed = $certification->grade != CertificateGrade::BC && $certification->grade
         <?php foreach ($transcripts as $key => $group): ?>
           <tr class="text-center">
             <td class="fw-bold"><?= Html::encode($group['code']) ?></td>
-            <td class="fw-bold text-start"><?= Html::encode($group['label']) ?> [<?= Html::encode($group['weight'] * 100) ?>%]</td>
-            <td class="fw-bold" colspan="3"></td>
+            <td class="fw-bold text-start" colspan="2"><?= Html::encode($group['label']) ?> [<?= Html::encode($group['weight'] * 100) ?>%]</td>
+            <td class="fw-bold" colspan="2"></td>
           </tr>
 
           <?php foreach ($group['indicator_group'] as $index => $indicator) : ?>
@@ -106,10 +106,12 @@ $passed = $certification->grade != CertificateGrade::BC && $certification->grade
 
           <div class="p-3 bg-light rounded-2 border border-light-subtle mb-3">
             <span class="small text-secondary fw-bold text-uppercase d-block mb-1">Apresiasi & Ketentuan</span>
-            <p class="mb-0 text-dark-emphasis fw-medium">
-              <i class="fa-solid fa-clock-rotate-left me-2 text-secondary"></i>
-              Sertifikasi diulang paling cepat setelah <?= Html::encode(date('d-m-Y', strtotime($certification->next_certification_due_date))) ?>.
-            </p>
+            <div class="mb-0 text-dark-emphasis fw-medium d-flex align-middle justify-content-center">
+              <i class="fa-solid fa-clock-rotate-left me-2 text-secondary my-auto"></i>
+              <p class="my-auto">
+                Sertifikasi diulang paling cepat setelah <?= Html::encode(Yii::$app->formatter->asDate($certification->next_certification_due_date, 'php:d F Y')) ?>.
+              </p>
+          </div>
           </div>
 
           <div class="d-flex justify-content-between">

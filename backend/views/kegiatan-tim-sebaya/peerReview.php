@@ -41,7 +41,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <h1><?= Html::encode($this->title) ?></h1>
   <div class="text-muted d-flex align-items-center gap-2 mb-2">
     <?php if ($is_leader): ?>
@@ -54,137 +54,140 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     </div>
   </div>
 
-  <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100">
+  <div class="bg-white px-md-3 px-2 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100">
     <h2><?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h2>
 
     <?php
     $saveAction = Url::to(['simpan-sementara-peer-review', 'certification_id' => $certification->id, 'page' => $page]);
     $finalizeAction = Url::to(['finalisasi-peer-review', 'certification_id' => $certification->id]);
     ?>
-    <form id="peer-review-form" action="<?= $saveAction ?>" method="post">
-      <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
+    <div class="mobile-scroll">
 
-      <table class="table align-middle">
-        <thead>
-          <tr class="text-center">
-            <th scope="col" style="width: 50px;">No</th>
-            <th scope="col" class="text-start">Kriteria</th>
-            <th scope="col" style="width: 100px;">Skor Mandiri</th>
-            <th scope="col" style="width: 100px;">Bukti Mandiri</th>
-            <th scope="col" style="width: 250px;">Penilaian Sebaya</th>
-            <th scope="col" style="width: 150px;">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($current_child_groups as $subGroup): ?>
-            <tr class="table-light">
-              <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
-              <td colspan="5" class="fw-bold">
-                <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
-              </td>
+      <form id="peer-review-form" action="<?= $saveAction ?>" method="post">
+        <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
+  
+        <table class="table align-middle">
+          <thead>
+            <tr class="text-center">
+              <th scope="col" style="width: 50px;">No</th>
+              <th scope="col" class="text-start">Kriteria</th>
+              <th scope="col" style="min-width: 100px;">Skor Mandiri</th>
+              <th scope="col" style="min-width: 100px;">Bukti Mandiri</th>
+              <th scope="col" style="min-width: 250px;">Penilaian Sebaya</th>
+              <th scope="col" style="min-width: 150px;">Status</th>
             </tr>
-
-            <?php if (isset($subGroup->indicators)): ?>
-              <?php foreach ($subGroup->indicators as $index => $indicator): ?>
-                <?php
-                $scoreModel = $indicator->indicatorScores[0] ?? null;
-                $selfScore = $scoreModel->self_team_score ?? 0;
-                $peerScore = $scoreModel->peer_team_score ?? 0;
-                $currentStatus = $scoreModel->status ?? null;
-                ?>
-                <tr>
-                  <td class="text-center"><?= $index + 1 ?></td>
-                  <td><?= Html::encode($indicator->label) ?></td>
-                  <td class="text-center">
-                    <span class="badge bg-light text-dark self-score-display" data-indicator-id="<?= $indicator->id ?>">
-                      <?= $selfScore ?>
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    <?php if ($scoreModel && $scoreModel->evidence_url): ?>
-                      <a href="<?= Url::to($scoreModel->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat</a>
-                    <?php else: ?>
-                      <span class="text-muted small">Tidak ada</span>
-                    <?php endif; ?>
-                  </td>
-                  <td>
-                    <select
-                      name="indicator_scores[<?= $indicator->id ?>][peer_team_score]"
-                      class="form-select score-select"
-                      data-subgroup-id="<?= $subGroup->id ?>"
-                      data-indicator-id="<?= $indicator->id ?>">
-                      <option value="0">Pilih Penilaian</option>
-
-                      <?php foreach ($indicator->indicatorOptions as $option): ?>
-                        <?php
-                        $selected = ($peerScore == $option->weight) ? 'selected' : '';
-                        ?>
-
-                        <option value="<?= $option->weight ?>" <?= $selected ?>>
-                          <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
-                  </td>
-                  <td>
-                    <select
-                      name="indicator_scores[<?= $indicator->id ?>][status]"
-                      class="form-select status-select"
-                      data-indicator-id="<?= $indicator->id ?>">
-                      <option value="">Pilih Status</option>
-                      <?php foreach (IndicatorStatus::list() as $val => $label): ?>
-                        <option value="<?= $val ?>" <?= ($currentStatus == $val) ? 'selected' : '' ?>>
-                          <?= $label ?>
-                        </option>
-                      <?php endforeach; ?>
-                    </select>
-                  </td>
-                </tr>
-              <?php endforeach; ?>
-            <?php endif; ?>
-
-            <tr>
-              <td colspan="2"></td>
-              <td colspan="3" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
-              <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
+          </thead>
+          <tbody>
+            <?php foreach ($current_child_groups as $subGroup): ?>
+              <tr class="table-light">
+                <td scope="row" class="text-center"><?= Html::encode($subGroup->code) ?></th>
+                <td colspan="5" class="fw-bold">
+                  <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
+                </td>
+              </tr>
+  
+              <?php if (isset($subGroup->indicators)): ?>
+                <?php foreach ($subGroup->indicators as $index => $indicator): ?>
+                  <?php
+                  $scoreModel = $indicator->indicatorScores[0] ?? null;
+                  $selfScore = $scoreModel->self_team_score ?? 0;
+                  $peerScore = $scoreModel->peer_team_score ?? 0;
+                  $currentStatus = $scoreModel->status ?? null;
+                  ?>
+                  <tr>
+                    <td class="text-center"><?= $index + 1 ?></td>
+                    <td><?= Html::encode($indicator->label) ?></td>
+                    <td class="text-center">
+                      <span class="badge bg-light text-dark self-score-display" data-indicator-id="<?= $indicator->id ?>">
+                        <?= $selfScore ?>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <?php if ($scoreModel && $scoreModel->evidence_url): ?>
+                        <a href="<?= Url::to($scoreModel->evidence_url) ?>" target="_blank" class="btn btn-sm btn-outline-info">Lihat</a>
+                      <?php else: ?>
+                        <span class="text-muted small">Tidak ada</span>
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <select
+                        name="indicator_scores[<?= $indicator->id ?>][peer_team_score]"
+                        class="form-select score-select"
+                        data-subgroup-id="<?= $subGroup->id ?>"
+                        data-indicator-id="<?= $indicator->id ?>">
+                        <option value="0">Pilih Penilaian</option>
+  
+                        <?php foreach ($indicator->indicatorOptions as $option): ?>
+                          <?php
+                          $selected = ($peerScore == $option->weight) ? 'selected' : '';
+                          ?>
+  
+                          <option value="<?= $option->weight ?>" <?= $selected ?>>
+                            <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </td>
+                    <td>
+                      <select
+                        name="indicator_scores[<?= $indicator->id ?>][status]"
+                        class="form-select status-select"
+                        data-indicator-id="<?= $indicator->id ?>">
+                        <option value="">Pilih Status</option>
+                        <?php foreach (IndicatorStatus::list() as $val => $label): ?>
+                          <option value="<?= $val ?>" <?= ($currentStatus == $val) ? 'selected' : '' ?>>
+                            <?= $label ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              <?php endif; ?>
+  
+              <tr>
+                <td colspan="2"></td>
+                <td colspan="3" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
+                <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
+              </tr>
+            <?php endforeach; ?>
+  
+            <tr class="table-secondary">
+              <th scope="row"></th>
+              <th colspan="4" class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
+              <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
             </tr>
-          <?php endforeach; ?>
-
-          <tr class="table-secondary">
-            <th scope="row"></th>
-            <th colspan="4" class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
-            <th class="text-center text-success fs-5" id="group-total-score" data-root-weight="<?= $current_root_group->weight ?>"><?= number_format($finalGroupScore, 2) ?></th>
-          </tr>
-        </tbody>
-      </table>
-    </form>
+          </tbody>
+        </table>
+      </form>
+    </div>
   </div>
 
-  <div class="d-flex justify-content-between w-100 mt-3">
+  <div class="d-flex justify-content-between w-100 mt-3 flex-md-row flex-column gap-2 gap-md-0">
     <div class="d-flex align-items-center">
-      <button type="submit" id="btn-save-temp" form="peer-review-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2">Simpan sementara</button>
+      <button type="submit" id="btn-save-temp" form="peer-review-form" name="target_page" value="<?= $page ?>" class="btn btn-sm s-btn-main py-2 ms-auto ms-md-0">Simpan sementara</button>
     </div>
-    <div>
+    <div class="ms-auto ms-md-0">
       <nav aria-label="pagination">
         <ul class="pagination">
           <li class="page-item <?php echo $page > 1 ? '' : 'disabled' ?>">
-            <a class="page-link s-btn-sec p-0 border-0">
-              <button type="submit" id="btn-prev" form="peer-review-form" name="target_page" value="<?= $page - 1 ?>" class="btn btn-link text-decoration-none w-100 h-100 py-2">Sebelumnya</button>
+            <a class="page-link s-btn-sec">
+              <button type="submit" id="btn-prev" form="peer-review-form" name="target_page" value="<?= $page - 1 ?>" class="btn-none">Sebelumnya</button>
             </a>
           </li>
           <?php foreach (range(1, $total_pages) as $inPage): ?>
-            <li class="page-item <?= $inPage == $page ? 'active' : '' ?>">
-              <a class="page-link p-0 border-0">
-                <button type="submit" id="btn-pagin" form="peer-review-form" name="target_page" value="<?= $inPage ?>" class="btn btn-link text-decoration-none w-100 h-100 py-2"><?= $inPage ?></button>
+            <li class="page-item">
+              <a class="page-link <?= $inPage == $page ? 'text-primary' : 'text-secondary' ?>">
+                <button type="submit" id="btn-pagin" form="peer-review-form" name="target_page" value="<?= $inPage ?>" class="btn-none"><?= $inPage ?></button>
               </a>
             </li>
           <?php endforeach ?>
           <li class="page-item">
-            <a class="page-link s-btn-main p-0 border-0">
-              <?php if ($page < $total_pages): ?>
-                <button type="submit" id="btn-next" form="peer-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn btn-link text-decoration-none text-white w-100 h-100 py-2">Berikutnya</button>
+            <a class="page-link s-btn-main <?php echo $page == $total_pages && !$is_leader ? 'disabled' : '' ?>">
+              <?php if ($page == $total_pages && $is_leader): ?>
+                <button type="submit" id="btn-finish" form="peer-review-form" name="finish" value="1" class="btn-none">Selesai Review</button>
               <?php else: ?>
-                <button type="submit" id="btn-finish" form="peer-review-form" name="finish" value="1" class="btn btn-link text-decoration-none text-white w-100 h-100 py-2">Selesai Review</button>
+                <button type="submit" id="btn-next" form="peer-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none w-100 h-100 ">Berikutnya</button>
               <?php endif; ?>
             </a>
           </li>

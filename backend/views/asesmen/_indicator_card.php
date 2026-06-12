@@ -14,19 +14,25 @@ use yii\helpers\Html;
     <div class="d-flex justify-content-between">
       <a id="parInd<?= $indicator->id ?>" class="text-decoration-none" data-bs-toggle="collapse" href="#collapseInd<?= $indicator->id ?>" role="button" aria-expanded="false" aria-controls="collapseInd<?= $indicator->id ?>">
         <div class="d-flex gap-1 align-items-start justify-content-between w-100 flex-grow-1">
-          <p class="mb-0 h6 text-secondary">Indikator [<?= Html::encode($indicator->code) ?>] </p>
-          <p class="mb-0 h6 text-black fw-bold"> <?= Html::encode($indicator->label) ?></p>
+          <div class="d-flex flex-column flex-md-row">
+            <p class="mb-0 h6 text-secondary">Indikator [<?= Html::encode($indicator->code) ?>] </p>
+            <p class="mb-0 h6 text-black fw-bold"> <?= Html::encode($indicator->label) ?></p>
+          </div>
           <i class="fa-solid fa-chevron-up text-black h-fit me-2 my-auto"></i>
         </div>
       </a>
       <div class="btn-group btn-group-sm h-fit khuvdvb">
-        <button class="btn btn-sm btn-primary" onclick='edit_indikator(<?= json_encode($indicator->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-        <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-indikator', 'indicator_id' => $indicator->id], [
+        <button class="btn btn-sm btn-primary" onclick='edit_indikator(<?= json_encode($indicator->attributes) ?>)'
+          data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Indikator"><i class="fa-solid fa-pen-to-square"></i></button>
+        <?= Html::a('<i class="fa-solid fa-trash-can"></i>', ['hapus-indikator', 'indicator_id' => $indicator->id], [
           'class' => 'btn btn-danger btn-sm',
           'data' => [
             'confirm' => 'Apakah Anda yakin ingin menghapus indikator ini?',
             'method' => 'delete',
           ],
+          'data-bs-toggle' => "tooltip",
+          'data-bs-placement' => "top",
+          'title' => "Hapus Indikator"
         ]) ?>
       </div>
 
@@ -43,18 +49,22 @@ use yii\helpers\Html;
             </div>
           </div>
           <div class="d-flex flex-row align-items-center btn-group btn-group-sm">
-            <button class="btn btn-outline-primary btn-sm" onclick='edit_opsi(<?= json_encode($option->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-            <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-opsi', 'indicator_option_id' => $option->id], [
+            <button class="btn btn-outline-primary btn-sm" onclick='edit_opsi(<?= json_encode($option->attributes) ?>)'
+            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Opsi"><i class="fa-solid fa-pen-to-square"></i></button>
+            <?= Html::a('<i class="fa-solid fa-trash-can"></i>', ['hapus-opsi', 'indicator_option_id' => $option->id], [
               'class' => 'btn btn-outline-danger btn-sm',
               'data' => [
                 'confirm' => 'Yakin hapus opsi?',
                 'method' => 'delete',
               ],
+              'data-bs-toggle' => "tooltip",
+              'data-bs-placement' => "top",
+              'title' => "Hapus Opsi"
             ]) ?>
           </div>
         </div>
-        <?php endforeach ?>
-        <?php if (empty($indicator->indicatorOptions)): ?>
+      <?php endforeach ?>
+      <?php if (empty($indicator->indicatorOptions)): ?>
         <div class="py-2">
           <p colspan="4" class="text-center text-muted small py-2">Belum ada opsi.</p>
         </div>

@@ -33,7 +33,7 @@ $this->beginContent('@backend/views/layouts/base.php');
             </div>
         <?php endif ?>
 
-        <main role="main" class="w-100 h-100 overflow-auto p-4 bg-light">
+        <main role="main" class="w-100 h-100 overflow-auto p-md-4 p-2 bg-light">
 
             <?php if (isset($this->params['breadcrumbs'])): ?>
                 <div class="mb-3">

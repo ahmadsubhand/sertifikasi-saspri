@@ -9,7 +9,7 @@ $currentRoute = Yii::$app->controller->getRoute();
 
 ?>
 
-<aside class="flex-shrink-0 border-md-end s-bg-main felx-1" style="width: 4.5rem;">
+<aside class="flex-shrink-0 border-md-end s-bg-main" style="width: 4.5rem;">
   <div class=" text-uppercase lh-sm mt-1">
     <div class="s-bg-side align-items-center">
       <a class="text-decoration-none text-white h6 align-items-center" id="collapse-trig"

@@ -14,19 +14,19 @@ $this->title = 'External Review';
 
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <h1><?= Html::encode($this->title) ?></h1>
 
   <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border p-3 d-flex flex-column gap-2 w-100">
     <?php Pjax::begin() ?>
-    <div id="cert-table-ext">
-      <div class="px-4">
+    <div id="cert-table-ext" class="mobile-scroll">
+      <div class="px-md-4 px-2">
         <table class="table align-middle text-center">
           <thead>
             <tr>
               <th scope="col">No</th>
               <th scope="col">Wilayah</th>
-              <th scope="col">Alamat Sekretaris</th>
+              <th scope="col" style="min-width: 200px;">Alamat Sekretaris</th>
               <th scope="col">Tenggat Waktu Penilaian</th>
               <th scope="col">Penilaian Sistem</th>
               <th scope="col">Aksi</th>
@@ -53,16 +53,16 @@ $this->title = 'External Review';
             <?php endforeach ?>
             <?php if (empty($certifications)): ?>
               <tr>
-                <td colspan="6" class="text-center">Tidak ada permintaan penerbitan sertifikasi.</td>
+                <td colspan="6" class="text-center">Tidak ada permintaan External Review.</td>
               </tr>
             <?php endif; ?>
           </tbody>
         </table>
-        <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
-          <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $prev_link === null ? 'disabled' : '' ?>" data-container="#cert-table-ext" href="<?= Url::to($prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
-          <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $next_link === null ? 'disabled' : '' ?>" data-container="#cert-table-ext" href="<?= Url::to($next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
-        </div>
       </div>
+    </div>
+    <div aria-label="Member Pagination" class=" align-items-center justify-content-around d-flex mt-3 w-100">
+      <a class="p-2 btn btn-sm s-btn-sec pager-btn <?= $prev_link === null ? 'disabled' : '' ?>" data-container="#cert-table-ext" href="<?= Url::to($prev_link) ?>"><i class="fa-solid fa-angles-left"></i> Sebelumnya</a>
+      <a class="p-2 btn btn-sm s-btn-main pager-btn <?= $next_link === null ? 'disabled' : '' ?>" data-container="#cert-table-ext" href="<?= Url::to($next_link) ?>">Berikutnya <i class="fa-solid fa-angles-right"></i></a>
     </div>
     <?php Pjax::end() ?>
   </div>

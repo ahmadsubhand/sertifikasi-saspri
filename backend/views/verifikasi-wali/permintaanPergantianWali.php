@@ -69,24 +69,30 @@ $shingles = [
         <h3 class="fw-bold mb-0"><?= Html::encode($this->title) ?></h3>
     </div>
 
-    <div class="d-flex mx-auto w-100 justify-content-evenly">
-        <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mb-3 h-fit" style="width: 20rem;">
-            <div class="text-center px-3 py-2">
-                <p class="text-muted mb-1">Wali Saat Ini</p>
-                <h4 class="fw-bold text-danger"><?= Html::encode($saspri_k->coordinator->username) ?></h4>
-                <p class="small text-muted mb-0"><?= Html::encode($saspri_k->coordinator->phone_number) ?></p>
+    <div class="w-100 d-flex justify-content-center">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-evenly w-100 gap-3">
+            <div class="bg-white px-2 py-4 rounded-3 shadow border border-light-subtle w-100 mx-auto" style="max-width: 22rem;">
+                <div class="text-center px-3 py-2">
+                    <p class="text-secondary small fw-medium mb-2">Wali Saat Ini</p>
+                    <h4 class="fw-bold text-danger mb-1"><?= Html::encode($saspri_k->coordinator->username) ?></h4>
+                    <p class="small text-muted mb-0"><?= Html::encode($saspri_k->coordinator->phone_number) ?></p>
+                </div>
             </div>
-        </div>
-        <div class=" align-items-sm-center text-center my-auto">
-            <h4 class="fw-bold mb-4 text-center h6">Menjadi</h4>
-            <i class="fa-solid fa-angles-right fs-1 mx-auto"></i>
-        </div>
-        <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mb-3 h-fit" style="width: 20rem;">
-            <div class="text-center px-3 py-2">
-                <p class="text-muted mb-1">Calon Wali Pengganti</p>
-                <h4 class="fw-bold text-success"><?= Html::encode($saspri_k->newCoordinator->username) ?></h4>
-                <p class="small text-muted mb-0"><?= Html::encode($saspri_k->newCoordinator->phone_number) ?></p>
+
+            <div class="text-center d-flex flex-column align-items-center justify-content-center py-2 my-2 my-md-0">
+                <h5 class="fw-bold mb-2 mb-md-3 text-dark text-uppercase tracking-wider" style="font-size: 0.85rem;">Menjadi</h5>
+                <i class="fa-solid fa-angles-right fs-2 text-muted d-none d-md-block"></i>
+                <i class="fa-solid fa-angles-down fs-2 text-muted d-block d-md-none"></i>
             </div>
+
+            <div class="bg-white px-2 py-4 rounded-3 shadow border border-light-subtle w-100 mx-auto" style="max-width: 22rem;">
+                <div class="text-center px-3 py-2">
+                    <p class="text-secondary small fw-medium mb-2">Calon Wali Pengganti</p>
+                    <h4 class="fw-bold text-success mb-1"><?= Html::encode($saspri_k->newCoordinator->username) ?></h4>
+                    <p class="small text-muted mb-0"><?= Html::encode($saspri_k->newCoordinator->phone_number) ?></p>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -98,13 +104,13 @@ $shingles = [
                 <p class="mb-0 italic">"<?= Html::encode($saspri_k->change_request_reason) ?: 'Tidak disebutkan' ?>"</p>
             </div>
 
-            <div class="d-flex justify-content-center gap-3">
+            <div class="d-flex justify-content-center gap-3 flex-column-reverse flex-md-row">
                 <button type="button" class="btn btn-danger px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
                     <i class="fa-solid fa-xmark me-2"></i> Tolak Pergantian
                 </button>
                 <?= Html::beginForm(['ganti-wali', 'saspri_k_id' => $saspri_k->id], 'post', ['class' => 'd-inline']) ?>
                 <input type="hidden" name="action" value="approve">
-                <button type="submit" class="btn btn-success px-4 py-2 fw-bold" onclick="return confirm('Apakah Anda yakin ingin menyetujui pergantian wali ini?')">
+                <button type="submit" class="btn btn-success px-4 py-2 fw-bold w-100" onclick="return confirm('Apakah Anda yakin ingin menyetujui pergantian wali ini?')">
                     <i class="fa-solid fa-check me-2"></i> Setujui Pergantian
                 </button>
                 <?= Html::endForm() ?>
@@ -117,7 +123,7 @@ $shingles = [
     <div class="row">
         <div class="col-sm-8">
             <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-                <div class="px-4">
+                <div class="px-md-4 px-2">
                     <p class="fw-bold h5 mb-3 border-bottom pb-2">Identitas SASPRI-K</p>
                     <?php foreach ($index as $key => $dat) : ?>
                         <?php echo $this->render('/component/_idline', [

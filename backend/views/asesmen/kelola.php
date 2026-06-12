@@ -11,7 +11,7 @@ use yii\bootstrap5\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\Pjax;
 
-$this->title = $assessment->title;
+$this->title =(string)'Manajemen Assesmen '.$assessment->title;
 // $this->params['breadcrumbs'][] = ['label' => 'Asesmen', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $this->title;
 
@@ -20,11 +20,11 @@ $indicator_model = new \common\models\Indicator();
 $option_model = new \common\models\IndicatorOption();
 
 $root_group_list = ArrayHelper::map($root_groups_only, 'id', function ($model) {
-  return '[' . $model->code . '] ' . $model->label;
+  return (string)'[' . $model->code . '] ' . $model->label;
 });
 
 $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model) {
-  return '[' . $model->code . '] ' . $model->label;
+  return (string)'[' . $model->code . '] ' . $model->label;
 });
 
 ?>
@@ -32,7 +32,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
 
 
 
-<div class="page-cont w-100 p-3 d-flex flex-column gap-3 asesmen-kelola">
+<div class="page-cont w-100 p-md-3 d-flex flex-column gap-3 asesmen-kelola">
   <div class="row align-items-center mb-4">
     <div class="col-md-11">
       <h1>Kelola Asesmen:</h1>
@@ -47,13 +47,13 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
   </div>
   <div class="collapse" id="settingscollapse">
     <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border p-3 d-flex flex-column gap-2 w-100 mb-4">
-      <div class="px-4 d-flex justify-content-between">
+      <div class="px-md-4 px-2 d-flex justify-content-between">
         <h5 class="mb-0">Pengaturan Utama Asesmen</h5>
         <a class="btn" data-bs-toggle="collapse" href="#settingscollapse" role="button" aria-expanded="false" aria-controls="collapseSettings">
           <i class="fa-solid fa-x"></i>
         </a>
       </div>
-      <div class="px-4 ">
+      <div class="px-md-4 px-2">
         <div class="row g-3 align-items-end ">
           <div class="col-md-5">
             <?= Html::beginForm(['ubah-judul', 'assessment_id' => $assessment->id], 'patch') ?>
@@ -92,6 +92,10 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     </div>
   </div>
   <!-- groups -->
+  <?php Pjax::begin([
+      'id' => 'asesmen-kelola-pjax', 
+      'enablePushState' => false, 
+      'timeout' => 5000]) ?>
   <?php foreach ($root_groups as $root): ?>
     <?php
     $sum = 0;
@@ -110,13 +114,17 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
             <span class="fw-light text-primary">bobot Group: <?= Html::encode($root->weight) ?>% | <span data-bs-toggle="tooltip" data-bs-placement="top" title="Pastikan bobot subgroup mencapai 100"> bobot subgroup <?= $sum ?>/100 </span></span>
           </div>
           <div class="btn-group btn-group-sm">
-            <a class="btn btn-primary rounded-start-2" onclick='edit_group(<?= json_encode($root->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</a>
-            <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $root->id], [
+            <a class="btn btn-primary rounded-start-2" onclick='edit_group(<?= json_encode($root->attributes) ?>)'
+              data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Group"><i class="fa-solid fa-pen-to-square"></i></a>
+            <?= Html::a('<i class="fa-solid fa-trash-can"></i>', ['hapus-grup', 'indicator_group_id' => $root->id], [
               'class' => 'btn btn-danger',
               'data' => [
                 'confirm' => 'Apakah Anda yakin ingin menghapus group ini beserta seluruh isinya?',
                 'method' => 'delete',
               ],
+              'data-bs-toggle' => "tooltip",
+              'data-bs-placement' => "top",
+              'title' => "Hapus Group"
             ]) ?>
           </div>
         </a>
@@ -140,17 +148,21 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
         <?php endif; ?>
         <!-- subgroup -->
         <?php foreach ($root->childGroups as $child): ?>
-          <div class="card mb-3 s-border-main ms-4 shadow-sm">
+          <div class="card mb-3 s-border-main ms-1 shadow-sm">
             <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center">
-              <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?> <span class="fw-light"> | bobot subgroup: <?= Html::encode($child->weight) ?></span></span>
+              <span class="fw-bold">Subgroup [<?= Html::encode($child->code) ?>] <?= Html::encode($child->label) ?> <span class="fw-light"> <br class="d-block d-md-none">| bobot subgroup: <?= Html::encode($child->weight) ?></span></span>
               <div class="btn-group btn-group-sm">
-                <button class="btn btn-primary" onclick='edit_group(<?= json_encode($child->attributes) ?>)'><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-                <?= Html::a('<i class="fa-solid fa-trash-can"></i> Hapus', ['hapus-grup', 'indicator_group_id' => $child->id], [
+                <button class="btn btn-primary" onclick='edit_group(<?= json_encode($child->attributes) ?>)'
+                  data-bs-toggle="tooltip" data-bs-placement="top" title="Edit Subroup"><i class="fa-solid fa-pen-to-square"></i></button>
+                <?= Html::a('<i class="fa-solid fa-trash-can"></i>', ['hapus-grup', 'indicator_group_id' => $child->id], [
                   'class' => 'btn btn-danger',
                   'data' => [
                     'confirm' => 'Apakah Anda yakin ingin menghapus subgroup ini beserta seluruh isinya?',
                     'method' => 'delete',
                   ],
+                  'data-bs-toggle' => "tooltip",
+                  'data-bs-placement' => "top",
+                  'title' => "Hapus Subgroup"
                 ]) ?>
               </div>
             </div>
@@ -191,6 +203,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       </div>
     </div>
   <?php endforeach ?>
+  <?php Pjax::end()?>
   <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center rounded rounded-2">
     <button class="btn s-btn-main  w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 " onclick="tambah_group(null)">
       <i class="fa-solid fa-circle-plus fs-3 mb-1"></i>
@@ -224,7 +237,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn s-btn-main">Simpan</button>
+        <button type="submit" class="btn s-btn-main" data-container="asesmen-kelola-pjax">Simpan</button>
       </div>
       <?php ActiveForm::end(); ?>
     </div>
@@ -251,7 +264,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn s-btn-main">Simpan</button>
+        <button type="submit" class="btn s-btn-main" data-container="asesmen-kelola-pjax">Simpan</button>
       </div>
       <?php ActiveForm::end(); ?>
     </div>
@@ -281,7 +294,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-        <button type="submit" class="btn s-btn-main">Simpan</button>
+        <button type="submit" class="btn s-btn-main" data-container="asesmen-kelola-pjax">Simpan</button>
       </div>
       <?php ActiveForm::end(); ?>
     </div>
@@ -427,4 +440,6 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     })
   })
 
+  //pjax on modal Close
+  
 </script>

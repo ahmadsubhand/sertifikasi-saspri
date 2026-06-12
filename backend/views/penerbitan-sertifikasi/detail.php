@@ -64,9 +64,9 @@ $shingles = [
 ];
 ?>
 
-<div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
+<div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <div class="d-flex align-items-center text-center">
-    <a href="/tim-mandiri" class=" text-decoration-none text-black fs-5 me-3">
+    <a href="/penerbitan-sertifikasi" class=" text-decoration-none text-black fs-5 me-3">
       <i class="fa-solid fa-arrow-left"></i>
     </a>
     <p class="fw-bold mb-0 h3">Detail Sertifikasi</p>
@@ -74,8 +74,8 @@ $shingles = [
   <div class="row">
     <div class="col-sm-8">
       <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
-        <div class=" px-4">
-          <p class=" fw-bold">Identitas </p>
+        <div class=" px-md-4 px-2">
+          <p class=" fw-bold h5 mb-3 border-bottom pb-2">Identitas SASPRI-K</p>
           <?php foreach ($index as $key => $dat) : ?>
             <?php echo $this->render('/component/_idline', [
               'label' => $label[$key],
@@ -87,7 +87,7 @@ $shingles = [
       </div>
     </div>
     <div class="col-sm-4">
-      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
+      <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border mt-md-0 mt-3">
         <?php if ($cert->status != CertificationStatus::COMPLETED) : ?>
           <div class="px-3 text-center">
             <p class=" fw-bold h5">
@@ -128,13 +128,13 @@ $shingles = [
     </div>
   </div>
   <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-6 mt-3 mt-md-0">
       <?= $this->render('/component/_team_table', [
         "model" => $self_team,
         "is_self" => 1
         ]) ?>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6 mt-3 mt-md-0">
       <?= $this->render('/component/_team_table', [
         "model" => $peer_team,
         "is_self" => 0
