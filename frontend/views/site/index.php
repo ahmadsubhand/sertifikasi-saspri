@@ -16,7 +16,7 @@ use yii\widgets\Pjax;
  * @var int|null $active_certifications_count
  */
 
-$this->title = 'Dashboard Sertifikasi';
+$this->title = 'Informasi Sertifikasi';
 ?>
 <div class="page-cont w-100 p-md-3 d-flex flex-column gap-3 asesmen-kelola">
   <h1><?= Html::encode($this->title) ?></h1>

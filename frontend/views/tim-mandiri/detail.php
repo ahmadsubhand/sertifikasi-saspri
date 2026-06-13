@@ -116,7 +116,7 @@ $shingles = [
               </p>
             <?php endif ?>
           </div>
-          <?php if (in_array(Yii::$app->user->id, array_column($self_team, 'user_id')) && $cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
+          <?php if ($cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
             <div class="px-md-3 px-1">
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-green me-2 w-100 mt-3',
