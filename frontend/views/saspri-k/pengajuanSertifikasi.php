@@ -57,10 +57,32 @@ $percentages = [
 
     </div>
   </div>
+  <?php if ($certification->is_rejected) : ?>
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden w-100 mx-auto my-2">
+      <div class="bg-danger" style="height: 5px;"></div>
+
+      <div class="card-body p-2 p-md-4">
+        <div class="d-flex align-items-center gap-3 justify-content-center mb-4">
+          <div class=" text-danger rounded-circle d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-circle-xmark fs-4"></i>
+          </div>
+          <h2 class="h4 fw-bold text-danger mb-0">Sertifikasi Ditolak</h2>
+        </div>
+
+        <hr class="text-dark opacity-10 my-4">
+        <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-2">
+          Alasan Penolakan:
+        </span>
+        <p class="text-dark fs-5 mb-0 lh-base fw-medium">
+          <?= Html::encode($certification->rejection_reason) ?>
+        </p>
+      </div>
+    </div>
+  <?php endif ?>
   <div class="bg-white px-md-5 px-2 py-4 rounded-2 shadow border-1 border text-center">
     <p class="fs-4 fw-bold">Status Sertifikasi</p>
     <div class="progress">
-      <div class="progress-bar <?= $certification->status === CertificationStatus::COMPLETED ? 'bg-success' : 's-bg-main' ?>" role="progressbar" style="width: <?= $percentages[$certification->status] ?>;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+      <div class="progress-bar <?= $certification->is_rejected ? 'bg-danger' : ($certification->status === CertificationStatus::COMPLETED ? 'bg-success' : 's-bg-main') ?>" role="progressbar" style="width: <?= $percentages[$certification->status] ?>;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
     </div>
     <div class="w-100 d-flex justify-content-between text-center">
       <p class="text-start" style="width: 5rem;">Mulai</p>
@@ -113,7 +135,7 @@ $percentages = [
                   <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
                     <?php foreach (TeamRole::list() as $value => $label): ?>
                       <?php if ($value == TeamRole::FACILITATOR) {
-                          break;
+                        break;
                       } ?>
                       <option value="<?= $value ?>" <?= $member->role === $value ? 'selected' : '' ?>>
                         <?= $label ?>
@@ -159,6 +181,25 @@ $percentages = [
     </button>
     <?= Html::endForm() ?>
   </div>
+
+  <?php if (CertificationStatus::PENDING_SELF_TEAM_FORMATION != $certification->status): ?>
+    <hr class="text-dark opacity-10 my-3">
+
+    <div>
+      <?= Html::a(
+        'Batalkan Sertifikasi',
+        ['batalkan-pengajuan-sertifikasi'],
+        [
+          'class' => 'btn btn-danger me-2 w-100 mb-3',
+          'disabled' => $certification->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION,
+          'data' => [
+            'method' => 'post',
+            'confirm' => 'Apakah Anda yakin ingin membatalkan sertifikasi?',
+          ],
+        ]
+      ) ?>
+    </div>
+  <?php endif ?>
 </div>
 
 <script>

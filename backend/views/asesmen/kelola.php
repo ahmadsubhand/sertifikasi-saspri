@@ -11,7 +11,7 @@ use yii\bootstrap5\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\Pjax;
 
-$this->title =(string)'Manajemen Assesmen '.$assessment->title;
+$this->title = (string)'Manajemen Assesmen ' . $assessment->title;
 // $this->params['breadcrumbs'][] = ['label' => 'Asesmen', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $this->title;
 
@@ -93,9 +93,10 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
   </div>
   <!-- groups -->
   <?php Pjax::begin([
-      'id' => 'asesmen-kelola-pjax', 
-      'enablePushState' => false, 
-      'timeout' => 5000]) ?>
+    'id' => 'asesmen-kelola-pjax',
+    'enablePushState' => false,
+    'timeout' => 5000
+  ]) ?>
   <?php foreach ($root_groups as $root): ?>
     <?php
     $sum = 0;
@@ -203,7 +204,7 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
       </div>
     </div>
   <?php endforeach ?>
-  <?php Pjax::end()?>
+  <?php Pjax::end() ?>
   <div class="card-header s-bg-main text-white d-flex justify-content-between align-items-center rounded rounded-2">
     <button class="btn s-btn-main  w-100 py-2 mt-1 d-flex align-items-center justify-content-center gap-2 " onclick="tambah_group(null)">
       <i class="fa-solid fa-circle-plus fs-3 mb-1"></i>
@@ -409,37 +410,77 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
     new bootstrap.Modal(document.getElementById('modal_opsi')).show();
   }
 
+
   // fe stuff
-  const collapseRootObj = document.querySelectorAll('[id^=collapseRoot], [id^=collapseInd]')
-  collapseRootKey = "rootState"
+  function initCollapseState() {
+    const collapseRootObj = document.querySelectorAll('[id^=collapseRoot], [id^=collapseInd]')
+    collapseRootKey = "rootState"
 
-  const onLocal = JSON.parse(localStorage.getItem(collapseRootKey)) || {}
+    const onLocal = JSON.parse(localStorage.getItem(collapseRootKey)) || {}
 
-  collapseRootObj.forEach(function(e) {
-    // console.log(e)
-    if (onLocal[e.id] === true) {
-      e.classList.add('show')
-      const par = document.getElementById(e.getAttribute('parent-link'))
-      par.setAttribute('aria-expanded', 'true')
-    } else if (onLocal[e.id] === false) {
-      e.classList.remove('show')
-      const par = document.getElementById(e.getAttribute('parent-link'))
-      par.setAttribute('aria-expanded', 'false')
-    }
-  })
-
-  collapseRootObj.forEach(function(e) {
-
-    e.addEventListener('shown.bs.collapse', function() {
-      onLocal[e.id] = true
-      localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
+    collapseRootObj.forEach(function(e) {
+      // console.log(e)
+      if (onLocal[e.id] === true) {
+        e.classList.add('show')
+        const par = document.getElementById(e.getAttribute('parent-link'))
+        par.setAttribute('aria-expanded', 'true')
+      } else if (onLocal[e.id] === false) {
+        e.classList.remove('show')
+        const par = document.getElementById(e.getAttribute('parent-link'))
+        par.setAttribute('aria-expanded', 'false')
+      }
     })
-    e.addEventListener('hidden.bs.collapse', function() {
-      onLocal[e.id] = false
-      localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
+
+    collapseRootObj.forEach(function(e) {
+
+      e.addEventListener('shown.bs.collapse', function() {
+        onLocal[e.id] = true
+        localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
+      })
+      e.addEventListener('hidden.bs.collapse', function() {
+        onLocal[e.id] = false
+        localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
+      })
     })
-  })
+  }
 
   //pjax on modal Close
-  
+  $(document).on('submit', '#form_group, #form_indikator, #form_opsi', function(e) {
+    e.preventDefault();
+
+    const $form = $(this);
+    const modalId = $form.closest('.modal').attr('id');
+
+    $.ajax({
+      url: $form.attr('action'),
+      method: $form.attr('method') || 'POST',
+      data: $form.serialize(),
+      success: function() {
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById(modalId)
+        );
+
+        if (modal) {
+          modal.hide();
+        }
+
+        $.pjax.reload({
+          container: '#asesmen-kelola-pjax',
+          timeout: 5000,
+          push: false,
+          replace: false
+        });
+      }
+    });
+  });
+  $(document).on('pjax:end', function() {
+    initCollapseState()
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+  });
+
+  initCollapseState()
 </script>

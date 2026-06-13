@@ -88,13 +88,31 @@ if ($saspri_k->new_coordinator_id) {
                 </div>
 
                 <div class="w-100">
-                    <button type="submit" class="btn btn-danger w-100 py-2 fw-bold" <?= $new_coordinator ? 'disabled' : '' ?>>
+                    <button type="submit" class="btn s-btn-main w-100 py-2 fw-bold" <?= $new_coordinator ? 'disabled' : '' ?>>
                         Ajukan pergantian wali
                     </button>
                 </div>
             </form>
         </div>
     </div>
+    <?php if ($saspri_k->change_status != 'approved'): ?>
+    <hr class="text-dark opacity-10 my-3">
+
+    <div>
+      <?= Html::a(
+        'Batalkan Sertifikasi',
+        ['batalkan-pergantian-wali'],
+        [
+          'class' => 'btn btn-danger me-2 w-100 mb-3',
+          'disabled' => $saspri_k->change_status == 'approved',
+          'data' => [
+            'method' => 'post',
+            'confirm' => 'Apakah Anda yakin ingin membatalkan pergantian wali?',
+          ],
+        ]
+      ) ?>
+    </div>
+  <?php endif ?>
 </div>
 
 <script>

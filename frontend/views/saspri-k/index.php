@@ -77,7 +77,7 @@ $shingles = [
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
-  <div class=" d-flex justify-content-between">
+  <div class=" d-flex justify-content-between flex-column">
     <h3 class="fw-bold">SASPRI Kawasan</h3>
     <div class="d-md-none md-block">
       <a href="/saspri-k/pengajuan-sertifikasi" class=" btn s-btn-main me-2 w-100 mb-3" style="font-size: small;">+ Pengajuan Sertifikasi</a>

@@ -139,7 +139,10 @@ $passed = $certification->grade != CertificateGrade::BC && $certification->grade
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <?= $this->render('/component/_reject_modal', ['step' => 'Transcript']); ?>
+          <?= $this->render('/component/_reject_modal', [
+            'step' => 'Transcript',
+            'url' => ['tolak-sertifikasi', 'certification_id' => $certification->id]
+            ]); ?>
         </div>
       </div>
     </div>

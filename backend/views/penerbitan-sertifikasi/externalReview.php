@@ -185,6 +185,27 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
       </nav>
     </div>
   </div>
+  <div class="w-100 pt-4 border-top border-secondary-subtle">
+    <button type="button" class=" btn btn-danger me-2 mb-3 w-100" data-bs-toggle="modal" data-bs-target="#rejectModal">Tolak Sertifikasi</button>
+  </div>
+
+
+  <div class="modal fade modal-lg" id="rejectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="rejectModalLabel">Penolakan Sertifikasi</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <?= $this->render('/component/_reject_modal', [
+            'step' => 'External Review',
+            'url' => ['tolak-sertifikasi', 'certification_id' => $certification->id]
+            ]); ?>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <?php
