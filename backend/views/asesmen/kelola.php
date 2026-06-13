@@ -412,7 +412,8 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
 
 
   // fe stuff
-  function initCollapseState() {
+  // function initCollapseState() {
+  //   }
     const collapseRootObj = document.querySelectorAll('[id^=collapseRoot], [id^=collapseInd]')
     collapseRootKey = "rootState"
 
@@ -442,45 +443,44 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
         localStorage.setItem(collapseRootKey, JSON.stringify(onLocal))
       })
     })
-  }
 
-  //pjax on modal Close
-  $(document).on('submit', '#form_group, #form_indikator, #form_opsi', function(e) {
-    e.preventDefault();
+  //pjax on modal Close (bad)
+  // $(document).on('submit', '#form_group, #form_indikator, #form_opsi', function(e) {
+  //   e.preventDefault();
 
-    const $form = $(this);
-    const modalId = $form.closest('.modal').attr('id');
+  //   const $form = $(this);
+  //   const modalId = $form.closest('.modal').attr('id');
 
-    $.ajax({
-      url: $form.attr('action'),
-      method: $form.attr('method') || 'POST',
-      data: $form.serialize(),
-      success: function() {
+  //   $.ajax({
+  //     url: $form.attr('action'),
+  //     method: $form.attr('method') || 'POST',
+  //     data: $form.serialize(),
+  //     success: function() {
 
-        const modal = bootstrap.Modal.getInstance(
-          document.getElementById(modalId)
-        );
+  //       const modal = bootstrap.Modal.getInstance(
+  //         document.getElementById(modalId)
+  //       );
 
-        if (modal) {
-          modal.hide();
-        }
+  //       if (modal) {
+  //         modal.hide();
+  //       }
 
-        $.pjax.reload({
-          container: '#asesmen-kelola-pjax',
-          timeout: 5000,
-          push: false,
-          replace: false
-        });
-      }
-    });
-  });
-  $(document).on('pjax:end', function() {
-    initCollapseState()
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl)
-    });
-  });
+  //       $.pjax.reload({
+  //         container: '#asesmen-kelola-pjax',
+  //         timeout: 5000,
+  //         push: false,
+  //         replace: false
+  //       });
+  //     }
+  //   });
+  // });
+  // $(document).on('pjax:end', function() {
+  //   initCollapseState()
+  //   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  //   var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+  //     return new bootstrap.Tooltip(tooltipTriggerEl)
+  //   });
+  // });
 
   initCollapseState()
 </script>
