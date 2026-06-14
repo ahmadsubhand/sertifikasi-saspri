@@ -22,6 +22,7 @@ use yii\widgets\Pjax;
  */
 
 // dd($peer_team_member_completed)
+$this->title =(string) 'Kegiatan Tim Sebaya';
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">

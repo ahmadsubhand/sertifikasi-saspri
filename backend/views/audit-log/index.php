@@ -10,9 +10,8 @@ use yii\helpers\Url;
  */
 
 $this->title = 'Sistem Audit Log';
-$this->params['breadcrumbs'][] = $this->title;
 
-// Helper function untuk merender diff JSON
+// Helper function untuk merender diff JSON (be)
 function renderDiff(?string $oldValues, ?string $newValues) {
     // 1. Cek tipe data terlebih dahulu untuk menghindari TypeError
     $oldStr = is_string($oldValues) ? $oldValues : '';
@@ -53,7 +52,7 @@ function renderDiff(?string $oldValues, ?string $newValues) {
 }
 ?>
 
-<div class="audit-log-index">
+<div class="audit-log-index p-md-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2><?= Html::encode($this->title) ?></h2>
     </div>
@@ -92,7 +91,7 @@ function renderDiff(?string $oldValues, ?string $newValues) {
             
             <div class="col-md-3">
                 <?= Html::hiddenInput('offset', 0) ?>
-                <button type="submit" class="btn btn-primary w-100">Cari / Filter</button>
+                <button type="submit" class="btn s-btn-main w-100">Cari / Filter</button>
             </div>
             
             <?= Html::endForm() ?>
@@ -100,16 +99,16 @@ function renderDiff(?string $oldValues, ?string $newValues) {
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-body p-0 table-responsive">
-            <table class="table table-hover table-striped mb-0">
+        <div class="card-body px-md-4 px-2 table-responsive">
+            <table class="table table-hover table-striped mb-0 text-black">
                 <thead class="table-dark">
-                    <tr>
-                        <th width="15%">Waktu</th>
-                        <th width="10%">Aksi</th>
-                        <th width="15%">Tabel</th>
-                        <th width="10%">ID Data</th>
-                        <th width="15%">User ID</th>
-                        <th width="35%">Detail Perubahan</th>
+                    <tr >
+                        <th class="text-black" style="min-width:150px;">Waktu</th>
+                        <th class="text-black" style="min-width:100px;">Aksi</th>
+                        <th class="text-black" style="min-width:150px;">Tabel</th>
+                        <th class="text-black" style="min-width:100px;">ID Data</th>
+                        <th class="text-black" style="min-width:150px;">User ID</th>
+                        <th class="text-black" style="min-width:300px;">Detail Perubahan</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -158,13 +157,13 @@ function renderDiff(?string $oldValues, ?string $newValues) {
             </table>
         </div>
         
-        <div class="card-footer d-flex justify-content-between align-items-center">
-            <span class="text-muted small">
-                Menampilkan offset: <?= $pagination['currentOffset'] ?>
+        <div class="card-footer d-flex justify-content-between flex-column flex-md-row align-items-center">
+            <span class="text-muted small mb-3 text-start ">
+                Menampilkan halaman: <?= $pagination['currentOffset'] + 1 ?>
             </span>
             <div class="btn-group">
                 <?php
-                    // Helper untuk membuat URL dengan filter yang aktif
+                    // Helper untuk membuat URL dengan filter yang aktif (be)
                     $buildUrl = function($newOffset) use ($filters) {
                         $params = array_merge(['index', 'offset' => $newOffset], $filters);
                         return Url::to($params);
@@ -172,19 +171,19 @@ function renderDiff(?string $oldValues, ?string $newValues) {
                 ?>
 
                 <?php if ($pagination['hasPrev']): ?>
-                    <a href="<?= $buildUrl($pagination['prevOffset']) ?>" class="btn btn-outline-primary">
-                        &laquo; Sebelumnya
+                    <a href="<?= $buildUrl($pagination['prevOffset']) ?>" class="btn btn-sm btn-outline-primary">
+                        <i class="fa-solid fa-angles-left"></i> Sebelumnya
                     </a>
                 <?php else: ?>
-                    <button class="btn btn-outline-secondary" disabled>&laquo; Sebelumnya</button>
+                    <button class="btn btn-outline-secondary" disabled><i class="fa-solid fa-angles-left"></i> Sebelumnya</button>
                 <?php endif; ?>
 
                 <?php if ($pagination['hasNext']): ?>
-                    <a href="<?= $buildUrl($pagination['nextOffset']) ?>" class="btn btn-outline-primary">
-                        Selanjutnya &raquo;
+                    <a href="<?= $buildUrl($pagination['nextOffset']) ?>" class="btn btn-sm btn-outline-primary">
+                        Selanjutnya <i class="fa-solid fa-angles-right"></i>
                     </a>
                 <?php else: ?>
-                    <button class="btn btn-outline-secondary" disabled>Selanjutnya &raquo;</button>
+                    <button class="btn btn-outline-secondary" disabled>Selanjutnya <i class="fa-solid fa-angles-right"></i></button>
                 <?php endif; ?>
             </div>
         </div>

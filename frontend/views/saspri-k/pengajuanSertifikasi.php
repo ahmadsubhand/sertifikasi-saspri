@@ -22,7 +22,9 @@ $percentages = [
   CertificationStatus::PEER_REVIEW => '50%',
   CertificationStatus::EXTERNAL_REVIEW => '73%',
   CertificationStatus::COMPLETED => '100%',
-]
+];
+
+$this->title =(string) 'Pengajuan Sertifikasi';
 ?>
 
 

@@ -13,7 +13,7 @@ use yii\helpers\Url;
 /** @var int $total_pages */
 /** @var bool $is_leader */
 
-$this->title = 'Peer Review SASPRI-K';
+$this->title =(string) 'Peer Review SASPRI-K '. $certification->saspriK->region_name;
 
 // Score Calculation Logic (Temporary)
 $groupTotalScore = 0;

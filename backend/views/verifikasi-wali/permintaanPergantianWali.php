@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\Certification $valid_certificate */
 
-$this->title = 'Detail Permintaan Pergantian Wali';
+$this->title =(string) 'Detail Permintaan Pergantian Wali'. $saspri_k->region_name;
 
 $label = [
     'SASPRI-K',

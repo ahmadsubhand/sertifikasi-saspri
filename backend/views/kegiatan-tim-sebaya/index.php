@@ -21,6 +21,8 @@ use yii\widgets\Pjax;
  * @var string|null $completed_next_link
  */
 
+$this->title = 'Kegiatan Tim Sebaya';
+
 // dd($peer_team_member_completed)
 ?>
 

@@ -62,6 +62,7 @@ $shingles = [
   'breeding_livestock_count' => 'Ekor',
   'productive_heifer_count' => 'Ekor',
 ];
+$this->title = (string)'External Review '. $saspri->region_name;
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">

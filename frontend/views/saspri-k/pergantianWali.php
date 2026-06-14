@@ -16,7 +16,7 @@ $is_rejected = $saspri_k->change_status === ApprovalStatus::REJECTED;
 $new_coordinator = null;
 if ($saspri_k->new_coordinator_id) {
     $new_coordinator = User::findOne($saspri_k->new_coordinator_id);
-}
+};
 
 ?>
 

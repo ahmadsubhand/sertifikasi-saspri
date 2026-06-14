@@ -195,6 +195,7 @@ table thead tr:first-child th:last-child {
 
 .mobile-scroll {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .width-acc {
@@ -207,6 +208,7 @@ table thead tr:first-child th:last-child {
 @media (min-width: 768px) {
   .mobile-scroll {
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   .width-acc {
     width: 25%;

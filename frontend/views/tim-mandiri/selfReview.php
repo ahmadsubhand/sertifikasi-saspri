@@ -13,7 +13,7 @@ use yii\helpers\Url;
 /** @var int $total_pages */
 /** @var bool $is_leader */
 
-$this->title = 'Self Review SASPRI-K';
+$this->title = 'Self Review Sertifikasi SASPRI-K';
 
 // Score Calculation Logic (Temporary)
 $groupTotalScore = 0;

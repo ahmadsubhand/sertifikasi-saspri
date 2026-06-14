@@ -34,11 +34,13 @@ if ($saspri_k && $saspri_k->district_id) {
 
 $model = $saspri_k ?: new \common\models\SaspriK();
 
+$this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
+
 ?>
 
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
     <div class="">
-        <h3 class="fw-bold">Daftar Sebagai Wali SASPRI</h3>
+        <h3 class="fw-bold">Daftar Sebagai Wali <SASPRI-K></SASPRI-K></h3>
     </div>
 
     <?php if ($is_pending): ?>

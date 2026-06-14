@@ -20,6 +20,8 @@ use yii\widgets\Pjax;
  * @var string|null $completed_prev_link
  * @var string|null $completed_next_link
 */
+
+$this->title =(string) 'Kegiatan Tim Mandiri';
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">

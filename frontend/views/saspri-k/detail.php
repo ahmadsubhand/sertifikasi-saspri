@@ -65,6 +65,8 @@ $shingles = [
   'productive_heifer_count' => 'Ekor',
 ];
 
+$this->title =(string) 'Detail Sertifikasi';
+
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">

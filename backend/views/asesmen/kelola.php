@@ -482,5 +482,5 @@ $child_group_list = ArrayHelper::map($child_groups_only, 'id', function ($model)
   //   });
   // });
 
-  initCollapseState()
+  // initCollapseState()
 </script>

@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
 $user_ids = ArrayHelper::getColumn($peer_team, 'user_id');
 $current_user_index = array_search(Yii::$app->user->id, $user_ids);
 $member_id = ($current_user_index !== false) ? $peer_team[$current_user_index]->id : null;
+$this->title = (string)'Detail Sertifikasi SASPRI-K '. $saspri->region_name;
 
 $label = [
   'SASPRI-K',

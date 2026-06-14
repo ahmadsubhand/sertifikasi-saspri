@@ -67,6 +67,8 @@ $shingles = [
   'productive_heifer_count' => 'Ekor',
 ];
 
+$this->title =(string) 'Detail Kegiatan Tim Mandiri';
+
 ?>
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">

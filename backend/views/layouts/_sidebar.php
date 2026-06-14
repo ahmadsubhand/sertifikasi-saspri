@@ -69,6 +69,13 @@ $currentRoute = Yii::$app->controller->getRoute();
         </div>
       </a>
     </div>
+    <div class="<?= str_contains($currentRoute, 'audit') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+      <a href="<?php echo Url::to('/audit-log') ?>" class="text-decoration-none text-white w-100 text-white h6 ">
+        <div class=" py-3 mx-2 ">
+          Audit Log
+        </div>
+      </a>
+    </div>
   </div>
 </aside>
 

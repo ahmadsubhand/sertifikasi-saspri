@@ -22,7 +22,7 @@ use yii\widgets\Pjax;
 
 // dd($saspri_k_members);
 
-$this->title = 'Saspri-K ' .$saspri_k->region_name;
+$this->title =(string) 'Saspri-K ' .$saspri_k->region_name;
  
 
 $label = [
