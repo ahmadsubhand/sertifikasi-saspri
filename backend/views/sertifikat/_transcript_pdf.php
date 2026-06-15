@@ -64,6 +64,15 @@ function formatAngka(float $angka, int $desimal = 2)
     return number_format($angka, $desimal, ',', '.');
 }
 ?>
+<div style="width: 100%; height: 100%; display:flex;">
+    <!-- DONT CHANGE THE STYLES NO BORDER NO WORK!!!! (idk why) -->
+    <div style=" text-align: center; margin-left: 46mm; border:.1px solid rgba(255,255,255,0.001);">
+        <h2 style="margin-top: 112mm; color:#f8c263 ;">SASPRI-K <?= Html::encode($saspri_k->region_name) ?></h2>
+        <h4 style="margin-top: 6mm;"><?= Html::encode($certification->code?? 'code') ?></h4>
+        <h4 style="margin-top: 94mm;"><?= Html::encode(Yii::$app->formatter->asDate($certification->issued_at, 'php:d F Y')) ?></h4>
+    </div>
+</div>
+<pagebreak/>
 
 <div class="transcript-container px-4">
     <h3 class="text-center font-weight-bold">
@@ -95,8 +104,8 @@ function formatAngka(float $angka, int $desimal = 2)
     <table class="table">
         <tbody>
             <tr aria-colcount="" class="border-1 border border-black">
-                <th width="5%">KODE</th>
-                <th width="55%">INDIKATOR UTAMA DAN ASPEK YANG DINILAI</th>
+                <th width="10%">KODE</th>
+                <th width="50%">INDIKATOR UTAMA DAN ASPEK YANG DINILAI</th>
                 <th width="15%">BOBOT</th>
                 <th width="15%">NILAI<br>TERBOBOT</th>
                 <th width="15%">NILAI<br>AKHIR</th>

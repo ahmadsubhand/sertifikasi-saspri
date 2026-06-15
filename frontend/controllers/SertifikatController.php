@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\Certification;
 
 use kartik\mpdf\Pdf;
+use Yii;
 use yii\helpers\Inflector;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -22,12 +23,12 @@ class SertifikatController extends Controller
         $transcripts = $certification->getTranscripts();
 
         // 2. Render tampilan HTML ke dalam variabel string
-        $content = $this->renderPartial('_transcript_pdf', [
+        $content = $this->renderPartial('@frontend/views/sertifikat/_transcript_pdf', [
             'certification' => $certification,
             'saspri_k' => $certification->getSaspriK()->with('district')->one(),
             'transcripts' => $transcripts,
         ]);
-
+        $certImage = Yii::getAlias((string)'@frontend/web/cert/'.$certification->level.'.png');
         // 3. Konfigurasi dan Generate PDF
         $pdf = new Pdf([
             'mode' => Pdf::MODE_UTF8,
@@ -41,6 +42,18 @@ class SertifikatController extends Controller
             'marginBottom' => 10,
             'content' => $content,
             'cssInline' => '
+                @page :first {
+                    background-image: url("' . $certImage . '");
+                    background-image-resize: 6;
+                    margin: 0mm; 
+                }
+                @page {
+                    background-image: none;
+                    margin-left: 30mm;
+                    margin-right: 30mm;
+                    margin-top: 20mm;
+                    margin-bottom: 10mm;
+                }
                 body { font-family: sans-serif; font-size: 12px; }
                 .table { 
                     width: 100%; 
@@ -76,7 +89,6 @@ class SertifikatController extends Controller
                 'SetFooter' => ['|Halaman {PAGENO}|'],
             ]
         ]);
-
         return $pdf->render();
     }
 }
