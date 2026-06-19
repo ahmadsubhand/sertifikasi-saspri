@@ -1,29 +1,44 @@
-# 🚀 Setup Proyek dengan Laragon
+# 🚀 Sertifikasi SASPRI
 
-Panduan ini berisi langkah-langkah untuk menjalankan aplikasi **Sertifikasi SASPRI** secara lokal menggunakan **Laragon**.
+Aplikasi Sertifikasi SASPRI berbasis Yii2 yang terdiri dari frontend dan backend.
 
-Setelah proses instalasi selesai, aplikasi dapat diakses melalui:
+Dokumen ini mencakup:
 
-* **Frontend:** http://frontend.test
-* **Backend:** http://backend.test
+1. Setup lingkungan pengembangan lokal menggunakan Laragon.
+2. Deployment aplikasi ke server menggunakan Podman, Nginx, dan Let's Encrypt SSL.
+3. Troubleshooting yang umum ditemui selama proses deployment.
 
 ---
 
 # 📋 Prasyarat
 
+## Untuk Pengembangan Lokal
+
 Pastikan perangkat Anda telah terinstal:
 
-* Laragon (beserta PHP, MySQL, dan Apache/Nginx)
+* Laragon (PHP, MySQL, Apache/Nginx)
 * Composer
 * Git
 
+## Untuk Deployment Server
+
+Pastikan server telah memiliki:
+
+* Podman
+* Podman Compose
+* MySQL Container
+* Nginx Reverse Proxy Container
+* Git
+* Certbot
+* Domain yang sudah mengarah ke alamat IP server
+
 ---
 
-# 🛠️ Langkah-langkah Instalasi
+# 🛠️ Setup Lokal dengan Laragon
 
 ## 1. Clone Repository
 
-Buka terminal Laragon, kemudian jalankan:
+Buka terminal Laragon kemudian jalankan:
 
 ```bash
 git clone <URL_REPOSITORY> nama-folder-proyek
@@ -69,10 +84,10 @@ Perintah ini akan membuat file konfigurasi lokal seperti:
 
 ### Buat Database
 
-Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru, misalnya:
+Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru:
 
-```text
-saspri_db
+```sql
+CREATE DATABASE sertifikasi_saspri;
 ```
 
 ### Sesuaikan Konfigurasi Database
@@ -83,15 +98,15 @@ Buka file:
 common/config/main-local.php
 ```
 
-Lalu sesuaikan konfigurasi dsn, username, dan password berikut:
+Lalu sesuaikan konfigurasi berikut:
 
 ```php
 'db' => [
     'class' => \yii\db\Connection::class,
-    'dsn' => 'mysql:host=localhost;dbname=saspri_db',
+    'dsn' => 'mysql:host=localhost;dbname=sertifikasi_saspri',
     'username' => 'root',
     'password' => '',
-    'charset' => 'utf8',
+    'charset' => 'utf8mb4',
 ],
 ```
 
@@ -99,16 +114,16 @@ Lalu sesuaikan konfigurasi dsn, username, dan password berikut:
 
 ## 5. Migrasi dan Seeding Database
 
-Jalankan perintah berikut untuk membuat seluruh tabel dan mengisi data awal:
+Jalankan perintah berikut:
 
 ```bash
 php yii migrate
 php yii db/seed
 ```
 
-### ⚠️ Informasi Akun Login Default
+### Informasi Akun Login Default
 
-Semua akun yang dibuat melalui proses seeding menggunakan password yang sama:
+Semua akun yang dibuat melalui proses seeding menggunakan password:
 
 ```text
 password_0
@@ -128,7 +143,7 @@ Agar aplikasi dapat diakses menggunakan domain `.test`, buat symbolic link dari 
 
 ### Frontend
 
-Jalankan Command Prompt sebagai **Administrator**, lalu:
+Jalankan Command Prompt sebagai Administrator:
 
 ```cmd
 mklink /D "C:\laragon\www\frontend" "C:\path\ke\proyek\frontend\web"
@@ -200,11 +215,333 @@ password_0
 
 ---
 
+# 🚀 Deployment ke Server (Podman + Nginx)
+
+## Struktur Direktori
+
+```text
+/srv/podman
+├── apps/
+│   └── php/
+├── data/
+│   └── apps/
+└── infra/
+    └── nginx/
+```
+
+---
+
+## 1. Setup Volume Mount
+
+Edit file:
+
+```bash
+cd /srv/podman
+sudo nano podman-compose.yml
+```
+
+Tambahkan volume berikut pada service `nginx` dan `php83_fpm`:
+
+```yaml
+- ./apps/php/sertifikasi-saspri:/var/www/html/sertifikasi-saspri
+- ./data/apps/sertifikasi-saspri:/var/www/data/sertifikasi-saspri
+```
+
+Pemetaan direktori:
+
+| Host VPS                                   | Container                          |
+| ------------------------------------------ | ---------------------------------- |
+| `/srv/podman/apps/php/sertifikasi-saspri`  | `/var/www/html/sertifikasi-saspri` |
+| `/srv/podman/data/apps/sertifikasi-saspri` | `/var/www/data/sertifikasi-saspri` |
+
+---
+
+## 2. Restart Container
+
+```bash
+cd /srv/podman
+sudo podman-compose up -d
+```
+
+---
+
+## 3. Setup Database
+
+### Cek Password Root MySQL
+
+```bash
+cat /srv/podman/.env
+```
+
+Cari nilai:
+
+```env
+MYSQL_ROOT_PASSWORD=...
+```
+
+### Masuk ke MySQL
+
+```bash
+sudo podman exec -it mysql mysql -u root -p
+```
+
+### Buat Database
+
+```sql
+CREATE DATABASE sertifikasi_saspri
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+---
+
+## 4. Clone Repository
+
+```bash
+cd /srv/podman/apps/php
+
+mkdir -p sertifikasi-saspri
+cd sertifikasi-saspri
+
+git init
+git remote add origin https://gitlab.com/ahmadsubhand/sertifikasi-saspri.git
+git pull origin main
+```
+
+---
+
+## 5. Install Dependency
+
+Jalankan Composer menggunakan container sementara:
+
+```bash
+sudo podman run --rm \
+  -v $(pwd):/app \
+  -w /app \
+  docker.io/library/composer \
+  install --ignore-platform-reqs
+```
+
+---
+
+## 6. Inisialisasi Yii2
+
+```bash
+sudo podman exec -it php83_fpm \
+bash -c "cd /var/www/html/sertifikasi-saspri && php init"
+```
+
+Pilih:
+
+```text
+0 -> Development Environment
+yes -> Konfirmasi
+```
+
+atau
+
+```text
+1 -> Production Environment
+yes -> Konfirmasi
+```
+
+---
+
+## 7. Konfigurasi Database
+
+Edit file:
+
+```text
+common/config/main-local.php
+```
+
+Sesuaikan konfigurasi:
+
+```php
+'db' => [
+    'class' => \yii\db\Connection::class,
+    'dsn' => 'mysql:host=mysql;dbname=sertifikasi_saspri',
+    'username' => 'root',
+    'password' => 'MYSQL_ROOT_PASSWORD',
+    'charset' => 'utf8mb4',
+],
+```
+
+---
+
+## 8. Migrasi dan Seeder
+
+```bash
+sudo podman exec -it php83_fpm \
+bash -c "cd /var/www/html/sertifikasi-saspri && php yii migrate"
+```
+
+```bash
+sudo podman exec -it php83_fpm \
+bash -c "cd /var/www/html/sertifikasi-saspri && php yii db/seed"
+```
+
+> Seeder hanya diperlukan pada lingkungan pengembangan atau saat membutuhkan data awal.
+
+---
+
+## 9. Setup Nginx
+
+Masuk ke direktori konfigurasi:
+
+```bash
+cd /srv/podman/infra/nginx/sites-available
+```
+
+Buat file:
+
+```bash
+sudo nano site-sertifikasi.conf
+```
+
+Salin konfigurasi Nginx sesuai kebutuhan aplikasi.
+
+---
+
+## 10. Aktifkan Site
+
+```bash
+sudo ln -s \
+/srv/podman/infra/nginx/sites-available/site-sertifikasi.conf \
+/srv/podman/infra/nginx/sites-enabled/
+```
+
+---
+
+## 11. Reload Nginx
+
+```bash
+sudo podman exec -it nginx_reverse_proxy nginx -s reload
+```
+
+---
+
+## 12. Generate SSL Certificate
+
+Pastikan domain telah mengarah ke server.
+
+```bash
+sudo certbot certonly \
+--webroot \
+-w /srv/podman/apps/php/sertifikasi-saspri/frontend/web \
+-d sertifikasi.digdaya.net
+```
+
+---
+
+## 13. Pasang SSL Certificate
+
+Perbarui konfigurasi Nginx:
+
+```nginx
+ssl_certificate      /etc/letsencrypt/live/sertifikasi.digdaya.net/fullchain.pem;
+ssl_certificate_key  /etc/letsencrypt/live/sertifikasi.digdaya.net/privkey.pem;
+```
+
+---
+
+## 14. Validasi dan Reload Nginx
+
+Validasi konfigurasi:
+
+```bash
+sudo podman exec -it nginx_reverse_proxy nginx -t
+```
+
+Reload:
+
+```bash
+sudo podman exec -it nginx_reverse_proxy nginx -s reload
+```
+
+---
+
+# 🔍 Troubleshooting
+
+## Melihat Daftar Container
+
+```bash
+sudo podman ps -a
+```
+
+---
+
+## Memeriksa Volume Mount
+
+```bash
+sudo podman inspect \
+-f '{{range .Mounts}}Dari VPS: {{.Source}} ---> Ke Container: {{.Destination}}{{"\n"}}{{end}}' \
+php83_fpm
+```
+
+---
+
+## Memastikan Folder Aplikasi Terbaca di Container
+
+Periksa direktori kerja container:
+
+```bash
+sudo podman exec -it php83_fpm pwd
+```
+
+Contoh output:
+
+```text
+/var/www/html
+```
+
+Lihat isi direktori:
+
+```bash
+sudo podman exec -it php83_fpm ls -l /var/www/html
+```
+
+Jika folder `sertifikasi-saspri` belum muncul, kemungkinan volume mount belum terdaftar pada `podman-compose.yml`.
+
+---
+
+## Mengetahui Konfigurasi Nginx yang Digunakan
+
+Daftar site aktif:
+
+```text
+/srv/podman/infra/nginx/sites-enabled/
+```
+
+Gunakan konfigurasi aplikasi lain sebagai referensi saat membuat virtual host baru.
+
+---
+
+## Mengetahui Konfigurasi SSL
+
+Periksa sertifikat yang tersedia:
+
+```text
+/etc/letsencrypt/live/
+```
+
+Atau lihat konfigurasi:
+
+```nginx
+ssl_certificate ...
+ssl_certificate_key ...
+```
+
+Konfigurasi tersebut menunjukkan bahwa SSL dikelola menggunakan Certbot (Let's Encrypt).
+
+---
+
 # 📝 Catatan
 
-Jika terjadi perubahan konfigurasi:
-
 * Jalankan ulang migration bila diperlukan.
-* Pastikan Apache/Nginx dan MySQL pada Laragon sedang berjalan.
+* Pastikan database sudah dibuat sebelum menjalankan migration.
+* Pastikan Apache/Nginx dan MySQL berjalan pada lingkungan yang digunakan.
 * Periksa kembali konfigurasi database pada `common/config/main-local.php`.
-* Pastikan symbolic link mengarah ke folder `frontend/web` dan `backend/web` yang benar.
+* Pastikan symbolic link Laragon mengarah ke folder yang benar.
+* Pastikan volume mount Podman telah terpasang dengan benar sebelum menjalankan perintah Yii2.
+* Pastikan domain sudah mengarah ke server sebelum melakukan generate SSL menggunakan Certbot.
