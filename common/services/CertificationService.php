@@ -337,8 +337,8 @@ class CertificationService
             ->setGrade()
             ->submitExternalReview()
             ->generateCertificationCode()
-            ->calculateNextCertificationDueDate()
-            ->save();
+            ->calculateNextCertificationDueDate();
+        $certification->save();
 
         return $certification;
     }

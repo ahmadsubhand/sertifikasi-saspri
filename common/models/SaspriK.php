@@ -318,8 +318,14 @@ class SaspriK extends \yii\db\ActiveRecord
 
         foreach ($documents as $index => $document) {
             $fileName = $this->generateDocumentFileName($document->extension);
+            $filePath = $absolute_dir . '/' . $fileName;
     
-            if ($document->saveAs($absolute_dir . '/' . $fileName)) {
+            // Bypasses HTTP POST checks during PHPUnit testing
+            $isSaved = (defined('YII_ENV_TEST') && YII_ENV_TEST) 
+                ? copy($document->tempName, $filePath) 
+                : $document->saveAs($filePath);
+
+            if ($isSaved) {
                 $saspri_k_document = new SaspriKDocument();
                 $saspri_k_document->type = $types[$index];
                 $saspri_k_document->url = $relative_dir . '/' . $fileName;
