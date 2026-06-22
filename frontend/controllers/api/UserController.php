@@ -139,6 +139,7 @@ class UserController extends ActiveController
             ->distinct()
             ->joinWith('selfTeamMembers')
             ->joinWith('peerTeamMembers')
+            ->joinWith('saspriK.district')
             ->andWhere([
                 'or',
                 [SelfTeamMember::tableName() . '.user_id' => $user_id],

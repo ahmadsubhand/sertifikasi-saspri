@@ -494,10 +494,16 @@ server {
 
 ## 10. Aktifkan Site
 
+Masuk ke direktori
+
 ```bash
-sudo ln -s \
-/srv/podman/infra/nginx/sites-available/site-sertifikasi.conf \
-/srv/podman/infra/nginx/sites-enabled/
+cd /srv/podman/infra/nginx/sites-enabled
+```
+
+Buat symbolic link
+
+```bash
+sudo ln -s ../sites-available/site-sertifikasi.conf site-sertifikasi.conf
 ```
 
 ---
