@@ -6,6 +6,7 @@ use common\enums\ApprovalStatus;
 use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\PeerReviewForm;
@@ -123,10 +124,7 @@ class TimSebayaController extends Controller
     {
         try {
             $data = new RequestResponseForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             PeerTeamMemberService::joinRequestResponse($peer_team_member_id, $data);
 
             Yii::$app->session->setFlash(
@@ -175,10 +173,7 @@ class TimSebayaController extends Controller
     {
         try {
             $data = new PeerReviewForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             CertificationService::savePeerReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
@@ -213,10 +208,7 @@ class TimSebayaController extends Controller
     {
         try {
             $data = new PeerReviewForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             CertificationService::finalizePeerReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Peer Review berhasil difinalisasi');

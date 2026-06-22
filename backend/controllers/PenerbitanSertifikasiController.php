@@ -98,10 +98,7 @@ class PenerbitanSertifikasiController extends Controller
     {
         try {
             $data = new ExternalReviewForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             CertificationService::saveExternalReview($certification_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');

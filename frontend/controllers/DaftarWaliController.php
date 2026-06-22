@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\models\form\RegisterSaspriKForm;
 use common\services\SaspriKService;
 use Exception;
@@ -58,10 +59,7 @@ class DaftarWaliController extends Controller
     {
         try {
             $data = new RegisterSaspriKForm();
-            $data->load(Yii::$app->request->post(), 'SaspriK');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'SaspriK');
             $saspri_k = SaspriKService::register($data);
 
             Yii::$app->session->setFlash(
