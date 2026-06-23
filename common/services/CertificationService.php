@@ -16,6 +16,7 @@ use common\models\form\SelfReviewForm;
 use common\models\PeerTeamMember;
 use common\models\SelfTeamMember;
 use common\models\User;
+use common\services\NotificationService;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -77,7 +78,24 @@ class CertificationService
         }
 
         $certification->save(); // untuk mendapatkan id jika sertifikasi baru diajukan
-        $certification->addSelfTeamMembers($data->user_ids);
+        $member_ids = $certification->addSelfTeamMembers($data->user_ids);
+
+        $coordinator_username = $saspri_k->coordinator->username ?? 'Wali';
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+
+        foreach ($data->user_ids as $user_id) {
+            NotificationService::send(
+                $user_id,
+                'Undangan bergabung Tim Mandiri',
+                "Anda telah diundang oleh {$coordinator_username} untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+                [
+                    'sender_id' => $saspri_k->coordinator_id,
+                    'web_link' => 'tim-mandiri/index',
+                    'api_link' => 'self-team-member/join-request-response?self_team_member_id=' . $member_ids[$user_id],
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+        }
 
         return $valid_users;
     }
