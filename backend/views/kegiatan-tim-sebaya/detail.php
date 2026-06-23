@@ -10,6 +10,7 @@ use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 
 /** @var int $id
+ * @var int $member_id
  *  @var common\models\SaspriK $saspri
  *  @var common\models\Certification $cert
  * @var SelfTeamMember[] $self_team
@@ -17,8 +18,6 @@ use yii\helpers\ArrayHelper;
  */
 
 $user_ids = ArrayHelper::getColumn($peer_team, 'user_id');
-$current_user_index = array_search(Yii::$app->user->id, $user_ids);
-$member_id = ($current_user_index !== false) ? $peer_team[$current_user_index]->id : null;
 $this->title = (string)'Detail Sertifikasi SASPRI-K '. $saspri->region_name;
 
 $label = [
@@ -137,7 +136,7 @@ $shingles = [
                 'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Sebaya ini?',
               ]) ?>
             <?php endif ?>
-            <?php if (in_array(Yii::$app->user->id, array_column($peer_team, 'user_id')) && $cert->status == CertificationStatus::PEER_REVIEW) : ?>
+            <?php if ($cert->status == CertificationStatus::PEER_REVIEW) : ?>
               <div>
                 <?= Html::a('Mulai Peer Review', ['peer-review', 'certification_id' => $cert['id']], [
                   'class' => 'btn s-btn-main me-2 w-100 mt-3',

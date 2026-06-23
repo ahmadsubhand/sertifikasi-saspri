@@ -10,13 +10,13 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var int $id
+ * @var int $member_id
  *  @var common\models\SaspriK $saspri
  *  @var common\models\Certification $cert
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
 
-$member_id = $self_team[array_search(Yii::$app->user->id, array_column($self_team, 'user_id'))]->id;
 $label = [
   'SASPRI-K',
   'SASPRI-KK',
@@ -137,7 +137,7 @@ $this->title =(string) 'Detail Kegiatan Tim Mandiri';
               ]) ?>
             </div>
           <?php endif ?>
-          <?php if (in_array(Yii::$app->user->id, array_column($self_team, 'user_id')) && $cert->status == CertificationStatus::SELF_REVIEW) : ?>
+          <?php if ($cert->status == CertificationStatus::SELF_REVIEW) : ?>
             <div>
               <?= Html::a('Mulai Self Review', ['/tim-mandiri/self-review', 'certification_id' => $cert['id']], [
                 'class' => 'btn s-btn-main me-2 w-100 mt-3',

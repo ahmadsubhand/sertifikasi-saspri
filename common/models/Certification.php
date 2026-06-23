@@ -291,6 +291,8 @@ class Certification extends \yii\db\ActiveRecord
 
     public function addSelfTeamMembers(array $user_ids)
     {
+        $self_team_members_ids = [];
+
         foreach ($user_ids as $user_id) {
             $already_exists = SelfTeamMember::find()
                 ->where([
@@ -308,11 +310,17 @@ class Certification extends \yii\db\ActiveRecord
             $member->status = ApprovalStatus::PENDING;
             $member->role = TeamRole::MEMBER;
             $member->save(false);
+
+            $self_team_members_ids[$user_id] = $member->id;
         }
+
+        return $self_team_members_ids;
     }
 
     public function addPeerTeamMembers(array $user_ids)
     {
+        $peer_team_members_ids = [];
+
         foreach ($user_ids as $user_id) {
             $already_exists = PeerTeamMember::find()
                 ->where([
@@ -336,7 +344,11 @@ class Certification extends \yii\db\ActiveRecord
             }
 
             $member->save(false);
+
+            $peer_team_members_ids[$user_id] = $member->id;
         }
+
+        return $peer_team_members_ids;
     }
 
     public function validateApprovedSelfTeamComposition()

@@ -14,5 +14,12 @@ return [
         'cache' => [
             'class' => \yii\caching\FileCache::class,
         ],
+        'queue' => [
+            'class' => \yii\queue\db\Queue::class,
+            'db' => 'db',
+            'tableName' => '{{%queue}}',
+            'channel' => 'default',
+            'mutex' => \yii\mutex\MysqlMutex::class, // Mencegah bentrok jika ada banyak worker (Gunakan PgsqlMutex jika pakai PostgreSQL)
+        ],
     ],
 ];

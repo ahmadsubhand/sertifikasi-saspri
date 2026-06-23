@@ -244,16 +244,20 @@ class TimMandiriController extends Controller
     {
         try {
             $cert = Certification::findOne(['id' => $case_id]);
+
+            /** @var SelfTeamMember|null */
+            $member = null;
             if ($cert->status !== CertificationStatus::PENDING_SELF_TEAM_FORMATION) {
-                CertificationService::findSelfTeamMember($case_id, Yii::$app->user->id)
+                $member = CertificationService::findSelfTeamMember($case_id, Yii::$app->user->id)
                     ->checkSelfReviewPermission();
             } else {
+                /** @var SelfTeamMember|null */
                 $member = SelfTeamMember::find()
                     ->where([
                         'certification_id' => $case_id,
                         'user_id' => Yii::$app->user->id,
                     ])
-                    ->exists();
+                    ->one();
                 if (!$member) {
                     throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Mandiri');
                 }
@@ -275,6 +279,7 @@ class TimMandiriController extends Controller
                 ->all();
             return $this->render('detail', [
                 'id' => $case_id,
+                'member_id' => $member->id,
                 'saspri' => $saspri_k,
                 'cert' => $cert,
                 'self_team' => $self_team,

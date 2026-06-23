@@ -32,6 +32,7 @@ use yii\web\IdentityInterface;
  * @property SaspriK $saspriKAsCoordinator
  * @property SaspriK $saspriKAsCoordinatorCandidate
  * @property SaspriK $saspriK
+ * @property Notification[] $notifications
  */
 class User extends ActiveRecord implements IdentityInterface
 {
@@ -306,6 +307,16 @@ class User extends ActiveRecord implements IdentityInterface
     public function getSaspriK()
     {
         return $this->hasOne(SaspriK::class, ['id' => 'saspri_k_id']);
+    }
+
+    /**
+     * Gets query for [[Notifcation]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNotification()
+    {
+        return $this->hasMany(Notification::class, ['recipent_id' => 'id']);
     }
 
     public function removeUserFromSaspriK()
