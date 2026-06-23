@@ -112,101 +112,6 @@ Lalu sesuaikan konfigurasi berikut:
 
 ---
 
-## 5. Konfigurasi Firebase
-
-Aplikasi menggunakan Firebase Cloud Messaging (FCM) untuk mengirim push notification.
-
-### Konfigurasi Params
-
-Buka file:
-
-```text
-common/config/params-local.php
-```
-
-Lalu sesuaikan konfigurasi berikut:
-
-```php
-<?php
-
-return [
-    'frontendUrl' => 'http://frontend.test',
-    'firebase' => [
-        'apiKey' => '',
-        'authDomain' => '',
-        'projectId' => '',
-        'storageBucket' => '',
-        'messagingSenderId' => '',
-        'appId' => '',
-        'vapidKey' => '',
-    ],
-];
-```
-
-Seluruh nilai tersebut dapat diperoleh dari Firebase Console pada proyek yang digunakan.
-
-### Service Account Firebase
-
-Simpan file kredensial Firebase Service Account pada:
-
-```text
-common/config/firebase-credentials.json
-```
-
-File ini digunakan oleh backend untuk melakukan autentikasi ke Firebase saat mengirim push notification.
-
-> Jangan melakukan commit file `firebase-credentials.json` ke repository karena berisi kredensial rahasia.
-
----
-
-## 6. Konfigurasi HTTPS untuk FCM (Laragon)
-
-Firebase Cloud Messaging pada browser mewajibkan aplikasi berjalan melalui HTTPS.
-
-Untuk lingkungan pengembangan menggunakan Laragon:
-
-1. Buka Laragon.
-2. Pilih:
-
-```text
-Menu → SSL → Add laragon.crt to Trust Store
-```
-
-Jalankan langkah tersebut apabila sertifikat Laragon belum pernah ditambahkan ke Windows Trust Store.
-
-3. Aktifkan SSL:
-
-```text
-Menu → SSL → Enabled
-```
-
-4. Restart Laragon.
-
-Setelah SSL aktif, aplikasi dapat diakses melalui:
-
-```text
-https://frontend.test:8443
-https://backend.test:8443
-```
-
-> Tanpa HTTPS, fitur push notification pada browser tidak akan berfungsi.
-
----
-
-## 7. Menjalankan Queue Worker
-
-Aplikasi menggunakan Yii Queue untuk memproses pekerjaan asynchronous, seperti pengiriman push notification.
-
-Pada lingkungan pengembangan, queue worker dijalankan secara manual menggunakan perintah:
-
-```bash
-php yii queue/listen
-```
-
-Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queue.
-
----
-
 ## 5. Migrasi dan Seeding Database
 
 Jalankan perintah berikut:
@@ -254,39 +159,96 @@ mklink /D "C:\laragon\www\backend" "D:\Projects\saspri-app\backend\web"
 
 ---
 
-## 7. Restart Laragon
+## 7. Konfigurasi Firebase
 
-Pastikan Laragon dalam kondisi aktif.
+Aplikasi menggunakan Firebase Cloud Messaging (FCM) untuk mengirim push notification.
 
-Jika sebelumnya sudah berjalan:
+### Konfigurasi Params
 
-1. Klik **Stop All**
-2. Klik **Start All**
+Buka file:
 
-Laragon akan secara otomatis:
+```text
+common/config/params-local.php
+```
 
-* Mendeteksi folder baru
-* Membuat virtual host
-* Mengatur file hosts
-* Mengaktifkan domain `.test`
+Lalu sesuaikan konfigurasi berikut:
+
+```php
+<?php
+
+return [
+    'frontendUrl' => 'http://frontend.test',
+    'firebase' => [
+        'apiKey' => '',
+        'authDomain' => '',
+        'projectId' => '',
+        'storageBucket' => '',
+        'messagingSenderId' => '',
+        'appId' => '',
+        'vapidKey' => '',
+    ],
+];
+```
+
+Seluruh nilai tersebut dapat diperoleh dari Firebase Console pada proyek yang digunakan.
+
+### Service Account Firebase
+
+Simpan file kredensial Firebase Service Account pada:
+
+```text
+common/config/firebase-credentials.json
+```
+
+File ini digunakan oleh backend untuk melakukan autentikasi ke Firebase saat mengirim push notification.
+
+> Jangan melakukan commit file `firebase-credentials.json` ke repository karena berisi kredensial rahasia.
 
 ---
 
-## 8. Menjalankan Aplikasi
+## 8. Menjalankan Queue Worker
 
-Setelah seluruh langkah selesai, buka browser dan akses:
+Aplikasi menggunakan Yii Queue untuk memproses pekerjaan asynchronous, seperti pengiriman push notification.
 
-Frontend
+Pada lingkungan pengembangan, queue worker dijalankan secara manual menggunakan perintah:
 
-```text
-http://frontend.test
+```bash
+php yii queue/listen
 ```
 
-Backend
+Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queue.
+
+---
+
+## 9. Konfigurasi HTTPS untuk FCM (Laragon)
+
+Firebase Cloud Messaging pada browser mewajibkan aplikasi berjalan melalui HTTPS.
+
+1. Buka Laragon.
+2. Pilih:
 
 ```text
-http://backend.test
+Menu → SSL → Add laragon.crt to Trust Store
 ```
+
+Jalankan langkah tersebut apabila sertifikat Laragon belum pernah ditambahkan ke Windows Trust Store.
+
+3. Aktifkan SSL:
+
+```text
+Menu → SSL → Enabled
+```
+
+4. Restart Laragon.
+
+Setelah SSL aktif, aplikasi dapat diakses melalui:
+
+```text
+https://frontend.test:8443
+https://backend.test:8443
+```
+
+> Tanpa HTTPS, fitur push notification pada browser tidak akan berfungsi.
 
 ---
 
