@@ -10,13 +10,12 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 /** @var int $id
+ * @var int $member_id
  *  @var common\models\SaspriK $saspri
  *  @var common\models\Certification $cert
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
-
-$member_id = $peer_team[array_search(Yii::$app->user->id, array_column($peer_team, 'user_id'))]->id;
 $label = [
   'SASPRI-K',
   'SASPRI-KK',
@@ -119,7 +118,7 @@ $this->title =(string) 'Detail Kegiatan Tim Sebaya';
             <?php endif ?>
           </div>
           <?php if ($cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
-            <div class="px-3">
+            <div class="px-md-3 px-1">
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-green me-2 w-100 mt-3',
                 'data-method' => 'post',
@@ -137,7 +136,7 @@ $this->title =(string) 'Detail Kegiatan Tim Sebaya';
               ]) ?>
             </div>
           <?php endif ?>
-          <?php if (in_array(Yii::$app->user->id, array_column($peer_team, 'user_id')) && $cert->status == CertificationStatus::PEER_REVIEW) : ?>
+          <?php if ($cert->status == CertificationStatus::PEER_REVIEW) : ?>
             <div>
               <?= Html::a('Mulai Peer Review', ['/tim-sebaya/peer-review', 'certification_id' => $cert['id']], [
                 'class' => 'btn s-btn-main me-2 w-100 mt-3',

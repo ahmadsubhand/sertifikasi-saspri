@@ -5,25 +5,27 @@ namespace frontend\controllers;
 use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
 use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
-use frontend\models\ResendVerificationEmailForm;
-use frontend\models\VerifyEmailForm;
+use common\models\form\LoginForm;
+use common\models\form\RegisterForm;
+use common\models\form\VerifyEmailForm;
+use common\models\form\ResendVerificationEmailForm;
+use common\models\form\PasswordResetRequestForm;
+use common\models\form\ResetPasswordForm;
 use Yii;
-use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
 use common\models\SaspriK;
+use common\models\User;
+use common\services\UserService;
 use Exception;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
 use yii\db\ActiveQuery;
 use yii\helpers\Url;
+use yii\web\ConflictHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
@@ -226,6 +228,135 @@ class SiteController extends Controller
             throw $error;
         }
     }
+
+    /**
+     * Signs user up.
+     *
+     * @return mixed
+     */
+    public function actionSignup()
+    {
+        $data = new RegisterForm();
+        try {
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'RegisterForm');
+            $response = UserService::register($data);
+            Yii::$app->session->setFlash('success', $response['message']);
+            return $this->goHome();
+        } catch (Exception $error) {
+            if ($error instanceof ConflictHttpException) {
+                $data->addErrors([
+                    'username' => $error->getMessage(),
+                    'email' => $error->getMessage(),
+                ]);
+            }
+            $data->password = '';
+            return $this->render('signup', [
+                'model' => $data,
+            ]);
+        }
+    }
+
+    /**
+     * Resend verification email
+     *
+     * @return mixed
+     */
+    public function actionResendVerificationEmail()
+    {
+        $data = new ResendVerificationEmailForm();
+        try {
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'ResendVerificationEmailForm');
+            $response = UserService::resendVerificationEmail($data);
+            Yii::$app->session->setFlash('success', $response['message']);
+            return $this->goHome();
+        } catch (Exception $error) {
+            if ($error instanceof NotFoundHttpException) {
+                $data->addErrors([
+                    'email' => $error->getMessage(),
+                ]);
+            }
+            return $this->render('resendVerificationEmail', [
+                'model' => $data,
+            ]);
+        }
+    }
+
+    /**
+     * Verify email address
+     *
+     * @param string $token
+     * @throws BadRequestHttpException
+     * @return yii\web\Response
+     */
+    public function actionVerifyEmail($token)
+    {
+        $data = new VerifyEmailForm();
+        try {
+            ModelHelper::loadAndValidateOrFail($data, ['token' => $token]);
+            $response = UserService::verifyEmail($data);
+            Yii::$app->session->setFlash('success', $response['message']);
+        } catch (Exception $error) {
+            if ($error instanceof NotFoundHttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+            }
+        }
+        return $this->goHome();
+    }
+
+    /**
+     * Requests password reset.
+     *
+     * @return mixed
+     */
+    public function actionRequestPasswordReset()
+    {
+        $data = new PasswordResetRequestForm();
+        try {
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'PasswordResetRequestForm');
+            $response = UserService::requestPasswordReset($data);
+            Yii::$app->session->setFlash('success', $response['message']);
+            return $this->goHome();
+        } catch (Exception $error) {
+            if ($error instanceof NotFoundHttpException) {
+                $data->addErrors([
+                    'email' => $error->getMessage(),
+                ]);
+            }
+            return $this->render('requestPasswordResetToken', [
+                'model' => $data,
+            ]);
+        }
+    }
+
+    /**
+     * Resets password.
+     *
+     * @param string $token
+     * @return mixed
+     * @throws BadRequestHttpException
+     */
+    public function actionResetPassword($token)
+    {
+        $data = new ResetPasswordForm();
+        $post_data = Yii::$app->request->post('ResetPasswordForm', []);
+        try {
+            ModelHelper::loadAndValidateOrFail($data, [ 
+                'password' => $post_data ? $post_data['password'] : null,
+                'token' => $token,
+            ]);
+            $response = UserService::resetPassword($data);
+            Yii::$app->session->setFlash('success', $response['message']);
+            return $this->goHome();
+        } catch (Exception $error) {
+             if ($error instanceof NotFoundHttpException) {
+                Yii::$app->session->setFlash('error', $error->getMessage());
+            }
+            return $this->render('resetPassword', [
+                'model' => $data,
+            ]);
+        }
+    }
+
     /**
      * Logs in a user.
      *
@@ -233,27 +364,46 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
+        $data = new LoginForm();
+        try {
+            if (!Yii::$app->user->isGuest) {
+                return $this->goHome();
+            }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'LoginForm');
 
-            if(yii::$app->user->can(UserRole::COORDINATOR)){
+            $user = User::findByUsername($data->username);
+            if ($user === null) {
+                throw new NotFoundHttpException('Username atau password salah');
+            } 
+            if ($user->role->item_name === UserRole::ADMIN) {
+                throw new ForbiddenHttpException('Hanya boleh diakses oleh Wali atau Anggota SASPRI-K');
+            } 
+
+            UserService::login($data);
+
+            if(Yii::$app->user->can(UserRole::COORDINATOR)){
                 return $this->redirect('/saspri-k');
-            } else if(yii::$app->user->can(UserRole::USER)){
+            } else if(Yii::$app->user->can(UserRole::USER)){
                 return $this->redirect('/tim-mandiri');
             } else{
                 return $this->goBack();
             }
+        } catch (Exception $error) {
+            if (
+                $error instanceof NotFoundHttpException || 
+                $error instanceof ForbiddenHttpException
+            ) {
+                $data->addErrors([
+                    'username' => $error->getMessage(),
+                    'password' => $error->getMessage(),
+                ]);
+            }
+            $data->password = '';
+            return $this->render('login', [
+                'model' => $data,
+            ]);
         }
-
-        $model->password = '';
-
-        return $this->render('login', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -266,149 +416,5 @@ class SiteController extends Controller
         Yii::$app->user->logout();
 
         return $this->goHome();
-    }
-
-    /**
-     * Displays contact page.
-     *
-     * @return mixed
-     */
-    public function actionContact()
-    {
-        $model = new ContactForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
-            } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending your message.');
-            }
-
-            return $this->refresh();
-        }
-
-        return $this->render('contact', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Displays about page.
-     *
-     * @return mixed
-     */
-    public function actionAbout()
-    {
-        return $this->render('about');
-    }
-
-    /**
-     * Signs user up.
-     *
-     * @return mixed
-     */
-    public function actionSignup()
-    {
-        $model = new SignupForm();
-        if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');
-            return $this->goHome();
-        }
-
-        return $this->render('signup', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Requests password reset.
-     *
-     * @return mixed
-     */
-    public function actionRequestPasswordReset()
-    {
-        $model = new PasswordResetRequestForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-
-                return $this->goHome();
-            }
-
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
-        }
-
-        return $this->render('requestPasswordResetToken', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Resets password.
-     *
-     * @param string $token
-     * @return mixed
-     * @throws BadRequestHttpException
-     */
-    public function actionResetPassword($token)
-    {
-        try {
-            $model = new ResetPasswordForm($token);
-        } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
-            Yii::$app->session->setFlash('success', 'New password saved.');
-
-            return $this->goHome();
-        }
-
-        return $this->render('resetPassword', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Verify email address
-     *
-     * @param string $token
-     * @throws BadRequestHttpException
-     * @return yii\web\Response
-     */
-    public function actionVerifyEmail($token)
-    {
-        try {
-            $model = new VerifyEmailForm($token);
-        } catch (InvalidArgumentException $e) {
-            throw new BadRequestHttpException($e->getMessage());
-        }
-        if ($model->verifyEmail()) {
-            Yii::$app->session->setFlash('success', 'Your email has been confirmed!');
-            return $this->goHome();
-        }
-
-        Yii::$app->session->setFlash('error', 'Sorry, we are unable to verify your account with provided token.');
-        return $this->goHome();
-    }
-
-    /**
-     * Resend verification email
-     *
-     * @return mixed
-     */
-    public function actionResendVerificationEmail()
-    {
-        $model = new ResendVerificationEmailForm();
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            if ($model->sendEmail()) {
-                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
-                return $this->goHome();
-            }
-            Yii::$app->session->setFlash('error', 'Sorry, we are unable to resend verification email for the provided email address.');
-        }
-
-        return $this->render('resendVerificationEmail', [
-            'model' => $model
-        ]);
     }
 }

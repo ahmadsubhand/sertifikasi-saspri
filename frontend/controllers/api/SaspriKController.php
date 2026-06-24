@@ -59,6 +59,7 @@ class SaspriKController extends ActiveController
                 'add-members' => ['POST'],
                 'remove-member' => ['DELETE'],
                 'change-coordinator' => ['POST'],
+                'detail-change-coordinator' => ['GET'],
                 'cancel-coordinator-change' => ['POST'],
                 'update' => ['PUT'],
                 'register' => ['POST'],
@@ -82,6 +83,7 @@ class SaspriKController extends ActiveController
                 'add-members',
                 'remove-member',
                 'change-coordinator',
+                'detail-change-coordinator',
                 'cancel-coordinator-change',
                 'update',
                 'register',
@@ -119,6 +121,7 @@ class SaspriKController extends ActiveController
                         'add-members',
                         'remove-member',
                         'change-coordinator',
+                        'detail-change-coordinator',
                         'cancel-coordinator-change',
                         'update',
                     ],
@@ -366,6 +369,11 @@ class SaspriKController extends ActiveController
         }
 
         return SaspriKService::registrationRequestResponse($saspri_k_id, $data);
+    }
+
+    public function actionDetailChangeCoordinator()
+    {
+        return SaspriKService::detailChangeCoordinator();
     }
 
     public function actionChangeCoordinator()

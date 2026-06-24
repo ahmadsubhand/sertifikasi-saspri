@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\RequestResponse;
+use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\form\ChangeLevelForm;
@@ -14,6 +15,7 @@ use common\services\SaspriKService;
 use Exception;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -27,6 +29,15 @@ class VerifikasiWaliController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::ADMIN],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [
@@ -149,10 +160,7 @@ class VerifikasiWaliController extends Controller
     {
         try {
             $data = new RequestResponseForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
 
             Yii::$app->session->setFlash(
@@ -200,10 +208,7 @@ class VerifikasiWaliController extends Controller
     {
         try {
             $data = new ExternalReviewForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             SaspriKService::saveRegistration($saspri_k_id, $data);
 
             Yii::$app->session->setFlash('success', 'Perubahan berhasil disimpan sementara');
@@ -239,17 +244,11 @@ class VerifikasiWaliController extends Controller
             $request = Yii::$app->request->post();
 
             $data = new RequestResponseForm();
-            $data->load($request, '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
-
+            ModelHelper::loadAndValidateOrFail($data, $request);
+ 
             if ($data->action === RequestResponse::APPROVE) {
                 $scores = new ExternalReviewForm();
-                $scores->load($request, '');
-                if (!$scores->validate()) {
-                    throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-                }
+                ModelHelper::loadAndValidateOrFail($scores, $request);
     
                 SaspriKService::saveRegistration($saspri_k_id, $scores);
             }

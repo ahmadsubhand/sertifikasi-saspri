@@ -13,6 +13,7 @@ use common\models\form\PeerReviewForm;
 use common\models\form\RejectCertificationForm;
 use common\models\form\SelfReviewForm;
 use common\services\CertificationService;
+use common\services\UserService;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\filters\AccessControl;
@@ -71,6 +72,7 @@ class CertificationController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => [
+                'full-self-team-members',
                 'add-self-team-members',
                 'remove-self-team-member',
                 'change-self-team-member-role',
@@ -79,6 +81,7 @@ class CertificationController extends ActiveController
                 'self-review',
                 'save-self-review',
                 'finalize-self-review',
+                'full-peer-team-members',
                 'add-peer-team-members',
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
@@ -238,18 +241,23 @@ class CertificationController extends ActiveController
         ];
     }
 
-    public function actionFullSelfTeamMembers(int $certification_id, ?int $limit = 5, ?int $offset = 0)
+    public function actionFullSelfTeamMembers(?int $limit = 5, ?int $offset = 0)
     {
-        $certification = CertificationService::findOrFail($certification_id);
-        $members = $certification->getFullSelfTeamMembers()
-            ->with(['user' => function (ActiveQuery $query) {
-                $query->select(UserHelper::$basicSelect);
-            }])
-            ->orderBy(['role' => SORT_ASC])
-            ->limit($limit + 1)
-            ->offset($offset)
-            ->asArray()
-            ->all();
+        $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
+        $certification = $saspri_k->findOrCreateOnGoingCertification();
+
+        $members = [];
+        if ($certification) {
+            $members = $certification->getFullSelfTeamMembers()
+                ->with(['user' => function (ActiveQuery $query) {
+                    $query->select(UserHelper::$basicSelect);
+                }])
+                ->orderBy(['role' => SORT_ASC])
+                ->limit($limit + 1)
+                ->offset($offset)
+                ->asArray()
+                ->all();
+        }
 
         $has_next = count($members) > $limit;
         if ($has_next) array_pop($members);

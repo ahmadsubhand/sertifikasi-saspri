@@ -184,9 +184,16 @@ class SaspriK extends \yii\db\ActiveRecord
      */
     public function getValidCertificate()
     {
+        $subQuery = Certification::find()
+            ->alias('c2')
+            ->select('MAX(c2.issued_at)')
+            ->where('c2.saspri_k_id = certification.saspri_k_id') 
+            ->andWhere(['not in', 'c2.grade', [CertificateGrade::BC, CertificateGrade::C]]);
+
         return $this->hasOne(Certification::class, ['saspri_k_id' => 'id'])
-            ->andWhere(['not in', 'grade', [CertificateGrade::BC, CertificateGrade::C]])
-            ->orderBy(['issued_at' => SORT_DESC]);
+            ->alias('certification')
+            ->andWhere(['not in', 'certification.grade', [CertificateGrade::BC, CertificateGrade::C]])
+            ->andWhere(['certification.issued_at' => $subQuery]);
     }
 
     public function getOnGoingCertification(): ActiveQuery
@@ -311,8 +318,14 @@ class SaspriK extends \yii\db\ActiveRecord
 
         foreach ($documents as $index => $document) {
             $fileName = $this->generateDocumentFileName($document->extension);
+            $filePath = $absolute_dir . '/' . $fileName;
     
-            if ($document->saveAs($absolute_dir . '/' . $fileName)) {
+            // Bypasses HTTP POST checks during PHPUnit testing
+            $isSaved = (defined('YII_ENV_TEST') && YII_ENV_TEST) 
+                ? copy($document->tempName, $filePath) 
+                : $document->saveAs($filePath);
+
+            if ($isSaved) {
                 $saspri_k_document = new SaspriKDocument();
                 $saspri_k_document->type = $types[$index];
                 $saspri_k_document->url = $relative_dir . '/' . $fileName;

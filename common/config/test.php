@@ -9,4 +9,9 @@ return [
             'identityClass' => 'common\models\User',
         ],
     ],
+    'params' => [
+        'supportEmail' => 'support@example.com',
+        'senderEmail' => 'noreply@example.com',
+        'senderName' => 'Sistem Test',
+    ],
 ];

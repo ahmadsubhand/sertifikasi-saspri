@@ -4,10 +4,13 @@ namespace backend\controllers;
 
 use common\enums\CertificateLevel;
 use common\enums\CertificationStatus;
+use common\enums\UserRole;
+use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
-use common\models\LoginForm;
+use common\models\form\LoginForm;
 use common\models\SaspriK;
+use common\models\User;
 use common\services\UserService;
 use Exception;
 use Yii;
@@ -42,7 +45,7 @@ class SiteController extends Controller
                     [
                         'actions' => ['logout', 'index', 'saspri-k', 'detail'],
                         'allow' => true,
-                        'roles' => ['@'],
+                        'roles' => [UserRole::ADMIN],
                     ],
                 ],
             ],
@@ -221,22 +224,41 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $this->layout = 'blank';
+        $data = new LoginForm();
+        try {
+            if (!Yii::$app->user->isGuest) {
+                return $this->goHome();
+            }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post(), 'LoginForm');
+
+            $user = User::findByUsername($data->username);
+            if ($user === null) {
+                throw new NotFoundHttpException('Username atau password salah');
+            } 
+            if ($user->role->item_name !== UserRole::ADMIN) {
+                throw new ForbiddenHttpException('Hanya boleh diakses oleh Admin SASPRI-N');
+            } 
+
+            UserService::login($data);
+
             return $this->goBack();
+        } catch (Exception $error) {
+            if (
+                $error instanceof NotFoundHttpException || 
+                $error instanceof ForbiddenHttpException
+            ) {
+                $data->addErrors([
+                    'username' => $error->getMessage(),
+                    'password' => $error->getMessage(),
+                ]);
+            }
+            $data->password = '';
+            return $this->render('login', [
+                'model' => $data,
+            ]);
         }
-
-        $model->password = '';
-
-        return $this->render('login', [
-            'model' => $model,
-        ]);
     }
 
     /**

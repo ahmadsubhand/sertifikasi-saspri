@@ -144,10 +144,7 @@ class PenentuanTimSebayaController extends Controller
     {
         try {
             $data = new AddMembersForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));   
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $username_users = CertificationService::addPeerTeamMembers($certification_id, $data);
 
             Yii::$app->session->setFlash('success', implode(', ', $username_users) . ' berhasil ditambahkan ke Tim Sebaya');
@@ -202,10 +199,7 @@ class PenentuanTimSebayaController extends Controller
     {
         try {
             $data = new ChangeMemberRoleForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));  
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $member = CertificationService::changePeerTeamMemberRole($certification_id, $user_id, $data);
 
             Yii::$app->session->setFlash(

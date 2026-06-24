@@ -7,7 +7,10 @@ use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\LoginForm;
+use common\models\form\PasswordResetRequestForm;
 use common\models\form\RegisterForm;
+use common\models\form\ResendVerificationEmailForm;
+use common\models\form\ResetPasswordForm;
 use common\models\form\VerifyEmailForm;
 use common\models\PeerTeamMember;
 use common\models\SelfTeamMember;
@@ -37,9 +40,12 @@ class UserController extends ActiveController
         $behaviors['verbs'] = [
             'class' => VerbFilter::class,
             'actions' => [
-                'login' => ['POST'],
                 'register' => ['POST'],
                 'verify-email' => ['POST'],
+                'resend-verification-email' => ['POST'],
+                'request-password-reset' => ['POST'],
+                'reset-password' => ['POST'],
+                'login' => ['POST'],
                 'me' => ['GET'],
                 'certifications' => ['GET'],
                 'detail' => ['GET'],
@@ -52,6 +58,7 @@ class UserController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => [
+                'logout',
                 'me',
                 'certifications',
                 'available-for-saspri-k',
@@ -89,13 +96,6 @@ class UserController extends ActiveController
         return $behaviors;
     }
 
-    public function actionLogin()
-    {
-        $data = new LoginForm();
-        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
-        return UserService::login($data);
-    }
-
     public function actionRegister()
     {
         $data = new RegisterForm();
@@ -103,11 +103,49 @@ class UserController extends ActiveController
         return UserService::register($data);
     }
 
+    public function actionResendVerificationEmail()
+    {
+        $data = new ResendVerificationEmailForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::resendVerificationEmail($data);
+    }
+
     public function actionVerifyEmail()
     {
         $data = new VerifyEmailForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return UserService::verifyEmail($data);
+    }
+
+    public function actionRequestPasswordReset()
+    {
+        $data = new PasswordResetRequestForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::requestPasswordReset($data);
+    }
+
+    public function actionResetPassword()
+    {
+        $data = new ResetPasswordForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::resetPassword($data);
+    }
+
+    public function actionLogin()
+    {
+        $data = new LoginForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
+        return UserService::login($data);
+    }
+
+    public function actionLogout()
+    {
+        $user = User::findOne(Yii::$app->user->id);
+        $user->removeAccessToken();
+        $user->save();
+        return [
+            'access_token' => $user->access_token
+        ];
     }
 
     public function actionMe()
@@ -139,6 +177,7 @@ class UserController extends ActiveController
             ->distinct()
             ->joinWith('selfTeamMembers')
             ->joinWith('peerTeamMembers')
+            ->joinWith('saspriK.district')
             ->andWhere([
                 'or',
                 [SelfTeamMember::tableName() . '.user_id' => $user_id],

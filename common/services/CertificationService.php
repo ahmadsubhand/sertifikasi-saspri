@@ -16,6 +16,7 @@ use common\models\form\SelfReviewForm;
 use common\models\PeerTeamMember;
 use common\models\SelfTeamMember;
 use common\models\User;
+use common\services\NotificationService;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -77,7 +78,23 @@ class CertificationService
         }
 
         $certification->save(); // untuk mendapatkan id jika sertifikasi baru diajukan
-        $certification->addSelfTeamMembers($data->user_ids);
+        $member_ids = $certification->addSelfTeamMembers($data->user_ids);
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+
+        foreach ($data->user_ids as $user_id) {
+            NotificationService::send(
+                $user_id,
+                'Undangan bergabung Tim Mandiri',
+                "Anda telah diundang untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
+                    'api_link' => 'self-team-member/join-request-response?self_team_member_id=' . $member_ids[$user_id],
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+        }
 
         return $valid_users;
     }
@@ -88,6 +105,21 @@ class CertificationService
         $certification = $saspri_k->findOrCreateOnGoingCertification()
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
         $member = CertificationService::findSelfTeamMember($certification->id, $user_id);
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+
+        NotificationService::send(
+            $user_id,
+            'Pengeluaran dari Tim Mandiri',
+            "Anda telah dikeluarkan dari Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'tim-mandiri/index',
+                'api_link' => 'user/certifications',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         $member->delete();
         return [
             ...$member,
@@ -102,6 +134,22 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::PENDING_SELF_TEAM_FORMATION);
         $member = CertificationService::findSelfTeamMember($certification->id, $user_id);
         $member->changeRole($data->role)->save();
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $role_name = TeamRole::list()[$data->role] ?? $data->role;
+
+        NotificationService::send(
+            $user_id,
+            'Perubahan Peran Tim Mandiri',
+            "Peran Anda di Tim Mandiri pada SASPRI-K kawasan {$district_name} telah diubah menjadi {$role_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
+                'api_link' => 'self-team-member/join-request-response?self_team_member_id=' . $member->id,
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         return [
             ...$member,
             'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
@@ -189,7 +237,24 @@ class CertificationService
             throw new BadRequestHttpException('Beberapa user tidak valid atau sudah terdaftar di Tim Sebaya saat ini');
         }
 
-        $certification->addPeerTeamMembers($data->user_ids);
+        $member_ids = $certification->addPeerTeamMembers($data->user_ids);
+
+        $district_name = $certification->saspriK->district->name ?? 'Kawasan';
+
+        foreach ($data->user_ids as $user_id) {
+            NotificationService::send(
+                $user_id,
+                'Undangan bergabung Tim Sebaya',
+                "Anda telah diundang untuk bergabung ke dalam Tim Sebaya di SASPRI-K kawasan {$district_name}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
+                    'api_link' => 'peer-team-member/join-request-response?peer_team_member_id=' . $member_ids[$user_id],
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+        }
+
         return $valid_users;
     }
 
@@ -198,6 +263,21 @@ class CertificationService
         $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
         $member = CertificationService::findPeerTeamMember($certification->id, $user_id);
+
+        $district_name = $certification->saspriK->district->name ?? 'Kawasan';
+
+        NotificationService::send(
+            $user_id,
+            'Pengeluaran dari Tim Sebaya',
+            "Anda telah dikeluarkan dari Tim Sebaya di SASPRI-K kawasan {$district_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'tim-sebaya/index',
+                'api_link' => 'user/certifications',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         $member->delete();
         return [
             ...$member,
@@ -211,6 +291,22 @@ class CertificationService
             ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
         $member = CertificationService::findPeerTeamMember($certification->id, $user_id);
         $member->changeRole($data->role)->save();
+
+        $district_name = $certification->saspriK->district->name ?? 'Kawasan';
+        $role_name = TeamRole::list()[$data->role] ?? $data->role;
+
+        NotificationService::send(
+            $user_id,
+            'Perubahan Peran Tim Sebaya',
+            "Peran Anda di Tim Sebaya pada SASPRI-K kawasan {$district_name} telah diubah menjadi {$role_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
+                'api_link' => 'peer-team-member/join-request-response?peer_team_member_id=' . $member->id,
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         return [
             ...$member,
             'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
@@ -337,8 +433,8 @@ class CertificationService
             ->setGrade()
             ->submitExternalReview()
             ->generateCertificationCode()
-            ->calculateNextCertificationDueDate()
-            ->save();
+            ->calculateNextCertificationDueDate();
+        $certification->save();
 
         return $certification;
     }

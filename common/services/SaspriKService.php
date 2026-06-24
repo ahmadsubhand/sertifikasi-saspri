@@ -257,6 +257,21 @@ class SaspriKService
         return $saspri_k;
     }
 
+    public static function detailChangeCoordinator()
+    {
+        /** @var SaspriK|null */
+        $saspri_k = SaspriK::find()
+            ->where(['coordinator_id' => Yii::$app->user->id])
+            ->andWhere(['!=', 'change_status', ApprovalStatus::APPROVED])
+            ->one();
+        return [
+            ...($saspri_k ?? []),
+            'district' => $saspri_k ? $saspri_k->district : [],
+            'coordinator' => $saspri_k ? $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one() : [],
+            'new_coordinator' => $saspri_k ? $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one() : [],
+        ];
+    }
+
     public static function changeCoordinator(CoordinatorChangeForm $data)
     {
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();

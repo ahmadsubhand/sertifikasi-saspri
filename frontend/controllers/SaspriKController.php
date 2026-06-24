@@ -69,10 +69,7 @@ class SaspriKController extends Controller
         try {
             $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $data = new ChangeLevelForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             SaspriKService::changeRegistrationLevel($saspri_k->id, $data);
 
             Yii::$app->session->setFlash('success', 'Berhasil mengubah level sertifikat');
@@ -179,10 +176,7 @@ class SaspriKController extends Controller
     {
         try {
             $data = new AddMembersForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));    
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $username_users = SaspriKService::addMembers($data);
             Yii::$app->session->setFlash(
                 'success',
@@ -283,10 +277,7 @@ class SaspriKController extends Controller
     {
         try {
             $data = new AddMembersForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));    
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $username_users = CertificationService::addSelfTeamMembers($data);
 
             Yii::$app->session->setFlash('success', implode(', ', $username_users) . ' berhasil ditambahkan ke Tim Mandiri');
@@ -341,10 +332,7 @@ class SaspriKController extends Controller
     {
         try {
             $data = new ChangeMemberRoleForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors)); 
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             $member = CertificationService::changeSelfTeamMemberRole($user_id, $data);
 
             Yii::$app->session->setFlash(
@@ -455,10 +443,7 @@ class SaspriKController extends Controller
     {
         try {
             $data = new CoordinatorChangeForm();
-            $data->load(Yii::$app->request->post(), '');
-            if (!$data->validate()) {
-                throw new BadRequestHttpException(implode(', ', $data->firstErrors));
-            }
+            ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->post());
             SaspriKService::changeCoordinator($data);
 
             Yii::$app->session->setFlash('success', 'Pergantian wali berhasil diajukan');
