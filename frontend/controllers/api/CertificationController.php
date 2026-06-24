@@ -72,6 +72,7 @@ class CertificationController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => [
+                'full-self-team-members',
                 'add-self-team-members',
                 'remove-self-team-member',
                 'change-self-team-member-role',
@@ -80,6 +81,7 @@ class CertificationController extends ActiveController
                 'self-review',
                 'save-self-review',
                 'finalize-self-review',
+                'full-peer-team-members',
                 'add-peer-team-members',
                 'remove-peer-team-member',
                 'change-peer-team-member-role',
