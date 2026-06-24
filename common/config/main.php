@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'name' => 'MATA-SAPI DIGDAYA',
     'language' => 'id-ID',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',

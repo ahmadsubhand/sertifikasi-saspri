@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\enums\ApprovalStatus;
 use common\enums\RequestResponse;
+use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\form\ChangeLevelForm;
@@ -14,6 +15,7 @@ use common\services\SaspriKService;
 use Exception;
 use Yii;
 use yii\db\ActiveQuery;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -27,6 +29,15 @@ class VerifikasiWaliController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => [UserRole::ADMIN],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::class,
                 'actions' => [

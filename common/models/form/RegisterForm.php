@@ -15,6 +15,12 @@ class RegisterForm extends Model
     /** @var string */
     public $password;
 
+    /** @var string */
+    public $full_name;
+
+    /** @var string */
+    public $phone_number;
+
 
     /**
      * {@inheritdoc}
@@ -22,17 +28,16 @@ class RegisterForm extends Model
     public function rules()
     {
         return [
-            ['username', 'trim'],
-            ['username', 'required'],
-            ['username', 'string', 'min' => 2, 'max' => 255],
+            [['username', 'email', 'full_name', 'phone_number'], 'trim'],
+            [['username', 'email', 'full_name', 'phone_number'], 'required'],
+            [['username', 'email', 'full_name'], 'string', 'min' => 3, 'max' => 255],
 
-            ['email', 'trim'],
-            ['email', 'required'],
             ['email', 'email'],
-            ['email', 'string', 'max' => 255],
 
             ['password', 'required'],
             ['password', 'string', 'min' => 8],
+
+            ['phone_number', 'string', 'max' => 20],
         ];
     }
 
@@ -45,6 +50,8 @@ class RegisterForm extends Model
             'username' => 'Nama Pengguna',
             'email' => 'Email',
             'password' => 'Kata Sandi',
+            'full_name' => 'Nama Lengkap',
+            'phone_number' => 'Nomor Telepon',
         ];
     }
 }

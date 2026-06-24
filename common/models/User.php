@@ -27,6 +27,7 @@ use yii\web\IdentityInterface;
  * @property string $password write-only password
  * @property int|null $saspri_k_id
  * @property string|null $phone_number
+ * @property string|null $full_name
  * 
  * @property AuthAssignment $role
  * @property SaspriK $saspriKAsCoordinator
@@ -78,10 +79,10 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             ['status', 'default', 'value' => self::STATUS_INACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_INACTIVE, self::STATUS_DELETED]],
-            [['password_reset_token', 'verification_token', 'saspri_k_id', 'phone_number', 'access_token'], 'default', 'value' => null],
+            [['password_reset_token', 'verification_token', 'saspri_k_id', 'phone_number', 'full_name', 'access_token'], 'default', 'value' => null],
             [['username', 'auth_key', 'password_hash', 'email'], 'required'],
             [['created_at', 'updated_at', 'saspri_k_id'], 'integer'],
-            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token', 'phone_number', 'access_token'], 'string', 'max' => 255],
+            [['username', 'password_hash', 'password_reset_token', 'email', 'verification_token', 'phone_number', 'full_name', 'access_token'], 'string', 'max' => 255],
             [['auth_key'], 'string', 'max' => 32],
             [['username'], 'unique'],
             [['email'], 'unique'],
@@ -264,6 +265,14 @@ class User extends ActiveRecord implements IdentityInterface
     public function generateEmailVerificationToken()
     {
         $this->verification_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
+
+    /**
+     * Removes access token
+     */
+    public function removeAccessToken()
+    {
+        $this->access_token = null;
     }
 
     /**

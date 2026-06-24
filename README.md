@@ -16,7 +16,7 @@ Dokumen ini mencakup:
 
 Pastikan perangkat Anda telah terinstal:
 
-* Laragon (PHP, MySQL, Apache/Nginx)
+* Laragon (PHP ^8.4.1, MySQL, Nginx)
 * Composer
 * Git
 
@@ -80,54 +80,13 @@ Perintah ini akan membuat file konfigurasi lokal seperti:
 
 ---
 
-## 4. Konfigurasi Database
+## 4. Setup Web Server Laragon (Virtual Host & HTTPS)
 
-### Buat Database
-
-Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru:
-
-```sql
-CREATE DATABASE sertifikasi_saspri;
-```
-
-### Sesuaikan Konfigurasi Database
-
-Buka file:
-
-```text
-common/config/main-local.php
-```
-
-Lalu sesuaikan konfigurasi berikut:
-
-```php
-'db' => [
-    'class' => \yii\db\Connection::class,
-    'dsn' => 'mysql:host=localhost;dbname=sertifikasi_saspri',
-    'username' => 'root',
-    'password' => '',
-    'charset' => 'utf8mb4',
-],
-```
-
----
-
-## 5. Migrasi dan Seeding Database
-
-Jalankan perintah berikut:
-
-```bash
-php yii migrate
-php yii db/seed
-```
-
----
-
-## 6. Setup Virtual Host Laragon
+### Setup Virtual Host Laragon
 
 Agar aplikasi dapat diakses menggunakan domain `.test`, buat symbolic link dari folder `web` Yii2 ke folder `www` milik Laragon.
 
-### Frontend
+#### Frontend
 
 Jalankan Command Prompt sebagai Administrator:
 
@@ -135,13 +94,13 @@ Jalankan Command Prompt sebagai Administrator:
 mklink /D "C:\laragon\www\frontend" "C:\path\ke\proyek\frontend\web"
 ```
 
-### Backend
+#### Backend
 
 ```cmd
 mklink /D "C:\laragon\www\backend" "C:\path\ke\proyek\backend\web"
 ```
 
-### Contoh
+#### Contoh
 
 Jika proyek berada di:
 
@@ -157,70 +116,7 @@ mklink /D "C:\laragon\www\frontend" "D:\Projects\saspri-app\frontend\web"
 mklink /D "C:\laragon\www\backend" "D:\Projects\saspri-app\backend\web"
 ```
 
----
-
-## 7. Konfigurasi Firebase
-
-Aplikasi menggunakan Firebase Cloud Messaging (FCM) untuk mengirim push notification.
-
-### Konfigurasi Params
-
-Buka file:
-
-```text
-common/config/params-local.php
-```
-
-Lalu sesuaikan konfigurasi berikut:
-
-```php
-<?php
-
-return [
-    'frontendUrl' => 'http://frontend.test',
-    'firebase' => [
-        'apiKey' => '',
-        'authDomain' => '',
-        'projectId' => '',
-        'storageBucket' => '',
-        'messagingSenderId' => '',
-        'appId' => '',
-        'vapidKey' => '',
-    ],
-];
-```
-
-Seluruh nilai tersebut dapat diperoleh dari Firebase Console pada proyek yang digunakan.
-
-### Service Account Firebase
-
-Simpan file kredensial Firebase Service Account pada:
-
-```text
-common/config/firebase-credentials.json
-```
-
-File ini digunakan oleh backend untuk melakukan autentikasi ke Firebase saat mengirim push notification.
-
-> Jangan melakukan commit file `firebase-credentials.json` ke repository karena berisi kredensial rahasia.
-
----
-
-## 8. Menjalankan Queue Worker
-
-Aplikasi menggunakan Yii Queue untuk memproses pekerjaan asynchronous, seperti pengiriman push notification.
-
-Pada lingkungan pengembangan, queue worker dijalankan secara manual menggunakan perintah:
-
-```bash
-php yii queue/listen
-```
-
-Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queue.
-
----
-
-## 9. Konfigurasi HTTPS untuk FCM (Laragon)
+### Konfigurasi HTTPS untuk FCM (Laragon)
 
 Firebase Cloud Messaging pada browser mewajibkan aplikasi berjalan melalui HTTPS.
 
@@ -248,7 +144,166 @@ https://frontend.test:8443
 https://backend.test:8443
 ```
 
+> Pastikan port SSL pada konfigurasi Nginx di Laragon disetel ke 8443. Jika menggunakan port default, hilangkan :8443 pada URL.
 > Tanpa HTTPS, fitur push notification pada browser tidak akan berfungsi.
+---
+
+## 5. Konfigurasi main-local.php (Database & SMTP)
+
+### Buat Database
+
+Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru:
+
+```sql
+CREATE DATABASE sertifikasi_saspri;
+```
+
+### Setup Gmail
+
+Aplikasi menggunakan SMTP untuk mengirim email seperti notifikasi dan proses terkait akun.
+
+Jika menggunakan Gmail:
+
+1. Aktifkan Two-Factor Authentication (2FA) pada akun Google.
+2. Buka halaman App Password Google.
+3. Buat App Password baru.
+4. Gunakan App Password yang dihasilkan sebagai nilai `password`.
+
+> Jangan menggunakan password login Gmail biasa karena tidak akan berfungsi untuk autentikasi SMTP.
+
+
+### Sesuaikan Konfigurasi
+
+Buka file:
+
+```text
+common/config/main-local.php
+```
+
+Lalu sesuaikan konfigurasi berikut:
+
+```php
+return [
+    'components' => [
+        'db' => [
+            'class' => \yii\db\Connection::class,
+            'dsn' => 'mysql:host=localhost;dbname=sertifikasi_saspri',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8mb4',
+        ],
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,
+            'viewPath' => '@common/mail',
+            'useFileTransport' => false,
+            'transport' => [
+                'scheme' => 'smtps',
+                'host' => 'smtp.gmail.com',
+                'username' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
+                'password' => '{{ 16 HURUF APP PASSWORD }}',
+                'port' => 465,
+            ],
+        ],
+    ],
+];
+```
+
+---
+
+## 6. Konfigurasi params-local.php (Global Params & Firebase)
+
+Aplikasi menggunakan Firebase Cloud Messaging (FCM) untuk mengirim push notification.
+
+Buka file:
+
+```text
+common/config/params-local.php
+```
+
+Lalu sesuaikan konfigurasi berikut:
+
+```php
+return [
+    'frontendUrl' => 'https://frontend.test:8443',
+    'firebase' => [
+        'apiKey' => '',
+        'authDomain' => '',
+        'projectId' => '',
+        'storageBucket' => '',
+        'messagingSenderId' => '',
+        'appId' => '',
+        'vapidKey' => '',
+    ],
+    'supportEmail' => 'email@contoh.com',
+    'senderEmail' => 'email@contoh.com',
+];
+```
+
+Keterangan:
+
+* Seluruh nilai pada konfigurasi firebase dapat diperoleh dari Firebase Console pada proyek yang digunakan.
+* `supportEmail` dan `senderEmail` digunakan sebagai alamat pengirim email sistem.
+* Disarankan menggunakan alamat email yang sama dengan `username` pada konfigurasi SMTP.
+
+---
+
+## 7. Setup Service Account Firebase
+
+Simpan file kredensial Firebase Service Account pada:
+
+```text
+common/config/firebase-credentials.json
+```
+
+File ini digunakan oleh backend untuk melakukan autentikasi ke Firebase saat mengirim push notification.
+
+> Jangan melakukan commit file `firebase-credentials.json` ke repository karena berisi kredensial rahasia.
+
+---
+
+## 8. Konfigurasi URL Manager Console
+
+Buka file:
+
+```text
+console/config/main-local.php
+```
+
+Tambahkan konfigurasi berikut:
+```php
+return [
+    'components' => [
+        'urlManager' => [
+            'hostInfo' => 'https://frontend.test:8443',
+        ],
+    ],
+];
+```
+
+---
+
+## 9. Migrasi dan Seeding Database
+
+Jalankan perintah berikut:
+
+```bash
+php yii migrate
+php yii db/seed
+```
+
+---
+
+## 10. Menjalankan Queue Worker
+
+Aplikasi menggunakan Yii Queue untuk memproses pekerjaan asynchronous, seperti pengiriman push notification.
+
+Pada lingkungan pengembangan, queue worker dijalankan secara manual menggunakan perintah:
+
+```bash
+php yii queue/listen
+```
+
+Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queue.
 
 ---
 

@@ -1,11 +1,7 @@
 <?php
 
 return [
-    'adminEmail' => 'admin@example.com',
-    'supportEmail' => 'support@example.com',
-    'senderEmail' => 'noreply@example.com',
-    'senderName' => 'Example.com mailer',
+    'senderName' => 'MATA-SAPI DIGDAYA',
     'user.passwordResetTokenExpire' => 3600,
     'user.passwordMinLength' => 8,
-    'frontendUrl' => 'http://frontend.test',
 ];
