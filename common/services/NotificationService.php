@@ -29,7 +29,7 @@ class NotificationService
      * @return Notification[] List of created database Notification models
      */
     public static function send(
-        int|array $recipientId,
+        int $recipientId,
         string $title,
         string $body,
         array $options = []

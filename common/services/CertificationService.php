@@ -81,12 +81,13 @@ class CertificationService
         $member_ids = $certification->addSelfTeamMembers($data->user_ids);
 
         $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->self_team_due_date));
 
         foreach ($data->user_ids as $user_id) {
             NotificationService::send(
                 $user_id,
                 'Undangan bergabung Tim Mandiri',
-                "Anda telah diundang untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+                "Anda telah diundang untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}. Batas akhir penerimaan undangan adalah {$formatted_due_date}.",
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
@@ -168,6 +169,38 @@ class CertificationService
             ->submitForSelfReview()
             ->save();
 
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->self_review_due_date));
+
+        foreach ($certification->selfTeamMembers as $member) {
+            NotificationService::send(
+                $member->user_id,
+                'Mulai ' . CertificationStatus::list()[$certification->status],
+                "Proses " .  strtolower(CertificationStatus::list()[$certification->status]) .
+                " di SASPRI-K kawasan {$district_name} telah dimulai. Batas akhir penilaian adalah {$formatted_due_date}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
+                    'api_link' => 'certification/self-review?certification_id=' . $certification->id,
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+        }
+
+        $coordinator_id = $saspri_k->coordinator_id;
+        NotificationService::send(
+            $coordinator_id,
+            CertificationStatus::list()[CertificationStatus::SELF_REVIEW],
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            strtolower(CertificationStatus::list()[CertificationStatus::SELF_REVIEW]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         return $certification;
     }
 
@@ -220,6 +253,24 @@ class CertificationService
             ->submitSelfReview();
         $certification->save();
 
+        $saspri_k = $certification->saspriK;
+        $coordinator_id = $saspri_k->coordinator_id;
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->peer_team_due_date));
+
+        NotificationService::send(
+            $coordinator_id,
+            CertificationStatus::list()[$certification->status],
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir pembentukan tim adalah {$formatted_due_date}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         return $certification;
     }
 
@@ -240,12 +291,13 @@ class CertificationService
         $member_ids = $certification->addPeerTeamMembers($data->user_ids);
 
         $district_name = $certification->saspriK->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->peer_team_due_date));
 
         foreach ($data->user_ids as $user_id) {
             NotificationService::send(
                 $user_id,
                 'Undangan bergabung Tim Sebaya',
-                "Anda telah diundang untuk bergabung ke dalam Tim Sebaya di SASPRI-K kawasan {$district_name}.",
+                "Anda telah diundang untuk bergabung ke dalam Tim Sebaya di SASPRI-K kawasan {$district_name}. Batas akhir penerimaan undangan adalah {$formatted_due_date}.",
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
@@ -320,6 +372,39 @@ class CertificationService
             ->validateApprovedPeerTeamComposition()
             ->submitForPeerReview()
             ->save();
+        $saspri_k = $certification->saspriK;
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->peer_review_due_date));
+
+        foreach ($certification->peerTeamMembers as $member) {
+            NotificationService::send(
+                $member->user_id,
+                'Mulai ' . CertificationStatus::list()[$certification->status],
+                "Proses " .  strtolower(CertificationStatus::list()[$certification->status]) .
+                " di SASPRI-K kawasan {$district_name} telah dimulai. Batas akhir penilaian adalah {$formatted_due_date}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
+                    'api_link' => 'certification/peer-review?certification_id=' . $certification->id,
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+        }
+
+        $coordinator_id = $saspri_k->coordinator_id;
+        NotificationService::send(
+            $coordinator_id,
+            CertificationStatus::list()[$certification->status],
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
 
         return $certification;
     }
@@ -374,6 +459,24 @@ class CertificationService
             ->setGrade()
             ->submitPeerReview();
         $certification->save();
+
+        $saspri_k = $certification->saspriK;
+        $coordinator_id = $saspri_k->coordinator_id;
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->external_review_due_date));
+
+        NotificationService::send(
+            $coordinator_id,
+            CertificationStatus::list()[$certification->status],
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir external review adalah {$formatted_due_date}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+                'channels' => ['db', 'fcm'],
+            ]
+        );
 
         return $certification;
     }
@@ -436,6 +539,41 @@ class CertificationService
             ->calculateNextCertificationDueDate();
         $certification->save();
 
+        $saspri_k = $certification->saspriK;
+        $coordinator_id = $saspri_k->coordinator_id;
+        $recipients = [
+            [
+                'user_ids' => [$coordinator_id],
+                'web_link' => 'saspri-k/detail?case_id=' . $certification->id,
+            ],
+            [
+                'user_ids' => $certification->getSelfTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
+            ],
+            [
+                'user_ids' => $certification->getPeerTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
+            ],
+        ];
+
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        foreach ($recipients as $recipient) {
+            foreach ($recipient['user_ids'] as $user_id) {
+                NotificationService::send(
+                    $user_id,
+                    'Sertifikasi Selesai',
+                    "Sertifikasi SASPRI-K kawasan {$district_name} telah selesai.",
+                    [
+                        'sender_id' => Yii::$app->user->id,
+                        'web_link' => $recipient['web_link'],
+                        'api_link' => 'certification/detail?certification_id=' . $certification->id,
+                        'channels' => ['db', 'fcm'],
+                    ]
+                );
+            }
+        }
+
         return $certification;
     }
 
@@ -445,6 +583,42 @@ class CertificationService
         $certification->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION)
             ->reject($data->rejection_reason, CertificationStatus::SELF_REVIEW)
             ->save();
+        
+        $saspri_k = $certification->saspriK;
+        $coordinator_id = $saspri_k->coordinator_id;
+        $recipients = [
+            [
+                'user_ids' => [$coordinator_id],
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+            ],
+            [
+                'user_ids' => $certification->getSelfTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
+                'api_link' => 'certification/detail?certification_id=' . $certification->id,
+            ],
+        ];
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->self_review_due_date));
+
+        foreach ($recipients as $recipient) {
+            foreach ($recipient['user_ids'] as $user_id) {
+                NotificationService::send(
+                    $user_id,
+                    'Sertifikasi Ditolak',
+                    "Sertifikasi SASPRI-K kawasan {$district_name} ditolak oleh SASPRI-N dan dikembalikan ke proses " .
+                    strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
+                    [
+                        'sender_id' => Yii::$app->user->id,
+                        'web_link' => $recipient['web_link'],
+                        'api_link' => $recipient['api_link'],
+                        'channels' => ['db', 'fcm'],
+                    ]
+                );
+            }
+        }
+
         return $certification;
     }
 
@@ -454,6 +628,42 @@ class CertificationService
         $certification->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->reject($data->rejection_reason, CertificationStatus::PEER_REVIEW)
             ->save();
+
+        $saspri_k = $certification->saspriK;
+        $coordinator_id = $saspri_k->coordinator_id;
+        $recipients = [
+            [
+                'user_ids' => [$coordinator_id],
+                'web_link' => 'saspri-k/pengajuan-sertifikasi',
+                'api_link' => 'saspri-k/on-going-certification',
+            ],
+            [
+                'user_ids' => $certification->getPeerTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
+                'api_link' => 'certification/detail?certification_id=' . $certification->id,
+            ],
+        ];
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->peer_review_due_date));
+
+        foreach ($recipients as $recipient) {
+            foreach ($recipient['user_ids'] as $user_id) {
+                NotificationService::send(
+                    $user_id,
+                    'Sertifikasi Ditolak',
+                    "Sertifikasi SASPRI-K kawasan {$district_name} ditolak oleh SASPRI-N dan dikembalikan ke proses " .
+                    strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
+                    [
+                        'sender_id' => Yii::$app->user->id,
+                        'web_link' => $recipient['web_link'],
+                        'api_link' => $recipient['api_link'],
+                        'channels' => ['db', 'fcm'],
+                    ]
+                );
+            }
+        }
+
         return $certification;
     }
 
@@ -471,7 +681,36 @@ class CertificationService
             );
         }
 
+        $recipients = [
+            [
+                'user_ids' => $certification->getSelfTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-mandiri/index',
+            ],
+            [
+                'user_ids' => $certification->getPeerTeamMembers()->select('user_id')->column(),
+                'web_link' => 'tim-sebaya/index',
+            ],
+        ];
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        foreach ($recipients as $recipient) {
+            foreach ($recipient['user_ids'] as $user_id) {
+                NotificationService::send(
+                    $user_id,
+                    'Sertifikasi Dibatalkan',
+                    "Sertifikasi SASPRI-K kawasan {$district_name} dibatalkan oleh Wali",
+                    [
+                        'sender_id' => Yii::$app->user->id,
+                        'web_link' => $recipient['web_link'],
+                        'api_link' => 'user/certifications',
+                        'channels' => ['db', 'fcm'],
+                    ]
+                );
+            }
+        }
+
         $certification->delete();
+
         return $certification;
     }
 }

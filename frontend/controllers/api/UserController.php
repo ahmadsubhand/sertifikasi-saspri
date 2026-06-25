@@ -2,6 +2,7 @@
 
 namespace frontend\controllers\api;
 
+use common\enums\ApprovalStatus;
 use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
@@ -175,19 +176,28 @@ class UserController extends ActiveController
         $user_id = Yii::$app->user->id;
         $certifications = Certification::find()
             ->distinct()
-            ->joinWith('selfTeamMembers')
-            ->joinWith('peerTeamMembers')
+            ->joinWith('fullSelfTeamMembers')
+            ->joinWith('fullPeerTeamMembers')
             ->joinWith('saspriK.district')
             ->andWhere([
                 'or',
-                [SelfTeamMember::tableName() . '.user_id' => $user_id],
-                [PeerTeamMember::tableName() . '.user_id' => $user_id],
+                [
+                    'and',
+                    [SelfTeamMember::tableName() . '.user_id' => $user_id],
+                    [SelfTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED],
+                ],
+                [
+                    'and',
+                    [PeerTeamMember::tableName() . '.user_id' => Yii::$app->user->id],
+                    [PeerTeamMember::tableName() . '.status' => ApprovalStatus::APPROVED],
+                ],
             ])
             ->orderBy(['updated_at' => SORT_DESC])
             ->limit($limit + 1)
             ->offset($offset)
             ->asArray()
             ->all();
+        // return $certifications->createCommand()->rawSql;
 
         $has_next = count($certifications) > $limit;
         if ($has_next) array_pop($certifications);
