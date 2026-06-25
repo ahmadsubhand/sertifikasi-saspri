@@ -219,6 +219,7 @@ class SaspriKService
     public static function registrationRequestResponse(int $saspri_k_id, RequestResponseForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isRequestRegistrationPending();
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
 
         if ($data->action === RequestResponse::APPROVE) {
             /** @var Certification $certification */
@@ -244,11 +245,34 @@ class SaspriKService
             $saspri_k->addMembers([$coordinator->id]);
 
             $saspri_k->approveRegistration();
+            NotificationService::send(
+                $saspri_k->coordinator_id,
+                'Pendaftaran SASPRI-K Disetujui',
+                "Pengajuan pendaftaran SASPRI-K kawasan {$district_name} telah disetujui oleh SASPRI-N.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'saspri-k/index',
+                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
         } elseif ($data->action === RequestResponse::REJECT) {
             if (!$data->rejection_reason) {
                 throw new BadRequestHttpException('Wajib menyertakan alasan penolakan');
             }
+
             $saspri_k->rejectRegistration($data->rejection_reason);
+            NotificationService::send(
+                $saspri_k->coordinator_id,
+                'Pendaftaran SASPRI-K Ditolak',
+                "Pengajuan pendaftaran SASPRI-K kawasan {$district_name} ditolak oleh SASPRI-N.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'daftar-wali/index',
+                    'api_link' => 'saspri-k/detail-registration',
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
         } else {
             throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
         }
@@ -285,6 +309,19 @@ class SaspriKService
         $saspri_k->requestCoordinatorChange($new_coordinator->id, $data->change_request_reason)
             ->save();
 
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        NotificationService::send(
+            $saspri_k->new_coordinator_id,
+            'Pergantian Wali SASPRI-K',
+            "Anda diajukan sebagai Wali baru untuk SASPRI-K kawasan {$district_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'site/index',
+                'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                'channels' => ['db', 'fcm'],
+            ]
+        );
+
         return [
             ...$saspri_k,
             'district' => $saspri_k->district,
@@ -299,7 +336,21 @@ class SaspriKService
         if ($saspri_k->change_status === ApprovalStatus::APPROVED) {
             throw new NotFoundHttpException('Tidak ditemukan permintaan pergantian Wali SASPRI-K');
         }
+        $new_coordinator_id = $saspri_k->new_coordinator_id;
         $saspri_k->cancelCoordinatorChange()->save();
+
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
+        NotificationService::send(
+            $new_coordinator_id,
+            'Pergantian Wali Dibatalkan',
+            "Pengajuan pergantian Wali telah dibatalkan oleh Wali SASPRI-K kawasan {$district_name}.",
+            [
+                'sender_id' => Yii::$app->user->id,
+                'web_link' => 'site/index',
+                'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                'channels' => ['db', 'fcm'],
+            ]
+        );
         return $saspri_k;
     }
 
@@ -318,6 +369,7 @@ class SaspriKService
     public static function coordinatorChangeResponse(int $saspri_k_id, RequestResponseForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isCoordinatorChangePending();
+        $district_name = $saspri_k->district->name ?? 'Kawasan';        
 
         if ($data->action === RequestResponse::APPROVE) {
             $old_coordinator = UserService::detail($saspri_k->coordinator_id);
@@ -327,11 +379,49 @@ class SaspriKService
             $new_coordinator->promoteToCoordinator();
 
             $saspri_k->approveCoordinatorChange();
+
+            NotificationService::send(
+                $old_coordinator->id,
+                'Pergantian Wali Disetujui',
+                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " . 
+                "Anda sudah bukan lagi Wali SASPRI-K kawasan {$district_name}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'site/index',
+                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
+
+            NotificationService::send(
+                $new_coordinator->id,
+                'Pergantian Wali Disetujui',
+                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " . 
+                "Anda telah diangkat menjadi Wali SASPRI-K kawasan {$district_name}.",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'saspri-k/index',
+                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
         } elseif ($data->action === RequestResponse::REJECT) {
             if (!$data->rejection_reason) {
                 throw new BadRequestHttpException('Wajib menyertakan alasan penolakan');
             }
+
             $saspri_k->rejectCoordinatorChange($data->rejection_reason);
+            NotificationService::send(
+                $saspri_k->coordinator_id,
+                'Pergantian Wali Ditolak',
+                "Pengajuan pergantian Wali SASPRI-K kawasan {$district_name} ditolak oleh SASPRI-N. ",
+                [
+                    'sender_id' => Yii::$app->user->id,
+                    'web_link' => 'saspri-k/pergantian-wali',
+                    'api_link' => 'saspri-k/detail-change-coordinator',
+                    'channels' => ['db', 'fcm'],
+                ]
+            );
         } else {
             throw new BadRequestHttpException('Wajib memilih antara setuju atau tolak');
         }

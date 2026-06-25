@@ -48,13 +48,14 @@ class SelfTeamMemberService
         $saspri_k = $certification->saspriK;
         $district_name = $saspri_k->district->name ?? 'Kawasan';
         $coordinator_id = $saspri_k->coordinator_id;
+        $formatted_due_date = date('d-m-Y H:i', strtotime($certification->self_team_due_date));
 
         if ($data->action === RequestResponse::APPROVE) {
             $member->approveRequest();
             NotificationService::send(
                 $coordinator_id,
                 'Penerimaan Undangan Tim Mandiri',
-                "{$member_username} telah menyetujui undangan untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+                "{$member_username} telah menyetujui undangan untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}. Batas akhir pembentukan tim adalah {$formatted_due_date}.",
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/pengajuan-sertifikasi',
@@ -67,7 +68,7 @@ class SelfTeamMemberService
             NotificationService::send(
                 $coordinator_id,
                 'Penolakan Undangan Tim Mandiri',
-                "{$member_username} telah menolak undangan untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}.",
+                "{$member_username} telah menolak undangan untuk bergabung ke dalam Tim Mandiri di SASPRI-K kawasan {$district_name}. Batas akhir pembentukan tim adalah {$formatted_due_date}.",
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/pengajuan-sertifikasi',

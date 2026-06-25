@@ -100,7 +100,7 @@ if ($saspri_k->new_coordinator_id) {
 
     <div>
       <?= Html::a(
-        'Batalkan Sertifikasi',
+        'Batalkan Pergantian Wali',
         ['batalkan-pergantian-wali'],
         [
           'class' => 'btn btn-danger me-2 w-100 mb-3',
