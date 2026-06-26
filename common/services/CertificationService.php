@@ -8,6 +8,7 @@ use common\enums\TeamRole;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
+use common\models\form\CertificationListForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
@@ -18,12 +19,70 @@ use common\models\SelfTeamMember;
 use common\models\User;
 use common\services\NotificationService;
 use Yii;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 class CertificationService
 {
+    public static function list(CertificationListForm $data)
+    {
+        $query = Certification::find()
+            ->distinct()
+            ->joinWith([
+                'saspriK.district.regency.province'
+            ]);
+
+        if ($data->province_id) {
+            $query->andWhere(['province.id' => $data->province_id]);
+        }
+
+        if ($data->regency_id) {
+            $query->andWhere(['regency.id' => $data->regency_id]);
+        }
+
+        if ($data->district_id) {
+            $query->andWhere(['district.id' => $data->district_id]);
+        }
+
+        if ($data->status !== $data::ALL) {
+            $query->andWhere(
+                $data->status === $data::ONGOING ? [
+                    'not in',
+                    'status',
+                    [
+                        CertificationStatus::PENDING_SELF_TEAM_FORMATION,
+                        CertificationStatus::COMPLETED,
+                    ]
+                ] : [
+                    'status' => CertificationStatus::COMPLETED,
+                ]
+            );
+        }
+
+        if ($data->level !== $data::ALL) {
+            $query->andWhere(['level' => $data->level]);
+        }
+
+        $certs = (clone $query)
+            ->orderBy([
+                'updated_at' => SORT_DESC
+            ])
+            ->limit($data->limit + 1)
+            ->offset($data->offset)
+            ->all();
+        $has_next = count($certs) > $data->limit;
+        if ($has_next) array_pop($certs);
+
+        return [
+            'certifications' => $certs,
+            'prev_link' => $data->offset > 0 ? Url::current(['offset' => max(0, $data->offset - $data->limit)]) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $data->offset + $data->limit]) : null,
+            'offset' => $data->offset,
+        ];
+    }
+
     public static function findOrFail(int $id) {
         $certification = Certification::findOne($id);
         if (!$certification) {

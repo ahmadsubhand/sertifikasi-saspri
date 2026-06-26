@@ -7,6 +7,7 @@ use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
+use common\models\form\CertificationListForm;
 use common\models\form\ChangeMemberRoleForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\PeerReviewForm;
@@ -72,6 +73,7 @@ class CertificationController extends ActiveController
         $behaviors['authenticator'] = [
             'class' => HttpBearerAuth::class,
             'only' => [
+                'index',
                 'full-self-team-members',
                 'add-self-team-members',
                 'remove-self-team-member',
@@ -101,6 +103,7 @@ class CertificationController extends ActiveController
         $behaviors['access'] = [
             'class' => AccessControl::class,
             'only' => [
+                'index',
                 'full-self-team-members',
                 'add-self-team-members',
                 'remove-self-team-member',
@@ -142,6 +145,7 @@ class CertificationController extends ActiveController
                     'allow' => true,
                     'roles' => [UserRole::ADMIN],
                     'actions' => [
+                        'index',
                         'full-peer-team-members',
                         'add-peer-team-members',
                         'remove-peer-team-member',
@@ -179,6 +183,13 @@ class CertificationController extends ActiveController
         ];
 
         return $behaviors;
+    }
+
+    public function actionIndex()
+    {
+        $data = new CertificationListForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->get());
+        return CertificationService::list($data);
     }
 
     public function actionDetail(int $certification_id)
