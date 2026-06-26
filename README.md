@@ -200,7 +200,7 @@ return [
                 'scheme' => 'smtps',
                 'host' => 'smtp.gmail.com',
                 'username' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
-                'password' => '{{ 16 HURUF APP PASSWORD }}',
+                'password' => '{{ 16 HURUF APP PASSWORD GMAIL TANPA SPASI }}',
                 'port' => 465,
             ],
         ],
@@ -327,7 +327,22 @@ Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queu
 
 ---
 
-## 1. Setup Volume Mount
+## 1. Clone Repository
+
+```bash
+cd /srv/podman/apps/php
+
+mkdir -p sertifikasi-saspri
+cd sertifikasi-saspri
+
+git init
+git remote add origin https://gitlab.com/ahmadsubhand/sertifikasi-saspri.git
+git pull origin main
+```
+
+---
+
+## 2. Setup Volume Mount
 
 Edit file:
 
@@ -336,7 +351,7 @@ cd /srv/podman
 sudo nano podman-compose.yml
 ```
 
-Tambahkan volume berikut pada service `nginx` dan `php83_fpm`:
+Tambahkan volume berikut pada service `nginx` dan `php85_fpm`:
 
 ```yaml
 - ./apps/php/sertifikasi-saspri:/var/www/html/sertifikasi-saspri
@@ -352,7 +367,7 @@ Pemetaan direktori:
 
 ---
 
-## 2. Restart Container
+## 3. Restart Container
 
 ```bash
 cd /srv/podman
@@ -361,70 +376,18 @@ sudo podman-compose up -d
 
 ---
 
-## 3. Setup Database
-
-### Cek Password Root MySQL
+## 4. Install Dependency
 
 ```bash
-cat /srv/podman/.env
-```
-
-Cari nilai:
-
-```env
-MYSQL_ROOT_PASSWORD=...
-```
-
-### Masuk ke MySQL
-
-```bash
-sudo podman exec -it mysql mysql -u root -p
-```
-
-### Buat Database
-
-```sql
-CREATE DATABASE sertifikasi_saspri
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && composer install"
 ```
 
 ---
 
-## 4. Clone Repository
+## 5. Inisialisasi Proyek Yii2
 
 ```bash
-cd /srv/podman/apps/php
-
-mkdir -p sertifikasi-saspri
-cd sertifikasi-saspri
-
-git init
-git remote add origin https://gitlab.com/ahmadsubhand/sertifikasi-saspri.git
-git pull origin main
-```
-
----
-
-## 5. Install Dependency
-
-Jalankan Composer menggunakan container sementara:
-
-```bash
-sudo podman run --rm \
-  -v $(pwd):/app \
-  -w /app \
-  docker.io/library/composer \
-  install --ignore-platform-reqs
-```
-
----
-
-## 6. Inisialisasi Yii2
-
-```bash
-sudo podman exec -it php83_fpm \
-bash -c "cd /var/www/html/sertifikasi-saspri && php init"
+sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php init"
 ```
 
 Pilih:
@@ -443,7 +406,41 @@ yes -> Konfirmasi
 
 ---
 
-## 7. Konfigurasi Database
+## 6. Konfigurasi main-local.php (Database & SMTP)
+
+### Buat Database
+
+Cek Password Root MySQL:
+
+```bash
+cat /srv/podman/.env
+```
+
+Cari nilai:
+
+```env
+MYSQL_ROOT_PASSWORD=...
+```
+
+Masuk ke MySQL:
+
+```bash
+sudo podman exec -it mysql mysql -u root -p
+```
+
+Buat Database:
+
+```sql
+CREATE DATABASE sertifikasi_saspri
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+```
+
+### Setup Gmail
+
+Jika menggunakan Gmail, ikuti panduan [Setup Gmail](#setup-gmail) seperti pada tahap lokal menggunakan Laragon.
+
+### Sesuaikan konfigurasi
 
 Edit file:
 
@@ -454,36 +451,158 @@ common/config/main-local.php
 Sesuaikan konfigurasi:
 
 ```php
-'db' => [
-    'class' => \yii\db\Connection::class,
-    'dsn' => 'mysql:host=mysql;dbname=sertifikasi_saspri',
-    'username' => 'root',
-    'password' => 'MYSQL_ROOT_PASSWORD',
-    'charset' => 'utf8mb4',
-],
+return [
+    'components' => [
+        'db' => [
+            'class' => \yii\db\Connection::class,
+            'dsn' => 'mysql:host=mysql;dbname=sertifikasi_saspri',
+            'username' => 'root',
+            'password' => 'MYSQL_ROOT_PASSWORD',
+            'charset' => 'utf8mb4',
+        ],
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,
+            'viewPath' => '@common/mail',
+            'useFileTransport' => false,
+            'transport' => [
+                'scheme' => 'smtps',
+                'host' => 'smtp.gmail.com',
+                'username' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
+                'password' => '{{ 16 HURUF APP PASSWORD GMAIL TANPA SPASI GMAIL TANPA SPASI }}',
+                'port' => 465,
+            ],
+        ],
+    ],
+];
 ```
 
 Gunakan nilai `MYSQL_ROOT_PASSWORD` yang diperoleh pada tahap sebelumnya.
 
 ---
 
-## 8. Migrasi dan Seeder
+## 7. Konfigurasi params-local.php (Global Params & Firebase)
+
+Edit file:
+
+```text
+common/config/params-local.php
+```
+
+Sesuaikan konfigurasi:
+
+```php
+return [
+    'frontendUrl' => 'https://sertifikasi.digdaya.net',
+    'firebase' => [
+        'apiKey' => '',
+        'authDomain' => '',
+        'projectId' => '',
+        'storageBucket' => '',
+        'messagingSenderId' => '',
+        'appId' => '',
+        'vapidKey' => '',
+    ],
+    'supportEmail' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
+    'senderEmail' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
+];
+```
+
+Seluruh nilai pada konfigurasi firebase dapat diperoleh dari Firebase Console pada proyek yang digunakan.
+
+---
+
+## 8. Setup Service Account Firebase
+
+Simpan file kredensial Firebase Service Account pada:
+
+```text
+common/config/firebase-credentials.json
+```
+
+## 9. Konfigurasi URL Manager Console
+
+Buka file:
+
+```text
+console/config/main-local.php
+```
+
+Tambahkan konfigurasi berikut:
+```php
+return [
+    'components' => [
+        'urlManager' => [
+            'hostInfo' => 'https://sertifikasi.digdaya.net',
+        ],
+    ],
+];
+```
+
+---
+
+## 10. Migrasi dan Seeder
 
 ```bash
-sudo podman exec -it php83_fpm \
-bash -c "cd /var/www/html/sertifikasi-saspri && php yii migrate"
+sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php yii migrate"
 ```
 
 ```bash
-sudo podman exec -it php83_fpm \
-bash -c "cd /var/www/html/sertifikasi-saspri && php yii db/seed"
+sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php yii db/seed"
 ```
 
 > Seeder hanya diperlukan pada lingkungan pengembangan atau saat membutuhkan data awal.
 
 ---
 
-## 9. Setup Nginx
+## 11. Menjalankan Queue Worker
+
+Perintah `php yii queue/listen` perlu dijalankan dalam service podman supaya dapat berjalan secara asinkronus, permanen, dan aman.
+
+Edit file:
+
+```bash
+cd /srv/podman
+sudo nano podman-compose.yml
+```
+
+Tambahkan service berikut sejajar dengan service php85_fpm:
+
+```yaml
+  # -----------------------------------
+  #  Sertifikasi SASPRI Queue Container
+  # -----------------------------------
+  sertifikasi_queue_worker:
+    # Gunakan build context/image yang sama persis dengan service PHP web
+    build:
+      context: ./infra/php/php85 # Sesuaikan dengan versi PHP yang digunakan
+      dockerfile: Dockerfile
+    container_name: ${CONTAINER_PREFIX}sertifikasi_queue_worker
+    hostname: ${CONTAINER_PREFIX}queue_worker
+    restart: unless-stopped
+    # Arahkan working directory LANGSUNG ke folder aplikasi Yii
+    working_dir: /var/www/html/sertifikasi-saspri
+    # Timpa CMD bawaan FPM dengan perintah listener Yii
+    command: ["php", "yii", "queue/listen", "--verbose=1"]
+    volumes:
+      # Mount yang sama dengan service PHP web
+      - ./apps/php/sertifikasi-saspri:/var/www/html/sertifikasi-saspri
+      - ./infra/php/php85/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    environment:
+      TZ: Asia/Jakarta
+    depends_on:
+      - mariadb
+      - mysql
+      - mongodb
+      - postgresql
+      - redis
+    networks:
+      digdaya:
+        ipv4_address: 10.99.0.121 # Pastikan IP ini belum terpakai
+```
+
+---
+
+## 12. Setup Nginx
 
 Masuk ke direktori konfigurasi:
 
@@ -588,7 +707,7 @@ server {
         fastcgi_param HTTPS on;
         fastcgi_param REQUEST_SCHEME https;
 
-        fastcgi_pass php83_fpm_nginx;
+        fastcgi_pass php85_fpm_nginx;
     }
 
     location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2)$ {
@@ -604,7 +723,7 @@ server {
 
 ---
 
-## 10. Aktifkan Site
+### Aktifkan Site
 
 Masuk ke direktori
 
@@ -620,7 +739,7 @@ sudo ln -s ../sites-available/site-sertifikasi.conf site-sertifikasi.conf
 
 ---
 
-## 11. Reload Nginx
+### Reload Nginx
 
 ```bash
 sudo podman exec -it nginx_reverse_proxy nginx -s reload
@@ -628,20 +747,21 @@ sudo podman exec -it nginx_reverse_proxy nginx -s reload
 
 ---
 
-## 12. Generate SSL Certificate
+
+
+## 13. Setup SSL Certificate
 
 Pastikan domain telah mengarah ke server.
 
+### Generate SSL Certificate
+
 ```bash
-sudo certbot certonly \
---webroot \
--w /srv/podman/apps/php/sertifikasi-saspri/frontend/web \
--d sertifikasi.digdaya.net
+sudo certbot certonly --webroot -w /srv/podman/apps/php/sertifikasi-saspri/frontend/web -d sertifikasi.digdaya.net
 ```
 
----
+> Jika sertifikat sertifikasi.digdaya.net sudah ada, tahap ini tidak perlu dilakukan
 
-## 13. Pasang SSL Certificate
+### Pasang SSL Certificate
 
 Edit kembali konfigurasi:
 
@@ -665,7 +785,7 @@ ssl_certificate_key  /etc/letsencrypt/live/sertifikasi.digdaya.net/privkey.pem;
 
 ---
 
-## 14. Validasi dan Reload Nginx
+### Validasi dan Reload Nginx
 
 Validasi konfigurasi:
 
@@ -712,7 +832,7 @@ Lihat pemetaan folder VPS ke container:
 ```bash
 sudo podman inspect \
 -f '{{range .Mounts}}Dari VPS: {{.Source}} ---> Ke Container: {{.Destination}}{{"\n"}}{{end}}' \
-php83_fpm
+php85_fpm
 ```
 
 Contoh output:
@@ -731,7 +851,7 @@ Jika folder `sertifikasi-saspri` belum muncul, kemungkinan volume mount belum te
 Periksa direktori kerja container:
 
 ```bash
-sudo podman exec -it php83_fpm pwd
+sudo podman exec -it php85_fpm pwd
 ```
 
 Contoh output:
@@ -743,7 +863,7 @@ Contoh output:
 Lihat isi direktori:
 
 ```bash
-sudo podman exec -it php83_fpm ls -l /var/www/html
+sudo podman exec -it php85_fpm ls -l /var/www/html
 ```
 
 Contoh output:
@@ -843,3 +963,4 @@ pastikan:
 ## SSL
 
 * Pastikan domain sudah mengarah ke server sebelum melakukan generate SSL menggunakan Certbot.
+* Jangan menjalankan proses pembuatan sertifikat baru berulang-ulang karena Let's Encrypt memiliki rate limit.
