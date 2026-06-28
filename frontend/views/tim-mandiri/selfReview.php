@@ -71,8 +71,8 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
             <tr class="text-center">
               <th scope="col" style="width: 50px;">No</th>
               <th scope="col" class="text-start">Kriteria</th>
-              <th scope="col" style="min-width: 250px;">Penilaian</th>
-              <th scope="col" style="min-width: 100px;">Bukti</th>
+              <th scope="col" style="min-width: 200px;">Penilaian</th>
+              <th scope="col" style="min-width: 150px;">Bukti</th>
             </tr>
           </thead>
           <tbody>

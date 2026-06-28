@@ -129,9 +129,10 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     </div>
 
     <!-- Penilaian Sertifikat -->
+
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100 mt-3">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-            <h5 class="fw-bold mb-0">Penilaian Sertifikat: <?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h5>
+            <h5 class="fw-bold mb-1">Penilaian Sertifikat SASPRI-K</h5>
             <div class="d-flex align-items-center gap-2 flex-column flex-md-row">
                 <span class="badge bg-primary">Level <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGantiLevel">
@@ -139,6 +140,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                 </button>
             </div>
         </div>
+        <h5 class="fw-bold mb-2"><?= Html::encode($current_root_group->code) ?>. <?= Html::encode($current_root_group->label) ?> (<?= Html::encode($current_root_group->weight) ?>%)</h5>
 
         <?php
         $saveAction = Url::to(['simpan-sementara-permintaan-pendaftaran', 'saspri_k_id' => $saspri_k->id, 'page' => $page]);
@@ -149,7 +151,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
             <form id="pendaftaran-wali-form" action="<?= $saveAction ?>" method="post">
                 <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
                 <input type="hidden" name="action" id="form-action-input" value="approve">
-    
+
                 <table class="table align-middle">
                     <thead>
                         <tr class="text-center">
@@ -166,7 +168,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                                     <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
                                 </td>
                             </tr>
-    
+
                             <?php if (isset($subGroup->indicators)): ?>
                                 <?php foreach ($subGroup->indicators as $index => $indicator): ?>
                                     <?php
@@ -183,12 +185,12 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                                                 data-subgroup-id="<?= $subGroup->id ?>"
                                                 data-indicator-id="<?= $indicator->id ?>">
                                                 <option value="0">Pilih Penilaian</option>
-    
+
                                                 <?php foreach ($indicator->indicatorOptions as $option): ?>
                                                     <?php
                                                     $selected = ($finalScore == $option->weight) ? 'selected' : '';
                                                     ?>
-    
+
                                                     <option value="<?= $option->weight ?>" <?= $selected ?>>
                                                         <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
                                                     </option>
@@ -198,14 +200,14 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                                     </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
-    
+
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="1" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
                                 <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
                             </tr>
                         <?php endforeach; ?>
-    
+
                         <tr class="table-secondary">
                             <th scope="row"></th>
                             <th class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>
@@ -260,7 +262,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                 <div class="text-muted small italic width-acc">Selesaikan penilaian pada seluruh kategori indikator untuk mengaktifkan tombol Setuju.</div>
             <?php endif; ?>
 
-            
+
         </div>
     </div>
 </div>

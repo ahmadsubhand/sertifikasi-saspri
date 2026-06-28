@@ -73,6 +73,7 @@ $this->title = 'Kegiatan Tim Sebaya';
                       'yes' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
                       'no' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
                       'look' => ['/kegiatan-tim-sebaya/detail', 'case_id' => $member->certification->id],
+                      'accepted' => $member->status == ApprovalStatus::APPROVED ? true : false,
                     ]); ?>
                   </td>
                 </tr>

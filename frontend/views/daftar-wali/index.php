@@ -34,7 +34,7 @@ if ($saspri_k && $saspri_k->district_id) {
 
 $model = $saspri_k ?: new \common\models\SaspriK();
 
-$this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
+$this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
 
 ?>
 
@@ -50,10 +50,32 @@ $this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
     <?php endif; ?>
 
     <?php if ($is_rejected): ?>
-        <div class="alert alert-danger">
+        <!-- <div class="alert alert-danger">
             <strong>Pendaftaran Anda ditolak.</strong><br>
             Alasan: <?= Html::encode($saspri_k->request_rejection_reason) ?><br>
             Silakan perbaiki data di bawah ini dan ajukan ulang.
+        </div> -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden w-100 mx-auto my-2">
+            <div class="bg-danger" style="height: 5px;"></div>
+
+            <div class="card-body p-2 p-md-4">
+                <div class="d-flex align-items-center gap-3 justify-content-center mb-4">
+                    <div class=" text-danger rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-circle-xmark fs-4"></i>
+                    </div>
+                    <h2 class="h4 fw-bold text-danger mb-0">Pendaftaran Ditolak</h2>
+                </div>
+
+                <hr class="text-dark opacity-10 my-4">
+                <span class="text-muted small text-uppercase tracking-wider fw-bold d-block mb-2">
+                    Alasan Penolakan:
+                </span>
+                <p class="text-dark fs-6 mb-0 lh-base fw-medium">
+                    <?= Html::encode($saspri_k->request_rejection_reason) ?>
+                    <br>
+                    Silakan perbaiki data di bawah ini dan ajukan ulang.
+                </p>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -112,7 +134,7 @@ $this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
             <div class="d-flex justify-content-between mt-4">
                 <p class="fw-bold">Dokumen Pendukung</p>
                 <div>
-                    <button type="button" id="add-row" class="btn btn-sm text-white" <?= $is_pending ?? 'disabled' ?> style="background-color: #6B78B9;">
+                    <button type="button" id="add-row" class="btn btn-sm text-white s-btn-main" <?= $is_pending ?? 'disabled' ?>>
                         <i class="fa-solid fa-plus"></i> Tambah
                     </button>
                 </div>
@@ -144,11 +166,11 @@ $this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
                             </div>
                             <div class="col-sm-5 col-12">
                                 <label class="form-label">Ganti Dokumen</label>
-                                <input class="form-control border-black" type="file" <?= $is_pending ?? 'disabled' ?>  name="saspri_k_documents[]" required>
+                                <input class="form-control border-black" type="file" <?= $is_pending ?? 'disabled' ?> name="saspri_k_documents[]" required>
 
                             </div>
                             <div class="col-sm-1 d-flex align-items-end col-12">
-                                <button type="button" class="rem-row btn btn-danger w-100"<?= $is_pending ?? 'disabled' ?>>
+                                <button type="button" class="rem-row btn btn-danger w-100" <?= $is_pending ?? 'disabled' ?>>
                                     <i class="fa-solid fa-trash"></i>
                                     <span class="d-inline d-md-none ms-2">Hapus Dokumen</span>
                                 </button>
@@ -178,6 +200,7 @@ $this->title =(string) 'Daftar Sebagai Wali SASPRI-K';
 
     <?php ActiveForm::end() ?>
     <div class="w-100">
+        <hr class="text-dark opacity-10 my-4">
         <?= Html::a('Batalkan Pendaftaran', ['batalkan-pendaftaran-saspri-k'], [
             'class' => 'btn w-100 py-2 fw-bold btn-danger',
             'data' => [

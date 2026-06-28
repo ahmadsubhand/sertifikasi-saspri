@@ -18,7 +18,17 @@ use yii\helpers\ArrayHelper;
  */
 
 $user_ids = ArrayHelper::getColumn($peer_team, 'user_id');
-$this->title = (string)'Detail Sertifikasi SASPRI-K '. $saspri->region_name;
+$this->title = (string)'Detail Sertifikasi SASPRI-K ' . $saspri->region_name;
+
+$user_id = Yii::$app->user->id;
+$has_approved = false;
+
+foreach ($peer_team as $member) {
+  if ($member->user_id == $user_id && $member->status === 'approved') {
+    $has_approved = true;
+    break;
+  }
+}
 
 $label = [
   'SASPRI-K',
@@ -117,18 +127,20 @@ $shingles = [
                               ? 'Sebelum tanggal ' . date('d-m-Y', strtotime($cert['peer_team_due_date']))
                               : '-' ?></p>
           </div>
-          <div class="px-md-3 px-1">
-
+          <div class="px-md-3 px-1 text-center">
+            <?php if ($has_approved) : ?>
+              <small class="text-center mx-auto mb-0">anda sudah merespon</small>
+            <?php endif ?>
             <?php if ($cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-green me-2 w-100 mt-3',
+                'class' => 'btn s-btn-green me-2 w-100 mt-3 ' . ($has_approved == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
                   'action' => RequestResponse::APPROVE,
                 ],
               ]) ?>
               <?= Html::a('Tolak', ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-red me-2 w-100 mt-3',
+                'class' => 'btn s-btn-red me-2 w-100 mt-3 ' . ($has_approved == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
                   'action' => RequestResponse::REJECT,

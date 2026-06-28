@@ -24,7 +24,7 @@ $percentages = [
   CertificationStatus::COMPLETED => '100%',
 ];
 
-$this->title =(string) 'Pengajuan Sertifikasi';
+$this->title = (string) 'Pengajuan Sertifikasi';
 ?>
 
 
@@ -195,7 +195,7 @@ $this->title =(string) 'Pengajuan Sertifikasi';
           'class' => 'btn btn-danger me-2 w-100 mb-3',
           'disabled' => $certification->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION,
           'data' => [
-            'method' => 'post',
+            'method' => 'delete',
             'confirm' => 'Apakah Anda yakin ingin membatalkan sertifikasi?',
           ],
         ]

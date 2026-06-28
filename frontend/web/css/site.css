@@ -55,6 +55,9 @@ table thead tr:first-child th:last-child {
 .content-wrap {
   flex: 1;
 }
+.s-text-main{
+  color: #0f172a;
+}
 .s-bg-main {
   background-color: #0f172a !important;
 }
