@@ -16,9 +16,11 @@ use common\models\Certification;
 use common\models\form\ChangeLevelForm;
 use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\SaspriKListForm;
 use common\models\form\UpdateSaspriKForm;
 use Exception;
 use Yii;
+use yii\helpers\Url;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -27,6 +29,46 @@ use yii\web\UploadedFile;
 
 class SaspriKService
 {
+    public static function list(SaspriKListForm $data)
+    {
+        $query = SaspriK::find()
+            ->distinct()
+            ->joinWith([
+                'coordinator',
+                'certifications',
+                'district.regency.province',
+            ]);
+
+        if ($data->province_id) {
+            $query->andWhere(['province.id' => $data->province_id]);
+        }
+
+        if ($data->regency_id) {
+            $query->andWhere(['regency.id' => $data->regency_id]);
+        }
+
+        if ($data->district_id) {
+            $query->andWhere(['district.id' => $data->district_id]);
+        }
+
+        $saspris = (clone $query)
+            ->orderBy([
+                'updated_at' => SORT_DESC
+            ])
+            ->limit($data->limit + 1)
+            ->offset($data->offset)
+            ->all();
+        $has_next = count($saspris) > $data->limit;
+        if ($has_next) array_pop($saspris);
+
+        return [
+            'saspri_k' => $saspris,
+            'prev_link' => $data->offset > 0 ? Url::current(['offset' => max(0, $data->offset - $data->limit)]) : null,
+            'next_link' => $has_next ? Url::current(['offset' => $data->offset + $data->limit]) : null,
+            'offset' => $data->offset,
+        ];
+    }
+
     public static function findOrFail(int $id) {
         $saspri_k = SaspriK::findOne($id);
         if (!$saspri_k) {

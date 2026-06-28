@@ -13,6 +13,7 @@ use common\models\form\CoordinatorChangeForm;
 use common\models\form\ExternalReviewForm;
 use common\models\form\RegisterSaspriKForm;
 use common\models\form\RequestResponseForm;
+use common\models\form\SaspriKListForm;
 use common\models\form\UpdateSaspriKForm;
 use common\models\SaspriK;
 use common\models\User;
@@ -42,6 +43,7 @@ class SaspriKController extends ActiveController
         $behaviors['verbs'] = [
             'class' => VerbFilter::class,
             'actions' => [
+                'index' => ['GET'],
                 'detail' => ['GET'],
                 'members' => ['GET'],
                 'valid-certificate' => ['GET'],
@@ -153,6 +155,13 @@ class SaspriKController extends ActiveController
         ];
 
         return $behaviors;
+    }
+
+    public function actionIndex()
+    {
+        $data = new SaspriKListForm();
+        ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->get());
+        return SaspriKService::list($data);
     }
 
     public function actionDetail(int $saspri_k_id)

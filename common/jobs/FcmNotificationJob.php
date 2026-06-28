@@ -37,7 +37,7 @@ class FcmNotificationJob extends BaseObject implements JobInterface
             $messaging = $factory->createMessaging();
 
             $frontendUrl = Yii::$app->params['frontendUrl'];
-            $logoUrl = $frontendUrl . '/images/matasapi.svg';
+            $logoUrl = $frontendUrl . '/images/matasapi.png';
 
             // Siapkan pesan. 'Notification' untuk UI popup, 'Data' untuk data proses di background (silent)
             $message = CloudMessage::new()
