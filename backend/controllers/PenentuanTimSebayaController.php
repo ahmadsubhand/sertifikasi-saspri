@@ -91,7 +91,7 @@ class PenentuanTimSebayaController extends Controller
                         'user' => function (ActiveQuery $query) {
                             $query->alias('u')
                                 ->with('saspriK')
-                                ->select(['u.id', 'u.username', 'u.saspri_k_id']);
+                                ->select(['u.id', 'u.username', 'u.saspri_k_id', 'u.full_name']);
                         }
                     ])
                     ->all(),

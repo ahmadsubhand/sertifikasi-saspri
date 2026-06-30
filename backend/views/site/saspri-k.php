@@ -195,7 +195,7 @@ $this->title =(string) 'Detail SASPRI-K'. $saspri_k->region_name;
               <?php foreach ($saspri_k_members as $key => $member) : ?>
                 <tr class="member-container" data-page-index="<?= $key ?>">
                   <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
-                  <td><?= Html::encode($member->username) ?></td>
+                  <td><?= Html::encode($member->full_name) ?></td>
                   <td><?= Html::encode($member->phone_number) ?></td>
                 </tr>
               <?php endforeach ?>

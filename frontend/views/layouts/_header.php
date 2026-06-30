@@ -363,11 +363,13 @@ $(document).ready(function() {
     }
 
     // current solution for notif
-    const fetchUnreadInterval = setInterval(() => {
-        fetchNotifications();
-        fetchUnreadCount();
-        // console.log('loop')
-    }, 30000);
+    if (window.isUserLoggedIn) {
+        const fetchUnreadInterval = setInterval(() => {
+            fetchNotifications();
+            fetchUnreadCount();
+            // console.log('loop')
+        }, 30000);
+    }
 });
 JS;
 $this->registerJs($js);

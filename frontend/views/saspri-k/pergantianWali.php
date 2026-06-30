@@ -140,7 +140,7 @@ if ($saspri_k->new_coordinator_id) {
                             data.forEach(user => {
                                 const item = document.createElement('div');
                                 item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
-                                item.textContent = user.username;
+                                item.textContent = `${user.username} - ${user.full_name}`;
                                 item.onclick = () => selectUser(user);
                                 dropdown.appendChild(item);
                             });
@@ -156,7 +156,7 @@ if ($saspri_k->new_coordinator_id) {
             container.innerHTML = `
             Calon koordinator:
             <div class="d-flex bg-white shadow border-1 border align-items-center justify-content-between p-2 btn rounded-4" style="width: fit-content;">
-                <span>Calon koordinator: ${user.username}</span>
+                <span>Calon koordinator: ${user.full_name}</span>
                 <span class="remove-btn ms-2" onclick="window.removeSelectedUser()">&times;</span>
                 <input type="hidden" name="new_coordinator_id" value="${user.id}">
             </div>

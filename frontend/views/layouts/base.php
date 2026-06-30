@@ -30,6 +30,9 @@ AppAsset::register($this);
     <?php echo $content ?>
 </div>
 
+<script>
+    window.isUserLoggedIn = <?= Yii::$app->user->isGuest ? 'false' : 'true' ?>;
+</script>
 <?php $this->endBody() ?>
 </body>
 </html>

@@ -143,7 +143,11 @@ class SaspriKController extends Controller
             $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $users = $saspri_k->getUsers()
                 ->where(['!=', 'id', $saspri_k->coordinator_id])
-                ->andWhere(['like', 'username', $q])
+                ->andWhere([
+                    'or',
+                    ['like', 'username', $q],
+                    ['like', 'full_name', $q]
+                ])
                 ->select(['id', 'username'])
                 ->limit(10)
                 ->asArray()
@@ -163,8 +167,14 @@ class SaspriKController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $users = User::find()->availableForSaspriK()
-            ->andWhere(['like', 'username', $q])
-            ->select([User::tableName() . '.id', 'username'])
+            ->andWhere(
+                [
+                    'or',
+                    ['like', 'username', $q],
+                    ['like', 'full_name', $q]
+                ]
+            )
+            ->select([User::tableName() . '.id', 'username', 'full_name'])
             ->limit(10)
             ->asArray()
             ->all();
@@ -232,7 +242,7 @@ class SaspriKController extends Controller
                     ->getFullSelfTeamMembers()
                     ->with([
                         'user' => function (ActiveQuery $query) {
-                            $query->select(['id', 'username']);
+                            $query->select(['id', 'username', 'full_name']);
                         }
                     ])
                     ->all(),
@@ -258,8 +268,15 @@ class SaspriKController extends Controller
             $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $certification = $saspri_k->onGoingCertification;
             $users = User::find()->availableForSelfTeam($saspri_k, $certification)
-                ->andWhere(['like', 'username', $q])
+                ->andWhere(
+                    [
+                        'or',
+                        ['like', 'username', $q],
+                        ['like', 'full_name', $q]
+                    ]
+                )
                 ->limit(10)
+                ->select([User::tableName() . '.id', 'username', 'full_name'])
                 ->asArray()
                 ->all();
 
@@ -308,7 +325,8 @@ class SaspriKController extends Controller
         try {
             $member = CertificationService::removeSelfTeamMember($user_id);
             Yii::$app->session->setFlash(
-                'success', $member['user']['username'] . ' berhasil dikeluarkan dari Tim Mandiri'
+                'success',
+                $member['user']['username'] . ' berhasil dikeluarkan dari Tim Mandiri'
             );
             return $this->redirect(['pengajuan-sertifikasi']);
         } catch (Exception $error) {
@@ -336,7 +354,7 @@ class SaspriKController extends Controller
             $member = CertificationService::changeSelfTeamMemberRole($user_id, $data);
 
             Yii::$app->session->setFlash(
-                'success', 
+                'success',
                 'Peran ' . $member['user']['username'] . ' berhasil diubah menjadi ' . strtolower(TeamRole::list()[$data->role])
             );
             return $this->redirect(['pengajuan-sertifikasi']);

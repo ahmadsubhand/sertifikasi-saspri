@@ -20,5 +20,6 @@ class UserHelper
         'user.id',
         'user.username',
         'user.phone_number',
+        'user.full_name'
     ];
 }

@@ -20,8 +20,8 @@ $this->title = 'Sertifikasi Berjalan';
 <div class="page-cont w-100 h-100 p-3 d-flex flex-column gap-3">
   <div class=" d-md-flex justify-content-between">
     <h1><?= Html::encode($this->title) ?></h1>
-    <div class="d-md-flex gap-4 align-self-end">
-      <div class="ms-auto ms-md-0 w-fit">
+    <div class="">
+      <div class="ms-auto ms-md-0 w-fit d-md-flex gap-4 align-self-end">
         <div>
           <label for="wilayah-search">Wilayah</label>
           <input class="form-control border-black" type="text" name="wilayah-search" id="wilayah-search" style="width: 12rem;" autocomplete="off">

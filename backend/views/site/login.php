@@ -9,31 +9,32 @@ use yii\bootstrap5\Html;
 
 $this->title = 'Login';
 ?>
-<div class="site-login">
-    <div class="mt-5 offset-lg-3 col-lg-6">
-        <!-- <div class="d-flex gap-2 align-items-center text-decoration-none text-white s-bg-main">
-            <?= Html::img('@web/images/matasapi.svg', [
-                'alt' => 'Matasapi Digdaya Logo',
-                'class' => 'bg-white rounded-3 p-1',
-                'style' => 'width: 45px; height: 45px; object-fit: contain;'
-            ]) ?>
-            <div class="d-flex flex-column lh-sm">
-                <h2 class="mb-0 fs-5 fw-bold text-uppercase tracking-wide">Sertifikasi</h2>
-                <small class="text-white-50 font-monospace" style="font-size: 10px; letter-spacing: 0.5px;">SASPRI-K</small>
+<div class="site-login d-flex justify-content-center align-items-center mx-auto min-vh-100">
+    <div class="border shadow-sm rounded-1 bg-white p-5 width-50-100">
+        <div class="d-flex gap-3 align-items-center text-white s-bg-main p-3 rounded-3 mb-4">
+            <div class="bg-white rounded-2 p-1 d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px;">
+                <?= Html::img('@web/images/matasapi.svg', [
+                    'alt' => 'Matasapi Digdaya Logo',
+                    'style' => 'max-width: 100%; max-height: 100%; object-fit: contain;'
+                ]) ?>
             </div>
-        </div> -->
-        <h1><?= Html::encode($this->title) ?></h1>
+            <div class="d-flex flex-column justify-content-center">
+                <h2 class="mb-0 fs-5 fw-bold text-uppercase tracking-wider" style="letter-spacing: 0.05em;">Sertifikasi</h2>
+                <small class="text-white-70 fw-semibold opacity-75" style="font-size: 11px; letter-spacing: 1px;">SASPRI-K</small>
+            </div>
+        </div>
+        <h1 class="fw-bold text-start text-dark h2 mb-2 font-monospace"><?= Html::encode($this->title) ?></h1>
 
-        <p>Please fill out the following fields to login:</p>
+        <p class="text-muted text-start">Silahkan isi form berikut untuk login:</p>
 
         <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-        <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+        <?= $form->field($model, 'username')->textInput(['autofocus' => true])->label('Username') ?>
 
-        <?= $form->field($model, 'password')->passwordInput() ?>
+        <?= $form->field($model, 'password')->passwordInput()->label('Password') ?>
 
-        <div class="form-group">
-            <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-block', 'name' => 'login-button']) ?>
+        <div class="form-group w-100">
+            <?= Html::submitButton('Login', ['class' => 'btn s-btn-main w-100', 'name' => 'login-button']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>

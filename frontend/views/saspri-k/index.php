@@ -211,7 +211,7 @@ $shingles = [
               Anggota</button>
           </form>
         </div>
-        <?php Pjax::begin() ?>
+        <?php Pjax::begin(['id' => 'saspri-member-pjax']) ?>
         <div id="sapri-member-card" class="mobile-scroll">
           <table class="table text-center">
             <thead>
@@ -225,8 +225,8 @@ $shingles = [
             <tbody>
               <?php foreach ($saspri_k_members as $key => $member) : ?>
                 <tr class="member-container" data-page-index="<?= $key ?>">
-                  <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></th>
-                  <td><?= Html::encode($member->username) ?></td>
+                  <td scope="row"><?php echo $user_offset + (int)$key + 1 ?></td>
+                  <td><?= Html::encode($member->full_name) ?></td>
                   <td><?= Html::encode($member->phone_number) ?></td>
                   <td>
                     <div class="d-flex gap-2">
@@ -236,12 +236,11 @@ $shingles = [
                           'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
                           'method' => 'delete',
                           ],
-                        'data-container'=>"#saspri-member-card"
                       ]) ?>
-                      <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
+                      <!-- <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
                         'class' => 's-btn-main btn btn-sm',
                         
-                      ]) ?>
+                      ]) ?> -->
                     </div>
                   </td>
                 </tr>
@@ -320,7 +319,7 @@ $shingles = [
 
                 const item = document.createElement('div');
                 item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
-                item.textContent = user.username;
+                item.textContent = `${user.username} - ${user.full_name}`;
                 item.onclick = () => selectUser(user);
                 dropdown.appendChild(item);
               });
@@ -353,7 +352,7 @@ $shingles = [
         chip.className = 'chip';
         chip.innerHTML = `
         <div class="d-flex bg-white shadow border-1 border m-2 align-items-center p-2 btn rounded-4" style="width: fit-content;">
-          <span>${user.username}</span>
+          <span>${user.username} - ${user.full_name}</span>
           <span class="remove-btn ms-1" onclick="window.removeUserFromList(${user.id})">&times;</span>
         </div>
       `;

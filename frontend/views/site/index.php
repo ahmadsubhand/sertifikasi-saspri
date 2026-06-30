@@ -106,7 +106,7 @@ $this->title = 'Informasi Sertifikasi SASPRI Kawasan';
                 <td scope="row"><?= $index + 1 ?></th>
                 <td><?= Html::encode(ucfirst($saspri->region_name)) ?></td>
                 <td><?= Html::encode(CertificateLevel::list()[$saspri->validCertificate->level] ?? '-') ?></td>
-                <td><?= Html::encode($saspri->coordinator->username) ?></td>
+                <td><?= Html::encode($saspri->coordinator->full_name) ?></td>
                 <td><?= Html::encode(ucfirst($saspri->address)) ?></td>
                 <td>
                   <a href="<?= Url::to(['saspri-k', 'saspri_id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main">

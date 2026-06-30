@@ -72,7 +72,7 @@ $this->title =(string) 'Kegiatan Tim Sebaya';
                       'yes' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
                       'no' => ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member->id],
                       'look' => ['/tim-sebaya/detail', 'case_id' => $member->certification->id],
-                      'accepted' => $member->status == ApprovalStatus::APPROVED ? true : false,
+                      'accepted' => $member->status != ApprovalStatus::PENDING ? true : false,
                     ]); ?>
                   </td>
                 </tr>

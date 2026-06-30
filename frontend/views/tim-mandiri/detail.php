@@ -11,21 +11,13 @@ use yii\helpers\Url;
 
 /** @var int $id
  * @var int $member_id
+ * @var bool $has_responded
  *  @var common\models\SaspriK $saspri
  *  @var common\models\Certification $cert
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
 
-$user_id = Yii::$app->user->id;
-$has_approved = false;
-
-foreach ($self_team as $member) {
-    if ($member->user_id == $user_id && $member->status === 'approved') {
-        $has_approved = true;
-        break; 
-    }
-}
 $label = [
   'SASPRI-K',
   'SASPRI-KK',
@@ -129,18 +121,18 @@ $this->title =(string) 'Detail Kegiatan Tim Mandiri';
           </div>
           <?php if ($cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
             <div class="px-md-3 px-1 text-center">
-              <?php if($has_approved) :?>
+              <?php if($has_responded) :?>
                 <small class="text-center mx-auto mb-0">anda sudah merespon</small>
               <?php endif ?>
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-green me-2 w-100 mt-3 '. ($has_approved == true ? 'disabled' : ''),
+                'class' => 'btn s-btn-green me-2 w-100 mt-3 '. ($has_responded == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
                     'action' => RequestResponse::APPROVE,
                 ],
               ]) ?>
               <?= Html::a('Tolak', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-red me-2 w-100 mt-3 '. ($has_approved == true ? 'disabled' : ''),
+                'class' => 'btn s-btn-red me-2 w-100 mt-3 '. ($has_responded == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
                     'action' => RequestResponse::REJECT,

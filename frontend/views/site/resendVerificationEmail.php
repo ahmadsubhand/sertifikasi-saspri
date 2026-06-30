@@ -8,7 +8,6 @@ use yii\bootstrap5\Html;
 use yii\bootstrap5\ActiveForm;
 
 $this->title = 'Resend verification email';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-resend-verification-email">
     <h1><?= Html::encode($this->title) ?></h1>

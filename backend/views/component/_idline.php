@@ -10,7 +10,7 @@ use common\models\User;
 
 switch (true) {
   case str_contains(strtolower($label), 'wali'):
-    $data = User::findOne(['id' => $data])->username;
+    $data = User::findOne(['id' => $data])->full_name;
     break;
 
   case str_contains($label, 'SASPRI-'):

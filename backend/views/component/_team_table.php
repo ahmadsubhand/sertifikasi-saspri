@@ -34,7 +34,7 @@ use yii\helpers\Url;
             <?php foreach ($model as $key => $value) : ?>
               <tr>
                 <td scope="row"><?php echo (int)$key + 1 ?></th>
-                <td><?= Html::encode($value->user->username) ?></td>
+                <td><?= Html::encode($value->user->full_name) ?></td>
                 <td><?= Html::encode(TeamRole::list()[$value->role]) ?></td>
                 <td><?= Html::encode($value->user->phone_number) ?></td>
               </tr>

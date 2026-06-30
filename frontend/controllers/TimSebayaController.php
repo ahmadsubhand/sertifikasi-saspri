@@ -247,6 +247,7 @@ class TimSebayaController extends Controller
             
             /** @var PeerTeamMember|null */
             $member = null;
+            $has_responded = false;
             if ($cert->status !== CertificationStatus::PENDING_PEER_TEAM_FORMATION) {
                 $member = CertificationService::findPeerTeamMember($case_id, Yii::$app->user->id)
                     ->checkPeerReviewPermission();
@@ -260,6 +261,9 @@ class TimSebayaController extends Controller
                     ->one();
                 if (!$member) {
                     throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Sebaya');
+                }
+                if($member && $member->status != ApprovalStatus::PENDING){
+                    $has_responded = true;
                 }
             }
             $saspri_k = $cert->saspriK;
@@ -281,6 +285,7 @@ class TimSebayaController extends Controller
             return $this->render('detail', [
                 'id' => $case_id,
                 'member_id' => $member->id,
+                'has_responded' => $has_responded,
                 'saspri' => $saspri_k,
                 'cert' => $cert,
                 'self_team' => $self_team,

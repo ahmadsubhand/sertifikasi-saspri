@@ -55,7 +55,7 @@ table thead tr:first-child th:last-child {
 .content-wrap {
   flex: 1;
 }
-.s-text-main{
+.s-text-main {
   color: #0f172a;
 }
 .s-bg-main {
@@ -208,6 +208,10 @@ table thead tr:first-child th:last-child {
   width: 100%;
 }
 
+.width-50-100 {
+  width: 100%;
+}
+
 @media (min-width: 768px) {
   .mobile-scroll {
     overflow-x: hidden;
@@ -218,6 +222,10 @@ table thead tr:first-child th:last-child {
   }
   .width-full-none {
     width: auto;
+  }
+
+  .width-50-100 {
+    width: 50%;
   }
 }
 

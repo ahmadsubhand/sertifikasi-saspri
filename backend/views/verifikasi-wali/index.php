@@ -48,7 +48,7 @@ $this->title = 'Verifikasi Wali SASPRI-K';
                   <td scope="row"><?= $index + 1 ?></th>
                   <td><?= Html::encode($saspri->region_name) ?></td>
                   <td><?= Html::encode($saspri->district->name) ?></td>
-                  <td><?= Html::encode($saspri->coordinator->username) ?></td>
+                  <td><?= Html::encode($saspri->coordinator->full_name) ?></td>
                   <td><?= Html::encode($saspri->cooperative_name) ?></td>
                   <td>
                     <a href="<?= Url::to(['permintaan-pendaftaran-wali', 'saspri_k_id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main" title="Detail Pendaftaran">
@@ -103,8 +103,8 @@ $this->title = 'Verifikasi Wali SASPRI-K';
                   <td scope="row"><?= $index + 1 ?></th>
                   <td><?= Html::encode($saspri->region_name) ?></td>
                   <td><?= Html::encode($saspri->district->name) ?></td>
-                  <td><?= Html::encode($saspri->coordinator->username) ?></td>
-                  <td><?= Html::encode($saspri->newCoordinator->username) ?></td>
+                  <td><?= Html::encode($saspri->coordinator->full_name) ?></td>
+                  <td><?= Html::encode($saspri->newCoordinator->full_name) ?></td>
                   <td>
                     <a href="<?= Url::to(['permintaan-pergantian-wali', 'saspri_k_id' => $saspri->id]) ?>" class="btn btn-sm s-btn-main" title="Detail Pergantian">
                       <i class="fa-solid fa-magnifying-glass"></i>

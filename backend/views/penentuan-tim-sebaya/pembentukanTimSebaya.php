@@ -140,7 +140,7 @@ $shingles = [
               <tr>
                 <td scope="row"><?= $index + 1 ?></th>
                 <td>
-                  <?= Html::encode($member->user->username) ?>
+                  <?= Html::encode($member->user->full_name) ?>
                   <?php if (\Yii::$app->authManager->getAssignment(UserRole::ADMIN, $member->user_id)): ?>
                     <span class="badge bg-secondary ms-1">Admin</span>
                   <?php endif; ?>

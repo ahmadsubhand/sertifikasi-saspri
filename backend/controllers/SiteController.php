@@ -97,7 +97,11 @@ class SiteController extends Controller
             $query->andWhere(['like', 'LOWER(region_name)', strtolower($wilayah)]);
         }
         if ($wali) {
-            $query->andWhere(['like', 'LOWER(user.username)', strtolower($wali)]);
+            $query->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($wali)],
+                ['like', 'LOWER(user.full_name)', strtolower($wali)]
+                ]);
         }
         if (in_array($level, CertificateLevel::values())) {
             $query->andWhere(['certification.level' => $level]);

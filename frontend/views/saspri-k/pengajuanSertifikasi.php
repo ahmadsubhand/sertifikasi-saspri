@@ -131,7 +131,7 @@ $this->title = (string) 'Pengajuan Sertifikasi';
             <?php foreach ($self_team_members as $index => $member): ?>
               <tr>
                 <tD scope="row"><?= $index + 1 ?></th>
-                <td><?= Html::encode($member->user->username) ?></td>
+                <td><?= Html::encode($member->user->full_name) ?></td>
                 <td>
                   <?= Html::beginForm(['ubah-peran-anggota-tim-mandiri', 'user_id' => $member->user->id], 'post') ?>
                   <select name="role" class="form-select form-select-sm" onchange="this.form.submit()">
@@ -237,7 +237,7 @@ $this->title = (string) 'Pengajuan Sertifikasi';
 
                 const item = document.createElement('div');
                 item.className = 'search-item p-2 rounded-2 btn w-100 text-start';
-                item.textContent = user.username;
+                item.textContent = `${user.username} - ${user.full_name}`;
                 item.onclick = () => selectUser(user);
                 dropdown.appendChild(item);
               });
@@ -270,7 +270,7 @@ $this->title = (string) 'Pengajuan Sertifikasi';
         chip.className = 'chip';
         chip.innerHTML = `
         <div class="d-flex bg-white shadow border-1 border m-2 align-items-center p-2 btn rounded-4" style="width: fit-content;">
-          <span>${user.username}</span>
+          <span>${user.username} - ${user.full_name}</span>
           <span class="remove-btn ms-1" onclick="window.removeUserFromList(${user.id})">&times;</span>
         </div>
       `;
