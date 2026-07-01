@@ -23,6 +23,7 @@ use yii\filters\auth\HttpBearerAuth;
 use yii\filters\VerbFilter;
 use yii\helpers\Url;
 use yii\rest\ActiveController;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 
 class UserController extends ActiveController
@@ -53,6 +54,7 @@ class UserController extends ActiveController
                 'available-for-saspri-k' => ['GET'],
                 'available-for-self-team' => ['GET'],
                 'available-for-peer-team' => ['GET'],
+                'teams' => ['GET'],
             ]
         ];
 
@@ -65,6 +67,7 @@ class UserController extends ActiveController
                 'available-for-saspri-k',
                 'available-for-self-team',
                 'available-for-peer-team',
+                'teams',
             ]
         ];
 
@@ -295,5 +298,13 @@ class UserController extends ActiveController
             'next_link' => $has_next ? Url::current(['offset' => $offset + $limit], true) : null,
             'offset' => $offset,
         ];
+    }
+
+    public function actionTeams(?string $status = null)
+    {
+        if ($status && !in_array($status, ApprovalStatus::values())) {
+            throw new BadRequestHttpException('Status tidak valid');
+        }
+        return UserService::teams($status);
     }
 }
