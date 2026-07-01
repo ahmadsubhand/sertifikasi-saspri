@@ -73,7 +73,9 @@ class CertificationService
             ->offset($data->offset)
             ->all();
         $has_next = count($certs) > $data->limit;
-        if ($has_next) array_pop($certs);
+        if ($has_next) {
+            array_pop($certs);
+        }
 
         return [
             'certifications' => $certs,
@@ -83,7 +85,8 @@ class CertificationService
         ];
     }
 
-    public static function findOrFail(int $id) {
+    public static function findOrFail(int $id)
+    {
         $certification = Certification::findOne($id);
         if (!$certification) {
             throw new NotFoundHttpException('Sertifikasi tidak ditemukan');
@@ -183,7 +186,7 @@ class CertificationService
         $member->delete();
         return [
             ...$member,
-            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+            'user' => $member->getUser()->select(UserHelper::basicSelect())->one(),
         ];
     }
 
@@ -212,7 +215,7 @@ class CertificationService
 
         return [
             ...$member,
-            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+            'user' => $member->getUser()->select(UserHelper::basicSelect())->one(),
         ];
     }
 
@@ -250,7 +253,7 @@ class CertificationService
         NotificationService::send(
             $coordinator_id,
             CertificationStatus::list()[CertificationStatus::SELF_REVIEW],
-            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " .
             strtolower(CertificationStatus::list()[CertificationStatus::SELF_REVIEW]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
             [
                 'sender_id' => Yii::$app->user->id,
@@ -320,7 +323,7 @@ class CertificationService
         NotificationService::send(
             $coordinator_id,
             CertificationStatus::list()[$certification->status],
-            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " .
             strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir pembentukan tim adalah {$formatted_due_date}.",
             [
                 'sender_id' => Yii::$app->user->id,
@@ -392,7 +395,7 @@ class CertificationService
         $member->delete();
         return [
             ...$member,
-            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+            'user' => $member->getUser()->select(UserHelper::basicSelect())->one(),
         ];
     }
 
@@ -420,7 +423,7 @@ class CertificationService
 
         return [
             ...$member,
-            'user' => $member->getUser()->select(UserHelper::$basicSelect)->one(),
+            'user' => $member->getUser()->select(UserHelper::basicSelect())->one(),
         ];
     }
 
@@ -455,7 +458,7 @@ class CertificationService
         NotificationService::send(
             $coordinator_id,
             CertificationStatus::list()[$certification->status],
-            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " .
             strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir penilaian adalah {$formatted_due_date}.",
             [
                 'sender_id' => Yii::$app->user->id,
@@ -527,7 +530,7 @@ class CertificationService
         NotificationService::send(
             $coordinator_id,
             CertificationStatus::list()[$certification->status],
-            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " . 
+            "Sertifikasi SASPRI-K kawasan {$district_name} sedang dalam proses " .
             strtolower(CertificationStatus::list()[$certification->status]) . ". Batas akhir external review adalah {$formatted_due_date}.",
             [
                 'sender_id' => Yii::$app->user->id,
@@ -563,7 +566,7 @@ class CertificationService
 
     public static function saveExternalReview(int $certification_id, ExternalReviewForm $data)
     {
-        $certification = CertificationService::findOrFail($certification_id)    
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->saveScores($data->indicator_scores, IndicatorScoreAttribute::EXTERNAL_REVIEW);
 
@@ -572,7 +575,7 @@ class CertificationService
 
     public static function transcripts(int $certification_id)
     {
-        $certification = CertificationService::findOrFail($certification_id)    
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
@@ -588,7 +591,7 @@ class CertificationService
 
     public static function finalizeExternalReview(int $certification_id)
     {
-        $certification = CertificationService::findOrFail($certification_id)    
+        $certification = CertificationService::findOrFail($certification_id)
             ->validateCertificationStatus(CertificationStatus::EXTERNAL_REVIEW)
             ->ensureAllScoresFilled(IndicatorScoreAttribute::EXTERNAL_REVIEW)
             ->calculateTotalScore(IndicatorScoreAttribute::EXTERNAL_REVIEW)
@@ -642,7 +645,7 @@ class CertificationService
         $certification->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION)
             ->reject($data->rejection_reason, CertificationStatus::SELF_REVIEW)
             ->save();
-        
+
         $saspri_k = $certification->saspriK;
         $coordinator_id = $saspri_k->coordinator_id;
         $recipients = [

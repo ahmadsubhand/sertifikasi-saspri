@@ -72,7 +72,9 @@ class TimMandiriController extends Controller
             ->offset($offset_request)
             ->all();
         $request_has_next = count($requests) > $limit;
-        if ($request_has_next) array_pop($requests);
+        if ($request_has_next) {
+            array_pop($requests);
+        }
 
         $uncompleted = (clone $base_query)
             ->andWhere(['stm.status' => ApprovalStatus::APPROVED])
@@ -89,7 +91,9 @@ class TimMandiriController extends Controller
             ->offset($offset_uncompleted)
             ->all();
         $uncompleted_has_next = count($uncompleted) > $limit;
-        if ($uncompleted_has_next) array_pop($uncompleted);
+        if ($uncompleted_has_next) {
+            array_pop($uncompleted);
+        }
 
         $completed = (clone $base_query)
             ->andWhere(['stm.status' => ApprovalStatus::APPROVED])
@@ -99,7 +103,9 @@ class TimMandiriController extends Controller
             ->offset($offset_completed)
             ->all();
         $completed_has_next = count($completed) > $limit;
-        if ($completed_has_next) array_pop($completed);
+        if ($completed_has_next) {
+            array_pop($completed);
+        }
 
         return $this->render('index', [
             'self_team_member_request' => $requests,
@@ -128,7 +134,7 @@ class TimMandiriController extends Controller
             SelfTeamMemberService::joinRequestResponse($self_team_member_id, $data);
 
             Yii::$app->session->setFlash(
-                'success', 
+                'success',
                 'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) .  ' permintaan bergabung Tim Mandiri'
             );
             return $this->redirect(['index']);
@@ -262,7 +268,7 @@ class TimMandiriController extends Controller
                 if (!$member) {
                     throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Mandiri');
                 }
-                if($member && $member->status != ApprovalStatus::PENDING){
+                if ($member && $member->status != ApprovalStatus::PENDING) {
                     $has_responded = true;
                 }
             }
@@ -270,14 +276,14 @@ class TimMandiriController extends Controller
             $self_team = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peer_team = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();

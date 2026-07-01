@@ -59,7 +59,9 @@ class SaspriKService
             ->offset($data->offset)
             ->all();
         $has_next = count($saspris) > $data->limit;
-        if ($has_next) array_pop($saspris);
+        if ($has_next) {
+            array_pop($saspris);
+        }
 
         return [
             'saspri_k' => $saspris,
@@ -69,7 +71,8 @@ class SaspriKService
         ];
     }
 
-    public static function findOrFail(int $id) {
+    public static function findOrFail(int $id)
+    {
         $saspri_k = SaspriK::findOne($id);
         if (!$saspri_k) {
             throw new NotFoundHttpException('SASPRI-K tidak ditemukan');
@@ -143,7 +146,7 @@ class SaspriKService
         $saspri_k;
         try {
             $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
-        } catch(Exception $error) {
+        } catch (Exception $error) {
             if ($error instanceof ForbiddenHttpException) {
                 $saspri_k = new SaspriK();
             } else {
@@ -184,7 +187,7 @@ class SaspriKService
         $saspri_k = SaspriK::find()
             ->where(['coordinator_id' => $user->id])
             ->andWhere(['!=', 'request_status', ApprovalStatus::APPROVED])
-            ->one();    
+            ->one();
 
         return [
             'saspri_k' => $saspri_k,
@@ -204,7 +207,7 @@ class SaspriKService
                 throw $error;
             }
         }
-        
+
         if ($saspri_k->request_status === ApprovalStatus::APPROVED) {
             throw new UnprocessableEntityHttpException('SASPRI-K yang telah disetujui tidak bisa dibatalkan');
         }
@@ -228,7 +231,7 @@ class SaspriKService
         return [
             'saspri_k' => $saspri_k,
             'documents' => $saspri_k ? $saspri_k->saspriKDocuments : [],
-            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
+            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::basicSelect())->one(),
             'certification' => $certification,
             'current_root_group' => $current_root_group,
             'current_child_groups' => $current_child_groups,
@@ -333,8 +336,8 @@ class SaspriKService
         return [
             ...($saspri_k ?? []),
             'district' => $saspri_k ? $saspri_k->district : [],
-            'coordinator' => $saspri_k ? $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one() : [],
-            'new_coordinator' => $saspri_k ? $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one() : [],
+            'coordinator' => $saspri_k ? $saspri_k->getCoordinator()->select(UserHelper::basicSelect())->one() : [],
+            'new_coordinator' => $saspri_k ? $saspri_k->getNewCoordinator()->select(UserHelper::basicSelect())->one() : [],
         ];
     }
 
@@ -367,8 +370,8 @@ class SaspriKService
         return [
             ...$saspri_k,
             'district' => $saspri_k->district,
-            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::$basicSelect)->one(),
-            'new_coordinator' => $saspri_k->getNewCoordinator()->select(UserHelper::$basicSelect)->one(),
+            'coordinator' => $saspri_k->getCoordinator()->select(UserHelper::basicSelect())->one(),
+            'new_coordinator' => $saspri_k->getNewCoordinator()->select(UserHelper::basicSelect())->one(),
         ];
     }
 
@@ -411,7 +414,7 @@ class SaspriKService
     public static function coordinatorChangeResponse(int $saspri_k_id, RequestResponseForm $data)
     {
         $saspri_k = SaspriKService::findOrFail($saspri_k_id)->isCoordinatorChangePending();
-        $district_name = $saspri_k->district->name ?? 'Kawasan';        
+        $district_name = $saspri_k->district->name ?? 'Kawasan';
 
         if ($data->action === RequestResponse::APPROVE) {
             $old_coordinator = UserService::detail($saspri_k->coordinator_id);
@@ -425,7 +428,7 @@ class SaspriKService
             NotificationService::send(
                 $old_coordinator->id,
                 'Pergantian Wali Disetujui',
-                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " . 
+                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " .
                 "Anda sudah bukan lagi Wali SASPRI-K kawasan {$district_name}.",
                 [
                     'sender_id' => Yii::$app->user->id,
@@ -438,7 +441,7 @@ class SaspriKService
             NotificationService::send(
                 $new_coordinator->id,
                 'Pergantian Wali Disetujui',
-                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " . 
+                "Pengajuan pergantian Wali telah disetujui oleh SASPRI-N. " .
                 "Anda telah diangkat menjadi Wali SASPRI-K kawasan {$district_name}.",
                 [
                     'sender_id' => Yii::$app->user->id,

@@ -94,7 +94,7 @@ class UserService
 
         $user->status = User::STATUS_ACTIVE;
         $user->save();
-        
+
         return [
             'message' => 'Email berhasil diverifikasi',
         ];
@@ -164,7 +164,7 @@ class UserService
 
     public static function detail(int $user_id): User
     {
-        $user = User::find()->where(['id' => $user_id])->select(UserHelper::$basicSelect)->one();
+        $user = User::find()->where(['id' => $user_id])->select(UserHelper::basicSelect())->one();
         if (!$user) {
             throw new NotFoundHttpException('Akun belum terdaftar dalam sistem');
         }

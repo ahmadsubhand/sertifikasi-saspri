@@ -8,23 +8,23 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- Additionals (7-11): 134-158 (5 members each)
 -- --------------------------------------------------------
 
-INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
+INSERT INTO `user` (id, username, full_name, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
 -- Admins
-(1, 'admin.nasional', 'ak1', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin1@saspri.id', 10, 1714876800, 1714876800, '08111111111', NULL),
-(2, 'admin.kawasan', 'ak2', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin2@saspri.id', 10, 1714876800, 1714876800, '08111111112', NULL),
-(3, 'admin.pusat', 'ak3', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'admin3@saspri.id', 10, 1714876800, 1714876800, '08111111113', NULL),
+(1,'admin.nasional','Admin Nasional','ak1','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','admin1@saspri.id',10,1714876800,1714876800,'08111111111',NULL),
+(2,'admin.kawasan','Admin Kawasan','ak2','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','admin2@saspri.id',10,1714876800,1714876800,'08111111112',NULL),
+(3,'admin.pusat','Admin Pusat','ak3','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','admin3@saspri.id',10,1714876800,1714876800,'08111111113',NULL),
 
 -- Independent Users (10: 4-13)
-(4, 'bambang.sudjatmiko', 'ak4', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'bambang@gmail.com', 10, 1714876800, 1714876800, '08120000001', NULL),
-(5, 'siti.nurhaliza', 'ak5', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'siti.n@gmail.com', 10, 1714876800, 1714876800, '08120000002', NULL),
-(6, 'joko.widodo', 'ak6', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'joko.w@gmail.com', 10, 1714876800, 1714876800, '08120000003', NULL),
-(7, 'megawati.soekarno', 'ak7', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'mega@gmail.com', 10, 1714876800, 1714876800, '08120000004', NULL),
-(8, 'susilo.yudhoyono', 'ak8', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'sby@gmail.com', 10, 1714876800, 1714876800, '08120000005', NULL),
-(9, 'prabowo.subianto', 'ak9', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'prabowo@gmail.com', 10, 1714876800, 1714876800, '08120000006', NULL),
-(10, 'anies.baswedan', 'ak10', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'anies@gmail.com', 10, 1714876800, 1714876800, '08120000007', NULL),
-(11, 'ganjar.pranowo', 'ak11', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'ganjar@gmail.com', 10, 1714876800, 1714876800, '08120000008', NULL),
-(12, 'ridwan.kamil', 'ak12', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'rk@gmail.com', 10, 1714876800, 1714876800, '08120000009', NULL),
-(13, 'khofifah.parawansa', 'ak13', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'khofifah@gmail.com', 10, 1714876800, 1714876800, '08120000010', NULL);
+(4,'bambang.sudjatmiko','Bambang Sudjatmiko','ak4','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','bambang@gmail.com',10,1714876800,1714876800,'08120000001',NULL),
+(5,'siti.nurhaliza','Siti Nurhaliza','ak5','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','siti.n@gmail.com',10,1714876800,1714876800,'08120000002',NULL),
+(6,'joko.widodo','Joko Widodo','ak6','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','joko.w@gmail.com',10,1714876800,1714876800,'08120000003',NULL),
+(7,'megawati.soekarno','Megawati Soekarno','ak7','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','mega@gmail.com',10,1714876800,1714876800,'08120000004',NULL),
+(8,'susilo.yudhoyono','Susilo Yudhoyono','ak8','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','sby@gmail.com',10,1714876800,1714876800,'08120000005',NULL),
+(9,'prabowo.subianto','Prabowo Subianto','ak9','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','prabowo@gmail.com',10,1714876800,1714876800,'08120000006',NULL),
+(10,'anies.baswedan','Anies Baswedan','ak10','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','anies@gmail.com',10,1714876800,1714876800,'08120000007',NULL),
+(11,'ganjar.pranowo','Ganjar Pranowo','ak11','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','ganjar@gmail.com',10,1714876800,1714876800,'08120000008',NULL),
+(12,'ridwan.kamil','Ridwan Kamil','ak12','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','rk@gmail.com',10,1714876800,1714876800,'08120000009',NULL),
+(13,'khofifah.parawansa','Khofifah Parawansa','ak13','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','khofifah@gmail.com',10,1714876800,1714876800,'08120000010',NULL);
 
 -- Coords and Members for SASPRI-K units
 -- Reps (1-6) - 20 members each
@@ -42,22 +42,22 @@ INSERT INTO `user` (id, username, auth_key, password_hash, email, status, create
 -- 154-158: Add 11
 
 -- Realistic names for Coordinators
-INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
-(14, 'budiman.sujatmiko', 'ak14', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'budiman@gmail.com', 10, 1714876800, 1714876800, '08130000001', 1),
-(34, 'agus.harimurti', 'ak34', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'agus@gmail.com', 10, 1714876800, 1714876800, '08130000002', 2), -- SASPRI-K 2: Representative for self_review
-(54, 'erick.thohir', 'ak54', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'erick@gmail.com', 10, 1714876800, 1714876800, '08130000003', 3), -- SASPRI-K 3: Representative for pending_peer_team_formation
-(74, 'sandiaga.uno', 'ak74', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'sandi@gmail.com', 10, 1714876800, 1714876800, '08130000004', 4), -- SASPRI-K 4: Representative for peer_review
-(94, 'nadiem.makarim', 'ak94', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'nadiem@gmail.com', 10, 1714876800, 1714876800, '08130000005', 5), -- SASPRI-K 5: Representative for external_review
-(114, 'luhut.pandjaitan', 'ak114', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'luhut@gmail.com', 10, 1714876800, 1714876800, '08130000006', 6), -- SASPRI-K 6: Representative for completed
-(134, 'mahfud.md', 'ak134', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'mahfud@gmail.com', 10, 1714876800, 1714876800, '08130000007', 7),
-(139, 'muhaimin.iskandar', 'ak139', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'cakimin@gmail.com', 10, 1714876800, 1714876800, '08130000008', 8),
-(144, 'ahmad.syaikhu', 'ak144', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'ahmad@gmail.com', 10, 1714876800, 1714876800, '08130000009', 9),
-(149, 'zulkifli.hasan', 'ak149', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'zulkifli@gmail.com', 10, 1714876800, 1714876800, '08130000010', 10),
-(154, 'suharso.monoarfa', 'ak154', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', 'suharso@gmail.com', 10, 1714876800, 1714876800, '08130000011', 11);
+INSERT INTO `user` (id, username, full_name, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id) VALUES
+(14,'budiman.sujatmiko','Budiman Sujatmiko','ak14','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','budiman@gmail.com',10,1714876800,1714876800,'08130000001',1),
+(34,'agus.harimurti','Agus Harimurti','ak34','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','agus@gmail.com',10,1714876800,1714876800,'08130000002',2),
+(54,'erick.thohir','Erick Thohir','ak54','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','erick@gmail.com',10,1714876800,1714876800,'08130000003',3),
+(74,'sandiaga.uno','Sandiaga Uno','ak74','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','sandi@gmail.com',10,1714876800,1714876800,'08130000004',4),
+(94,'nadiem.makarim','Nadiem Makarim','ak94','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','nadiem@gmail.com',10,1714876800,1714876800,'08130000005',5),
+(114,'luhut.pandjaitan','Luhut Pandjaitan','ak114','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','luhut@gmail.com',10,1714876800,1714876800,'08130000006',6),
+(134,'mahfud.md','Mahfud MD','ak134','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','mahfud@gmail.com',10,1714876800,1714876800,'08130000007',7),
+(139,'muhaimin.iskandar','Muhaimin Iskandar','ak139','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','cakimin@gmail.com',10,1714876800,1714876800,'08130000008',8),
+(144,'ahmad.syaikhu','Ahmad Syaikhu','ak144','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','ahmad@gmail.com',10,1714876800,1714876800,'08130000009',9),
+(149,'zulkifli.hasan','Zulkifli Hasan','ak149','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','zulkifli@gmail.com',10,1714876800,1714876800,'08130000010',10),
+(154,'suharso.monoarfa','Suharso Monoarfa','ak154','$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO','suharso@gmail.com',10,1714876800,1714876800,'08130000011',11);
 
 -- Rest of members bulk insert
-INSERT INTO `user` (id, username, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id)
-SELECT i, CONCAT('user.', i), 'auth_key', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', CONCAT('u', i, '@saspri.id'), 10, 1714876800, 1714876800, CONCAT('0813', LPAD(i, 7, '0')),
+INSERT INTO `user` (id, username, full_name, auth_key, password_hash, email, status, created_at, updated_at, phone_number, saspri_k_id)
+SELECT i, CONCAT('user.', i), CONCAT('User ',i), 'auth_key', '$2y$13$EjaPFBnZOQsHdGuHI.xvhuDp1fHpo8hKRSk6yshqa9c5EG8s3C3lO', CONCAT('u', i, '@saspri.id'), 10, 1714876800, 1714876800, CONCAT('0813', LPAD(i, 7, '0')),
 CASE 
   WHEN i BETWEEN 14 AND 33 THEN 1
   WHEN i BETWEEN 34 AND 53 THEN 2

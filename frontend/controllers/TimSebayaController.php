@@ -72,7 +72,9 @@ class TimSebayaController extends Controller
             ->offset($offset_request)
             ->all();
         $request_has_next = count($requests) > $limit;
-        if ($request_has_next) array_pop($requests);
+        if ($request_has_next) {
+            array_pop($requests);
+        }
 
         $uncompleted = (clone $base_query)
             ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
@@ -89,7 +91,9 @@ class TimSebayaController extends Controller
             ->offset($offset_uncompleted)
             ->all();
         $uncompleted_has_next = count($uncompleted) > $limit;
-        if ($uncompleted_has_next) array_pop($uncompleted);
+        if ($uncompleted_has_next) {
+            array_pop($uncompleted);
+        }
 
         $completed = (clone $base_query)
             ->andWhere(['ptm.status' => ApprovalStatus::APPROVED])
@@ -99,7 +103,9 @@ class TimSebayaController extends Controller
             ->offset($offset_completed)
             ->all();
         $completed_has_next = count($completed) > $limit;
-        if ($completed_has_next) array_pop($completed);
+        if ($completed_has_next) {
+            array_pop($completed);
+        }
 
         return $this->render('index', [
             'peer_team_member_request' => $requests,
@@ -128,7 +134,7 @@ class TimSebayaController extends Controller
             PeerTeamMemberService::joinRequestResponse($peer_team_member_id, $data);
 
             Yii::$app->session->setFlash(
-                'success', 
+                'success',
                 'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) .  ' permintaan bergabung Tim Sebaya'
             );
             return $this->redirect(['index']);
@@ -244,7 +250,7 @@ class TimSebayaController extends Controller
     {
         try {
             $cert = Certification::findOne(['id' => $case_id]);
-            
+
             /** @var PeerTeamMember|null */
             $member = null;
             $has_responded = false;
@@ -262,7 +268,7 @@ class TimSebayaController extends Controller
                 if (!$member) {
                     throw new ForbiddenHttpException('Akses ditolak karena Anda bukan anggota dari Tim Sebaya');
                 }
-                if($member && $member->status != ApprovalStatus::PENDING){
+                if ($member && $member->status != ApprovalStatus::PENDING) {
                     $has_responded = true;
                 }
             }
@@ -270,18 +276,18 @@ class TimSebayaController extends Controller
             $self_team = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peer_team = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
-    
+
             return $this->render('detail', [
                 'id' => $case_id,
                 'member_id' => $member->id,

@@ -179,9 +179,13 @@ class SaspriKController extends ActiveController
         $saspri_k = SaspriKService::findOrFail($saspri_k_id);
         $users = $saspri_k->getUsers()
             ->joinWith('role r')
-            ->andWhere(['like', 'username', $q])
+            ->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($q)],
+                ['like', 'LOWER(user.full_name)', strtolower($q)],
+            ])
             ->select([
-                ...UserHelper::$basicSelect,
+                ...UserHelper::basicSelect(),
                 'role' => new \yii\db\Expression('MIN(r.item_name)')
             ])
             ->groupBy(User::tableName() . '.id')
@@ -197,7 +201,9 @@ class SaspriKController extends ActiveController
             ->all();
 
         $has_next = count($users) > $limit;
-        if ($has_next) array_pop($users);
+        if ($has_next) {
+            array_pop($users);
+        }
 
         return [
             'members' => $users,
@@ -229,7 +235,9 @@ class SaspriKController extends ActiveController
             ->all();
 
         $has_next = count($certifications) > $limit;
-        if ($has_next) array_pop($certifications);
+        if ($has_next) {
+            array_pop($certifications);
+        }
 
         return [
             'certifications' => $certifications,
@@ -255,8 +263,8 @@ class SaspriKController extends ActiveController
             ->where(['request_status' => ApprovalStatus::PENDING])
             ->with([
                 'coordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
-                }, 
+                    $query->select(UserHelper::basicSelect());
+                },
                 'district',
             ])
             ->orderBy(['updated_at' => SORT_ASC])
@@ -266,7 +274,9 @@ class SaspriKController extends ActiveController
             ->all();
 
         $has_next = count($saspri_ks) > $limit;
-        if ($has_next) array_pop($saspri_ks);
+        if ($has_next) {
+            array_pop($saspri_ks);
+        }
 
         return [
             'registration_requests' => $saspri_ks,
@@ -282,11 +292,11 @@ class SaspriKController extends ActiveController
             ->where(['change_status' => ApprovalStatus::PENDING])
             ->with([
                 'newCoordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
+                    $query->select(UserHelper::basicSelect());
                 },
                 'coordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
-                }, 
+                    $query->select(UserHelper::basicSelect());
+                },
                 'district',
             ])
             ->orderBy(['updated_at' => SORT_ASC])
@@ -296,7 +306,9 @@ class SaspriKController extends ActiveController
             ->all();
 
         $has_next = count($saspri_ks) > $limit;
-        if ($has_next) array_pop($saspri_ks);
+        if ($has_next) {
+            array_pop($saspri_ks);
+        }
 
         return [
             'change_requests' => $saspri_ks,

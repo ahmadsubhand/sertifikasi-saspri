@@ -95,7 +95,7 @@ class Notification extends ActiveRecord
      */
     public function getRecipient()
     {
-        return $this->hasOne(User::class, ['id' => 'recipient_id'])->select(UserHelper::$basicSelect);
+        return $this->hasOne(User::class, ['id' => 'recipient_id'])->select(UserHelper::basicSelect());
     }
 
     /**
@@ -105,7 +105,7 @@ class Notification extends ActiveRecord
      */
     public function getSender()
     {
-        return $this->hasOne(User::class, ['id' => 'sender_id'])->select(UserHelper::$basicSelect);
+        return $this->hasOne(User::class, ['id' => 'sender_id'])->select(UserHelper::basicSelect());
     }
 
     /**

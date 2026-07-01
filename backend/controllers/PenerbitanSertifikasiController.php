@@ -62,7 +62,9 @@ class PenerbitanSertifikasiController extends Controller
             ->all();
 
         $has_next = count($certs) > $limit;
-        if ($has_next) array_pop($certs);
+        if ($has_next) {
+            array_pop($certs);
+        }
 
         return $this->render('index', [
             'certifications' => $certs,
@@ -196,14 +198,14 @@ class PenerbitanSertifikasiController extends Controller
             $self_team = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peer_team = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();

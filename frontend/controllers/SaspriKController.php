@@ -102,17 +102,21 @@ class SaspriKController extends Controller
                 ->offset($certification_offset)
                 ->all();
             $cert_has_next = count($certs) > $certification_limit;
-            if ($cert_has_next) array_pop($certs);
+            if ($cert_has_next) {
+                array_pop($certs);
+            }
 
             $users = $saspri_k->getUsers()
                 ->where(['!=', 'id', Yii::$app->user->id])
                 ->orderBy(['updated_at' => SORT_DESC])
-                ->select(UserHelper::$basicSelect)
+                ->select(UserHelper::basicSelect())
                 ->limit($user_limit + 1)
                 ->offset($user_offset)
                 ->all();
             $user_has_next = count($users) > $user_limit;
-            if ($user_has_next) array_pop($users);
+            if ($user_has_next) {
+                array_pop($users);
+            }
 
             return $this->render('index', [
                 'saspri_k' => $saspri_k,
@@ -145,8 +149,8 @@ class SaspriKController extends Controller
                 ->where(['!=', 'id', $saspri_k->coordinator_id])
                 ->andWhere([
                     'or',
-                    ['like', 'username', $q],
-                    ['like', 'full_name', $q]
+                    ['like', 'LOWER(user.username)', strtolower($q)],
+                    ['like', 'LOWER(user.full_name)', strtolower($q)],
                 ])
                 ->select(['id', 'username'])
                 ->limit(10)
@@ -167,13 +171,11 @@ class SaspriKController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $users = User::find()->availableForSaspriK()
-            ->andWhere(
-                [
-                    'or',
-                    ['like', 'username', $q],
-                    ['like', 'full_name', $q]
-                ]
-            )
+            ->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($q)],
+                ['like', 'LOWER(user.full_name)', strtolower($q)],
+            ])
             ->select([User::tableName() . '.id', 'username', 'full_name'])
             ->limit(10)
             ->asArray()
@@ -268,13 +270,11 @@ class SaspriKController extends Controller
             $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
             $certification = $saspri_k->onGoingCertification;
             $users = User::find()->availableForSelfTeam($saspri_k, $certification)
-                ->andWhere(
-                    [
-                        'or',
-                        ['like', 'username', $q],
-                        ['like', 'full_name', $q]
-                    ]
-                )
+                ->andWhere([
+                    'or',
+                    ['like', 'LOWER(user.username)', strtolower($q)],
+                    ['like', 'LOWER(user.full_name)', strtolower($q)],
+                ])
                 ->limit(10)
                 ->select([User::tableName() . '.id', 'username', 'full_name'])
                 ->asArray()
@@ -407,14 +407,14 @@ class SaspriKController extends Controller
             $selfTeam = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peerTeam = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
@@ -551,7 +551,7 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } else if (
+                } elseif (
                     $error instanceof NotFoundHttpException ||
                     $error instanceof UnprocessableEntityHttpException
                 ) {

@@ -3,6 +3,7 @@
 namespace common\helpers;
 
 use common\enums\UserRole;
+use common\models\User;
 use Yii;
 
 class UserHelper
@@ -16,10 +17,15 @@ class UserHelper
         }
     }
 
-    public static $basicSelect = [
-        'user.id',
-        'user.username',
-        'user.phone_number',
-        'user.full_name'
-    ];
+    public static function basicSelect(): array
+    {
+        $table = User::tableName();
+
+        return [
+            "$table.id",
+            "$table.username",
+            "$table.full_name",
+            "$table.phone_number",
+        ];
+    }
 }

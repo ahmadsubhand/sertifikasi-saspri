@@ -209,7 +209,7 @@ class CertificationController extends ActiveController
         $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getSelfTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
-                $query->select(UserHelper::$basicSelect);
+                $query->select(UserHelper::basicSelect());
             }])
             ->orderBy(['role' => SORT_ASC])
             ->limit($limit + 1)
@@ -218,7 +218,9 @@ class CertificationController extends ActiveController
             ->all();
 
         $has_next = count($members) > $limit;
-        if ($has_next) array_pop($members);
+        if ($has_next) {
+            array_pop($members);
+        }
 
         return [
             'members' => $members,
@@ -233,7 +235,7 @@ class CertificationController extends ActiveController
         $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getPeerTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
-                $query->select(UserHelper::$basicSelect);
+                $query->select(UserHelper::basicSelect());
             }])
             ->orderBy(['role' => SORT_ASC])
             ->limit($limit + 1)
@@ -242,7 +244,9 @@ class CertificationController extends ActiveController
             ->all();
 
         $has_next = count($members) > $limit;
-        if ($has_next) array_pop($members);
+        if ($has_next) {
+            array_pop($members);
+        }
 
         return [
             'members' => $members,
@@ -261,7 +265,7 @@ class CertificationController extends ActiveController
         if ($certification) {
             $members = $certification->getFullSelfTeamMembers()
                 ->with(['user' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
+                    $query->select(UserHelper::basicSelect());
                 }])
                 ->orderBy(['role' => SORT_ASC])
                 ->limit($limit + 1)
@@ -271,7 +275,9 @@ class CertificationController extends ActiveController
         }
 
         $has_next = count($members) > $limit;
-        if ($has_next) array_pop($members);
+        if ($has_next) {
+            array_pop($members);
+        }
 
         return [
             'members' => $members,
@@ -320,7 +326,7 @@ class CertificationController extends ActiveController
 
         return $this->asJson($data);
     }
-    
+
     public function actionSaveSelfReview(int $certification_id)
     {
         $data = new SelfReviewForm();
@@ -340,7 +346,7 @@ class CertificationController extends ActiveController
         $certification = CertificationService::findOrFail($certification_id);
         $members = $certification->getFullPeerTeamMembers()
             ->with(['user' => function (ActiveQuery $query) {
-                $query->select(UserHelper::$basicSelect);
+                $query->select(UserHelper::basicSelect());
             }])
             ->orderBy(['role' => SORT_ASC])
             ->limit($limit + 1)
@@ -349,7 +355,9 @@ class CertificationController extends ActiveController
             ->all();
 
         $has_next = count($members) > $limit;
-        if ($has_next) array_pop($members);
+        if ($has_next) {
+            array_pop($members);
+        }
 
         return [
             'members' => $members,

@@ -39,7 +39,7 @@ class SertifikasiBerjalanController extends Controller
         ?int $regency_id = null,
         ?int $district_id = null,
         ?string $level = null,
-        ?int $limit = 20, 
+        ?int $limit = 20,
         ?int $offset = 0
     ) {
         $query = Certification::find()
@@ -84,7 +84,9 @@ class SertifikasiBerjalanController extends Controller
             ->all();
 
         $has_next = count($certs) > $limit;
-        if ($has_next) array_pop($certs);
+        if ($has_next) {
+            array_pop($certs);
+        }
 
         return $this->render('index', [
             'certifications' => $certs,
@@ -100,7 +102,7 @@ class SertifikasiBerjalanController extends Controller
             $cert = Certification::findOne(['id' => $case_id]);
             if (
                 !$cert || // mau mulai dari sini atau sebelumnya lagi?
-                $cert->status === CertificationStatus::PENDING_SELF_TEAM_FORMATION || 
+                $cert->status === CertificationStatus::PENDING_SELF_TEAM_FORMATION ||
                 $cert->status === CertificationStatus::COMPLETED
             ) {
                 throw new NotFoundHttpException('Sertifikasi tidak ditemukan dalam sertifikasi yang sedang berjalan');
@@ -109,18 +111,18 @@ class SertifikasiBerjalanController extends Controller
             $self_team = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peer_team = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
-    
+
             return $this->render('detail', [
                 'id' => $case_id,
                 'saspri' => $saspri_k,

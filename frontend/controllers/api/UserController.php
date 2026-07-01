@@ -162,7 +162,7 @@ class UserController extends ActiveController
     {
         $user = User::find()
             ->where(['id' => $user_id])
-            ->select(UserHelper::$basicSelect)
+            ->select(UserHelper::basicSelect())
             ->asArray()
             ->one();
         if (!$user) {
@@ -200,7 +200,9 @@ class UserController extends ActiveController
         // return $certifications->createCommand()->rawSql;
 
         $has_next = count($certifications) > $limit;
-        if ($has_next) array_pop($certifications);
+        if ($has_next) {
+            array_pop($certifications);
+        }
 
         return [
             'certifications' => $certifications,
@@ -214,14 +216,20 @@ class UserController extends ActiveController
     {
         $users = User::find()
             ->availableForSaspriK()
-            ->andWhere(['like', 'username', $q])
-            ->select(UserHelper::$basicSelect)
+            ->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($q)],
+                ['like', 'LOWER(user.full_name)', strtolower($q)],
+            ])
+            ->select(UserHelper::basicSelect())
             ->limit($limit + 1)
             ->offset($offset)
             ->all();
 
         $has_next = count($users) > $limit;
-        if ($has_next) array_pop($users);
+        if ($has_next) {
+            array_pop($users);
+        }
 
         return [
             'users' => $users,
@@ -238,14 +246,20 @@ class UserController extends ActiveController
         $certification = $saspri_k->onGoingCertification;
         $users = User::find()
             ->availableForSelfTeam($saspri_k, $certification)
-            ->andWhere(['like', 'username', $q])
-            ->select(UserHelper::$basicSelect)
+            ->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($q)],
+                ['like', 'LOWER(user.full_name)', strtolower($q)],
+            ])
+            ->select(UserHelper::basicSelect())
             ->limit($limit + 1)
             ->offset($offset)
             ->all();
 
         $has_next = count($users) > $limit;
-        if ($has_next) array_pop($users);
+        if ($has_next) {
+            array_pop($users);
+        }
 
         return [
             'users' => $users,
@@ -260,14 +274,20 @@ class UserController extends ActiveController
         $certification = Certification::findOne(['id' => $certification_id]);
         $users = User::find()
             ->availableForPeerTeam($certification)
-            ->andWhere(['like', 'username', $q])
-            ->select(UserHelper::$basicSelect)
+            ->andWhere([
+                'or',
+                ['like', 'LOWER(user.username)', strtolower($q)],
+                ['like', 'LOWER(user.full_name)', strtolower($q)],
+            ])
+            ->select(UserHelper::basicSelect())
             ->limit($limit + 1)
             ->offset($offset)
             ->all();
 
         $has_next = count($users) > $limit;
-        if ($has_next) array_pop($users);
+        if ($has_next) {
+            array_pop($users);
+        }
 
         return [
             'users' => $users,

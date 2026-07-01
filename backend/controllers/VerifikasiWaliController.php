@@ -89,7 +89,7 @@ class VerifikasiWaliController extends Controller
         $registrations = $registration_query
             ->with([
                 'coordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
+                    $query->select(UserHelper::basicSelect());
                 },
                 'district'
             ])
@@ -105,10 +105,10 @@ class VerifikasiWaliController extends Controller
         $changes = $change_query
             ->with([
                 'coordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
+                    $query->select(UserHelper::basicSelect());
                 },
                 'newCoordinator' => function (ActiveQuery $query) {
-                    $query->select(UserHelper::$basicSelect);
+                    $query->select(UserHelper::basicSelect());
                 },
                 'district'
             ])
@@ -164,7 +164,8 @@ class VerifikasiWaliController extends Controller
             SaspriKService::coordinatorChangeResponse($saspri_k_id, $data);
 
             Yii::$app->session->setFlash(
-                'success', 'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) . ' pergantian wali'
+                'success',
+                'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) . ' pergantian wali'
             );
             return $this->redirect(['index']);
         } catch (Exception $error) {
@@ -245,18 +246,18 @@ class VerifikasiWaliController extends Controller
 
             $data = new RequestResponseForm();
             ModelHelper::loadAndValidateOrFail($data, $request);
- 
+
             if ($data->action === RequestResponse::APPROVE) {
                 $scores = new ExternalReviewForm();
                 ModelHelper::loadAndValidateOrFail($scores, $request);
-    
+
                 SaspriKService::saveRegistration($saspri_k_id, $scores);
             }
 
             SaspriKService::registrationRequestResponse($saspri_k_id, $data);
 
             Yii::$app->session->setFlash(
-                'success', 
+                'success',
                 'Berhasil ' . strtolower(RequestResponse::list()[$data->action]) . ' pendaftaran wali'
             );
             return $this->redirect(['index']);

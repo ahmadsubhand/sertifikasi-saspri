@@ -101,7 +101,7 @@ class SiteController extends Controller
                 'or',
                 ['like', 'LOWER(user.username)', strtolower($wali)],
                 ['like', 'LOWER(user.full_name)', strtolower($wali)]
-                ]);
+            ]);
         }
         if (in_array($level, CertificateLevel::values())) {
             $query->andWhere(['certification.level' => $level]);
@@ -116,7 +116,9 @@ class SiteController extends Controller
             ->all();
 
         $has_next = count($saspri) > $limit;
-        if ($has_next) array_pop($saspri);
+        if ($has_next) {
+            array_pop($saspri);
+        }
 
         return $this->render('index', [
             'saspris' => $saspri,
@@ -146,17 +148,21 @@ class SiteController extends Controller
                 ->offset($certification_offset)
                 ->all();
             $cert_has_next = count($certs) > $certification_limit;
-            if ($cert_has_next) array_pop($certs);
+            if ($cert_has_next) {
+                array_pop($certs);
+            }
 
             $users = $saspri_k->getUsers()
                 ->where(['!=', 'id', Yii::$app->user->id])
                 ->orderBy(['updated_at' => SORT_DESC])
-                ->select(UserHelper::$basicSelect)
+                ->select(UserHelper::basicSelect())
                 ->limit($user_limit + 1)
                 ->offset($user_offset)
                 ->all();
             $user_has_next = count($users) > $user_limit;
-            if ($user_has_next) array_pop($users);
+            if ($user_has_next) {
+                array_pop($users);
+            }
 
             return $this->render('saspri-k', [
                 'saspri_k' => $saspri_k,
@@ -190,14 +196,14 @@ class SiteController extends Controller
             $selfTeam = $cert->getSelfTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
             $peerTeam = $cert->getPeerTeamMembers()
                 ->with([
                     'user' => function (ActiveQuery $query) {
-                        $query->select(UserHelper::$basicSelect);
+                        $query->select(UserHelper::basicSelect());
                     },
                 ])
                 ->all();
@@ -240,17 +246,17 @@ class SiteController extends Controller
             $user = User::findByUsername($data->username);
             if ($user === null) {
                 throw new NotFoundHttpException('Username atau password salah');
-            } 
+            }
             if ($user->role->item_name !== UserRole::ADMIN) {
                 throw new ForbiddenHttpException('Hanya boleh diakses oleh Admin SASPRI-N');
-            } 
+            }
 
             UserService::login($data);
 
             return $this->goBack();
         } catch (Exception $error) {
             if (
-                $error instanceof NotFoundHttpException || 
+                $error instanceof NotFoundHttpException ||
                 $error instanceof ForbiddenHttpException
             ) {
                 $data->addErrors([

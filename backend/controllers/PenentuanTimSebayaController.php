@@ -119,7 +119,11 @@ class PenentuanTimSebayaController extends Controller
                 ->validateCertificationStatus(CertificationStatus::PENDING_PEER_TEAM_FORMATION);
 
             $users = User::find()->availableForPeerTeam($certification)
-                ->andWhere(['like', 'username', $q])
+                ->andWhere([
+                    'or',
+                    ['like', 'LOWER(user.username)', strtolower($q)],
+                    ['like', 'LOWER(user.full_name)', strtolower($q)],
+                ])
                 ->select(['id', 'username'])
                 ->limit(10)
                 ->asArray()
