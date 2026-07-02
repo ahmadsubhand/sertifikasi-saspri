@@ -297,7 +297,7 @@ class SaspriKService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/index',
-                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -314,7 +314,7 @@ class SaspriKService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'daftar-wali/index',
-                    'api_link' => 'saspri-k/detail-registration',
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -362,7 +362,7 @@ class SaspriKService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'site/index',
-                'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                'api_link' => '/saspri-k?saspri_k_id=' . $saspri_k->id,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -392,7 +392,7 @@ class SaspriKService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'site/index',
-                'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -433,7 +433,7 @@ class SaspriKService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'site/index',
-                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -446,7 +446,7 @@ class SaspriKService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/index',
-                    'api_link' => 'saspri-k/detail?saspri_k_id=' . $saspri_k->id,
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -463,7 +463,7 @@ class SaspriKService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/pergantian-wali',
-                    'api_link' => 'saspri-k/detail-change-coordinator',
+                    'api_link' => '/saspri-k?saspri_k_id=' . $saspri_k->id,
                     'channels' => ['db', 'fcm'],
                 ]
             );

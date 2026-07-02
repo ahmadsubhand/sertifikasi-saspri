@@ -153,7 +153,7 @@ class CertificationService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
-                    'api_link' => 'self-team-member/join-request-response?self_team_member_id=' . $member_ids[$user_id],
+                    'api_link' => '/self-team-member?self_team_member_id=' . $member_ids[$user_id],
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -178,7 +178,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'tim-mandiri/index',
-                'api_link' => 'user/certifications',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -208,7 +208,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
-                'api_link' => 'self-team-member/join-request-response?self_team_member_id=' . $member->id,
+                'api_link' => '/self-team-member?self_team_member_id=' . $member->id,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -243,7 +243,7 @@ class CertificationService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
-                    'api_link' => 'certification/self-review?certification_id=' . $certification->id,
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -258,7 +258,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -328,7 +328,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -363,7 +363,7 @@ class CertificationService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
-                    'api_link' => 'peer-team-member/join-request-response?peer_team_member_id=' . $member_ids[$user_id],
+                    'api_link' => '/peer-team-member?peer_team_member_id=' . $member_ids[$user_id],
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -387,7 +387,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'tim-sebaya/index',
-                'api_link' => 'user/certifications',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -416,7 +416,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
-                'api_link' => 'peer-team-member/join-request-response?peer_team_member_id=' . $member->id,
+                'api_link' => 'peer-team-member?peer_team_member_id=' . $member->id,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -448,7 +448,7 @@ class CertificationService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
-                    'api_link' => 'certification/peer-review?certification_id=' . $certification->id,
+                    'api_link' => null,
                     'channels' => ['db', 'fcm'],
                 ]
             );
@@ -463,7 +463,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -535,7 +535,7 @@ class CertificationService
             [
                 'sender_id' => Yii::$app->user->id,
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => null,
                 'channels' => ['db', 'fcm'],
             ]
         );
@@ -629,7 +629,7 @@ class CertificationService
                     [
                         'sender_id' => Yii::$app->user->id,
                         'web_link' => $recipient['web_link'],
-                        'api_link' => 'certification/detail?certification_id=' . $certification->id,
+                        'api_link' => null,
                         'channels' => ['db', 'fcm'],
                     ]
                 );
@@ -652,12 +652,12 @@ class CertificationService
             [
                 'user_ids' => [$coordinator_id],
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => '/certification?certification_id=' . $certification->id,
             ],
             [
                 'user_ids' => $certification->getSelfTeamMembers()->select('user_id')->column(),
                 'web_link' => 'tim-mandiri/detail?case_id=' . $certification->id,
-                'api_link' => 'certification/detail?certification_id=' . $certification->id,
+                'api_link' => '/certification?certification_id=' . $certification->id,
             ],
         ];
 
@@ -697,12 +697,12 @@ class CertificationService
             [
                 'user_ids' => [$coordinator_id],
                 'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                'api_link' => 'saspri-k/on-going-certification',
+                'api_link' => '/certification?certification_id=' . $certification->id,
             ],
             [
                 'user_ids' => $certification->getPeerTeamMembers()->select('user_id')->column(),
                 'web_link' => 'tim-sebaya/detail?case_id=' . $certification->id,
-                'api_link' => 'certification/detail?certification_id=' . $certification->id,
+                'api_link' => '/certification?certification_id=' . $certification->id,
             ],
         ];
 
@@ -764,7 +764,7 @@ class CertificationService
                     [
                         'sender_id' => Yii::$app->user->id,
                         'web_link' => $recipient['web_link'],
-                        'api_link' => 'user/certifications',
+                        'api_link' => null,
                         'channels' => ['db', 'fcm'],
                     ]
                 );
