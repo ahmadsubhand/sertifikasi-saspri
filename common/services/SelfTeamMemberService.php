@@ -72,7 +72,7 @@ class SelfTeamMemberService
                 [
                     'sender_id' => Yii::$app->user->id,
                     'web_link' => 'saspri-k/pengajuan-sertifikasi',
-                    'api_link' => '/on-going-certification',
+                    'api_link' => '/on-going-certification?certification_id=' . $certification->id,
                     'channels' => ['db', 'fcm'],
                 ]
             );
