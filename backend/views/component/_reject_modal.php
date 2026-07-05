@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/** @var string $step 
+/** @var string $step
  *  @var string|array $url
  *
 */
@@ -14,9 +14,9 @@ use yii\helpers\Html;
     <p class="text-muted small">
       Tolak sertifikasi jika ada kekurangan dari SASPRI-K
     </p>
-    <?= $form= Html::beginForm($url, 'post') ?>
+    <?= $form = Html::beginForm($url, 'post') ?>
     <label for="deny-reason" class="mb-0">Alasan:</label>
-    <input type="text" id="rejection-reason" name="rejection-reason" placeholder="Tulis alasan penolakan sertifikasi"
+    <input type="text" id="rejection-reason" name="rejection_reason" placeholder="Tulis alasan penolakan sertifikasi"
       class="form-control border border-1 shadow-sm" autocomplete="off">
 
     <div class="form-check mt-3">
