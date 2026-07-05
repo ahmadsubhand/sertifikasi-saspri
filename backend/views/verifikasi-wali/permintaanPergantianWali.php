@@ -74,7 +74,7 @@ $shingles = [
             <div class="bg-white px-2 py-4 rounded-3 shadow border border-light-subtle w-100 mx-auto" style="max-width: 22rem;">
                 <div class="text-center px-3 py-2">
                     <p class="text-secondary small fw-medium mb-2">Wali Saat Ini</p>
-                    <h4 class="fw-bold text-danger mb-1"><?= Html::encode($saspri_k->coordinator->username) ?></h4>
+                    <h4 class="fw-bold text-danger mb-1"><?= Html::encode($saspri_k->coordinator->full_name) ?></h4>
                     <p class="small text-muted mb-0"><?= Html::encode($saspri_k->coordinator->phone_number) ?></p>
                 </div>
             </div>
@@ -88,7 +88,7 @@ $shingles = [
             <div class="bg-white px-2 py-4 rounded-3 shadow border border-light-subtle w-100 mx-auto" style="max-width: 22rem;">
                 <div class="text-center px-3 py-2">
                     <p class="text-secondary small fw-medium mb-2">Calon Wali Pengganti</p>
-                    <h4 class="fw-bold text-success mb-1"><?= Html::encode($saspri_k->newCoordinator->username) ?></h4>
+                    <h4 class="fw-bold text-success mb-1"><?= Html::encode($saspri_k->newCoordinator->full_name) ?></h4>
                     <p class="small text-muted mb-0"><?= Html::encode($saspri_k->newCoordinator->phone_number) ?></p>
                 </div>
             </div>
@@ -105,7 +105,7 @@ $shingles = [
             </div>
 
             <div class="d-flex justify-content-center gap-3 flex-column-reverse flex-md-row">
-                <button type="button" class="btn btn-danger px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
+                <button type="button" class="btn btn-danger px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#rejectModal">
                     <i class="fa-solid fa-xmark me-2"></i> Tolak Pergantian
                 </button>
                 <?= Html::beginForm(['ganti-wali', 'saspri_k_id' => $saspri_k->id], 'post', ['class' => 'd-inline']) ?>
@@ -188,6 +188,22 @@ $shingles = [
                 <button type="submit" class="btn btn-danger">Tolak Pengajuan</button>
             </div>
             <?= Html::endForm() ?>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-lg" id="rejectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <?= $this->render('/component/_reject_modal', [
+            'step' => 'Pergantian Wali',
+            'url' => ['ganti-wali', 'saspri_k_id' => $saspri_k->id]
+            ]); ?>
+        </div>
         </div>
     </div>
 </div>

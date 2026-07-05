@@ -251,7 +251,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <!-- Final Actions -->
     <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border mt-3 mb-5">
         <div class="d-flex justify-content-center gap-3 flex-column-reverse flex-md-row">
-            <button type="button" class="btn btn-danger px-5 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#modalTolak">
+            <button type="button" class="btn btn-danger px-5 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#rejectModal">
                 <i class="fa-solid fa-xmark me-2"></i> Tolak Pendaftaran
             </button>
             <?php if ($page == $total_pages): ?>
@@ -294,27 +294,19 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     </div>
 </div>
 
-<!-- Modal Tolak -->
-<div class="modal fade" id="modalTolak" tabindex="-1" aria-hidden="true">
+
+<div class="modal fade modal-lg" id="rejectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <?= Html::beginForm(['daftarkan-wali', 'saspri_k_id' => $saspri_k->id], 'post') ?>
-            <input type="hidden" name="action" value="reject">
-            <div class="modal-header">
-                <h5 class="modal-title">Tolak Pendaftaran Wali</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Alasan Penolakan</label>
-                    <textarea name="rejection_reason" class="form-control" rows="4" placeholder="Masukkan alasan penolakan agar wali dapat memperbaikinya..." required></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-danger">Tolak Pengajuan</button>
-            </div>
-            <?= Html::endForm() ?>
+        <div class="modal-header">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <?= $this->render('/component/_reject_modal', [
+            'step' => 'Pendaftaran Wali',
+            'url' => ['daftarkan-wali', 'saspri_k_id' => $saspri_k->id]
+            ]); ?>
+        </div>
         </div>
     </div>
 </div>

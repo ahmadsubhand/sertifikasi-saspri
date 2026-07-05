@@ -194,7 +194,6 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="rejectModalLabel">Penolakan Sertifikasi</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
