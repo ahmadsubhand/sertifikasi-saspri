@@ -4,6 +4,8 @@ namespace common\services;
 
 use common\enums\ApprovalStatus;
 use common\enums\CertificateGrade;
+use common\enums\CertificateLevel;
+use common\enums\CertificationStatus;
 use common\enums\IndicatorScoreAttribute;
 use common\enums\RequestResponse;
 use common\helpers\UserHelper;
@@ -68,6 +70,35 @@ class SaspriKService
             'prev_link' => $data->offset > 0 ? Url::current(['offset' => max(0, $data->offset - $data->limit)]) : null,
             'next_link' => $has_next ? Url::current(['offset' => $data->offset + $data->limit]) : null,
             'offset' => $data->offset,
+        ];
+    }
+
+    public static function infografis()
+    {
+        $saspri_k = SaspriK::find()->andWhere(['request_status' => 'approved'])->joinWith(['validCertificate']);
+        $active_saspri_k = $saspri_k->count();
+        $active_certification = Certification::find()
+            ->distinct()
+            ->andWhere([
+                'not in',
+                'status',
+                [
+                    CertificationStatus::PENDING_SELF_TEAM_FORMATION,
+                    CertificationStatus::COMPLETED,
+                ]
+            ])
+            ->count();
+        $weania_plus = $saspri_k
+            ->andWhere([
+                'not in',
+                Certification::tableName() .'.level',
+                [CertificateLevel::WEANIA, CertificateLevel::NATALIA]
+            ])
+            ->count();
+        return [
+            'active_certification' => $active_certification,
+            'active_saspri_k' => $active_saspri_k,
+            'weania_plus' => $weania_plus,
         ];
     }
 

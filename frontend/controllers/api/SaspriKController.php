@@ -44,6 +44,7 @@ class SaspriKController extends ActiveController
             'class' => VerbFilter::class,
             'actions' => [
                 'index' => ['GET'],
+                'infografis' => ['GET'],
                 'detail' => ['GET'],
                 'members' => ['GET'],
                 'valid-certificate' => ['GET'],
@@ -162,6 +163,11 @@ class SaspriKController extends ActiveController
         $data = new SaspriKListForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->get());
         return SaspriKService::list($data);
+    }
+
+    public function actionInfografis()
+    {
+        return SaspriKService::infografis();
     }
 
     public function actionDetail(int $saspri_k_id)

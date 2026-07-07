@@ -41,6 +41,7 @@ class CertificationController extends ActiveController
             'actions' => [
                 'index' => ['GET'],
                 'detail' => ['GET'],
+                'download' => ['GET'],
                 'saspri-k' => ['GET'],
                 'self-team-members' => ['GET'],
                 'peer-team-members' => ['GET'],
@@ -471,5 +472,18 @@ class CertificationController extends ActiveController
     public function actionCancel()
     {
         return CertificationService::cancel();
+    }
+
+    public function actionDownload(int $certification_id)
+    {
+        $pdf = CertificationService::donwload($certification_id);
+        return $this->response->sendContentAsFile(
+            $pdf,
+            'transcript.pdf',
+            [
+                'mimeType' => 'application/pdf',
+                'inline' => true,
+            ]
+        );
     }
 }
