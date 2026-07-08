@@ -145,6 +145,11 @@ class SaspriKService
     {
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $user = SaspriKService::findMember($user_id, $saspri_k->id);
+        if ($saspri_k->new_coordinator_id === $user->id) {
+            throw new UnprocessableEntityHttpException(
+                'Anggota tidak dapat dikeluarkan karena sedang diajukan sebagai Wali baru'
+            );
+        }
         $user->removeUserFromSaspriK()->save();
 
         return [
