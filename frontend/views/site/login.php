@@ -36,7 +36,10 @@ $this->title = 'Login';
                     Belum Memiliki Akun?
                     <?= Html::a('Daftar', ['site/signup']) ?>
                 </div>
-
+                <div class="mt-2 mx-auto text-center" style="color:#999;">
+                    Perlu kirim ulang email verifikasi?
+                    <?= Html::a('Kirim Ulang', ['site/resend-verification-email']) ?>
+                </div>
                 <?php ActiveForm::end(); ?>
 
             </div>

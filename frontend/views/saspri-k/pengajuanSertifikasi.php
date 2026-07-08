@@ -14,6 +14,7 @@ use yii\helpers\Url;
 /** @var \common\models\SaspriK $saspri_k */
 /** @var \common\models\District $district */
 /** @var \common\models\SelfTeamMember[] $self_team_members */
+/** @var \common\models\PeerTeamMember[] $peer_team_members */
 
 $percentages = [
   CertificationStatus::PENDING_SELF_TEAM_FORMATION => '2%',
@@ -153,15 +154,15 @@ $this->title = (string) 'Pengajuan Sertifikasi';
                 </td>
                 <td>
                   <?= Html::a('<i class="fa-solid fa-xmark"></i>', ['hapus-anggota-tim-mandiri', 'user_id' => $member->user->id], [
-                    'class' => 'btn s-btn-red btn-sm',
+                    'class' => "btn s-btn-red btn-sm ". (($certification->status != CertificationStatus::PENDING_SELF_TEAM_FORMATION && $certification->is_rejected == 0) ? 'disabled' : ''),
                     'data' => [
                       'confirm' => 'Apakah Anda yakin ingin menghapus anggota ini?',
                       'method' => 'delete',
                     ],
                   ]) ?>
-                  <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
+                  <!-- <?= Html::a('<i class="fa-solid fa-magnifying-glass"></i>', ['#', 'user_id' => $member->id], [
                     'class' => 's-btn-main btn btn-sm',
-                  ]) ?>
+                  ]) ?> -->
                 </td>
               </tr>
             <?php endforeach ?>
@@ -175,9 +176,17 @@ $this->title = (string) 'Pengajuan Sertifikasi';
       </div>
     </div>
   </div>
+  <?php if ($peer_team_members != null) : ?>
+    <div>
+      <?= $this->render('/component/_team_table', [
+        "model" => $peer_team_members,
+        'is_self' => 0
+      ]) ?>
+    </div>
+  <?php endif ?>
   <div>
     <?= Html::beginForm(['ajukan-sertifikasi'], 'post') ?>
-    <button type="submit" class="btn s-btn-green me-2 w-100 mb-3" <?php echo CertificationStatus::PENDING_SELF_TEAM_FORMATION == $certification->status ? '' : 'disabled' ?>
+    <button type="submit" class="btn btn-lg s-btn-green me-2 w-100 mb-3" <?php echo CertificationStatus::PENDING_SELF_TEAM_FORMATION == $certification->status ? '' : 'disabled' ?>
       onclick="return confirm('Apakah Anda yakin ingin mengajukan sertifikasi? Pastikan komposisi tim sudah benar.')">
       Ajukan Sertifikasi
     </button>

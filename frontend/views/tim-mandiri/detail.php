@@ -1,5 +1,6 @@
 <?php
 
+use common\enums\TeamRole;
 use common\models\SelfTeamMember;
 use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
@@ -17,6 +18,16 @@ use yii\helpers\Url;
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
+
+$current_user_id = Yii::$app->user->id;
+$curr_role = null;
+
+foreach ($self_team as $member) {
+  if ($member->user_id == $current_user_id) {
+    $curr_role = $member->role;
+    break;
+  }
+}
 
 $label = [
   'SASPRI-K',
@@ -68,7 +79,7 @@ $shingles = [
   'productive_heifer_count' => 'Ekor',
 ];
 
-$this->title =(string) 'Detail Kegiatan Tim Mandiri';
+$this->title = (string) 'Detail Kegiatan Tim Mandiri';
 
 ?>
 
@@ -121,21 +132,26 @@ $this->title =(string) 'Detail Kegiatan Tim Mandiri';
           </div>
           <?php if ($cert->status == CertificationStatus::PENDING_SELF_TEAM_FORMATION) : ?>
             <div class="px-md-3 px-1 text-center">
-              <?php if($has_responded) :?>
-                <small class="text-center mx-auto mb-0">anda sudah merespon</small>
+              <small>Anda diminta menjadi <strong><?= TeamRole::list()[$curr_role] ?></strong> Satgas Mandiri</small>
+              <?php if ($has_responded) : ?>
+                <div class="d-flex align-items-center gap-3 w-100 mb-2 mt-3">
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                  <small class="text-center mx-auto mb-0 text-success">anda sudah merespon</small>
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                </div>
               <?php endif ?>
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-green me-2 w-100 mt-3 '. ($has_responded == true ? 'disabled' : ''),
+                'class' => 'btn s-btn-green me-2 w-100 mt-3 ' . ($has_responded == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
-                    'action' => RequestResponse::APPROVE,
+                  'action' => RequestResponse::APPROVE,
                 ],
               ]) ?>
               <?= Html::a('Tolak', ['tanggapi-permintaan-bergabung', 'self_team_member_id' => $member_id], [
-                'class' => 'btn s-btn-red me-2 w-100 mt-3 '. ($has_responded == true ? 'disabled' : ''),
+                'class' => 'btn s-btn-red me-2 w-100 mt-3 ' . ($has_responded == true ? 'disabled' : ''),
                 'data-method' => 'post',
                 'data-params' => [
-                    'action' => RequestResponse::REJECT,
+                  'action' => RequestResponse::REJECT,
                 ],
                 'data-confirm' => 'Apakah Anda yakin ingin menolak permintaan bergabung Tim Mandiri ini?',
               ]) ?>

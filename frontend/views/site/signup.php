@@ -33,7 +33,12 @@ $this->title = 'Signup';
                 <div class="form-group w-100">
                     <?= Html::submitButton('Signup', ['class' => 'btn s-btn-main w-100', 'name' => 'signup-button']) ?>
                 </div>
-    
+
+                <div class="mt-4 mx-auto text-center" style="color:#999;">
+                    Perlu kirim ulang email verifikasi?
+                    <?= Html::a('Kirim Ulang', ['site/resend-verification-email']) ?>
+                </div>
+
                 <?php ActiveForm::end(); ?>
             </div>
         </div>

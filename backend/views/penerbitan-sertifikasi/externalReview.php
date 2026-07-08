@@ -45,7 +45,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
   <div class="text-muted d-flex align-items-center gap-2 mb-2">
     <span class="badge bg-primary">Admin Nasional</span>
     <div>
-      Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
+      Sertifikasi<?= $certification->purpose == 'renewal' ? ' Ulang' : '' ?> SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
     </div>
   </div>
 

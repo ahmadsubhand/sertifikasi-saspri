@@ -134,7 +134,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
             <h5 class="fw-bold mb-1">Penilaian Sertifikat SASPRI-K</h5>
             <div class="d-flex align-items-center gap-2 flex-column flex-md-row">
-                <span class="badge bg-primary">Level <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
+                <span class="badge bg-primary">Tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?></span>
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalGantiLevel">
                     <i class="fa-solid fa-pen-to-square"></i> Ganti
                 </button>
@@ -273,16 +273,16 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
         <div class="modal-content">
             <?= Html::beginForm(['ganti-level-sertifikat', 'saspri_k_id' => $saspri_k->id], 'post') ?>
             <div class="modal-header">
-                <h5 class="modal-title">Ganti Level Sertifikat</h5>
+                <h5 class="modal-title">Ganti Tingkat Sertifikat</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Pilih Level Baru</label>
-                    <?= Html::dropDownList('level', $certification->level, CertificateLevel::list(), ['class' => 'form-select']) ?>
+                    <label class="form-label fw-bold">Pilih Tingkat Baru</label>
+                    <?= Html::dropDownList('Tingkat', $certification->level, CertificateLevel::list(), ['class' => 'form-select']) ?>
                 </div>
                 <div class="alert alert-warning small">
-                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Perhatian: Penilaian yang telah dilakukan pada level yang lama akan dihapus.
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i> Perhatian: Penilaian yang telah dilakukan pada Tingkat yang lama akan dihapus.
                 </div>
             </div>
             <div class="modal-footer">

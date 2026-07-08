@@ -134,7 +134,7 @@ $this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
             <div class="d-flex justify-content-between mt-4">
                 <p class="fw-bold">Dokumen Pendukung</p>
                 <div>
-                    <button type="button" id="add-row" class="btn btn-sm text-white s-btn-main" <?= $is_pending ?? 'disabled' ?>>
+                    <button type="button" id="add-row" class="btn btn-sm text-white s-btn-main " <?= ($is_pending == false) ? '' : 'disabled' ?>>
                         <i class="fa-solid fa-plus"></i> Tambah
                     </button>
                 </div>
@@ -144,14 +144,14 @@ $this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
                     <div class="doc-row row mb-3">
                         <div class="col-md-6">
                             <label class="form-label">Kategori / Nama Dokumen</label>
-                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
+                            <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= ($is_pending == false) ? '' : 'disabled' ?> placeholder="Contoh: Sertifikat SPR" required>
                         </div>
                         <div class="col-md-5">
                             <label class="form-label">Unggah Dokumen</label>
-                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= $is_pending ?? 'disabled' ?> required>
+                            <input class="form-control border-black" type="file" name="saspri_k_documents[]" <?= ($is_pending == false) ? '' : 'disabled' ?> required>
                         </div>
-                        <div class="col-md-1 d-flex align-items-end" <?= $is_pending ?? 'disabled' ?>>
-                            <button type="button" class="rem-row btn btn-danger w-100">
+                        <div class="col-md-1 d-flex align-items-end" >
+                            <button type="button" class="rem-row btn btn-danger w-100" <?= ($is_pending == false) ? '' : 'disabled' ?>>
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -162,15 +162,15 @@ $this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
                             <div class=" border-secondary border-bottom my-1"></div>
                             <div class="col-sm-6 col-12">
                                 <label class="form-label">Kategori / Nama Dokumen</label>
-                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= $is_pending ?? 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
+                                <input type="text" class="form-control border-black" name="SaspriK[saspri_k_documents][]" <?= ($is_pending == false) ? '' : 'disabled' ?> value="<?= Html::encode($doc->type) ?>" required>
                             </div>
                             <div class="col-sm-5 col-12">
                                 <label class="form-label">Ganti Dokumen</label>
-                                <input class="form-control border-black" type="file" <?= $is_pending ?? 'disabled' ?> name="saspri_k_documents[]" required>
+                                <input class="form-control border-black" type="file" <?= ($is_pending == false) ? '' : 'disabled' ?> name="saspri_k_documents[]" required>
 
                             </div>
                             <div class="col-sm-1 d-flex align-items-end col-12">
-                                <button type="button" class="rem-row btn btn-danger w-100" <?= $is_pending ?? 'disabled' ?>>
+                                <button type="button" class="rem-row btn btn-danger w-100" <?= ($is_pending == false) ? '' : 'disabled' ?>>
                                     <i class="fa-solid fa-trash"></i>
                                     <span class="d-inline d-md-none ms-2">Hapus Dokumen</span>
                                 </button>
@@ -199,6 +199,7 @@ $this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
     </div>
 
     <?php ActiveForm::end() ?>
+    <?php if($saspri_k != null) : ?>
     <div class="w-100">
         <hr class="text-dark opacity-10 my-4">
         <?= Html::a('Batalkan Pendaftaran', ['batalkan-pendaftaran-saspri-k'], [
@@ -209,6 +210,7 @@ $this->title = (string) 'Daftar Sebagai Wali SASPRI-K';
             ],
         ]) ?>
     </div>
+    <?php endif ?>
 </div>
 
 <?php

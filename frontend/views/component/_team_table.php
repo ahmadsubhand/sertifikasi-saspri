@@ -9,7 +9,9 @@ use yii\helpers\Url;
 /** @var SelfTeamMember[]|PeerTeamMember[]|null $model 
  * @var bool $is_self
 */
+
 ?>
+
 
 <div class="bg-white px-2 py-4 rounded-2 shadow border-1 border">
   <div class="collapse show px-md-4 px-2" id="collapse-running">

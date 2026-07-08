@@ -50,7 +50,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
       <span class="badge bg-secondary">Anggota Tim Sebaya</span>
     <?php endif; ?>
     <div>
-      Sertifikasi SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
+      Sertifikasi<?= $certification->is_rejected == 1 ? ' Ulang' : '' ?> SASPRI-K <?= Html::encode($certification->saspriK->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
     </div>
   </div>
 
@@ -62,9 +62,9 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     $finalizeAction = Url::to(['finalisasi-peer-review', 'certification_id' => $certification->id]);
     ?>
     <div class="mobile-scroll">
-      <form id="peer-review-form" action="<?= $saveAction ?>" method="post" >
+      <form id="peer-review-form" action="<?= $saveAction ?>" method="post">
         <?= Html::hiddenInput(\Yii::$app->request->csrfParam, \Yii::$app->request->csrfToken) ?>
-  
+
         <table class="table align-middle">
           <thead>
             <tr class="text-center">
@@ -84,7 +84,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                   <?= Html::encode($subGroup->label) ?> [<?= Html::encode($subGroup->weight) ?>%]
                 </td>
               </tr>
-  
+
               <?php if (isset($subGroup->indicators)): ?>
                 <?php foreach ($subGroup->indicators as $index => $indicator): ?>
                   <?php
@@ -115,12 +115,12 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                         data-subgroup-id="<?= $subGroup->id ?>"
                         data-indicator-id="<?= $indicator->id ?>">
                         <option value="0">Pilih Penilaian</option>
-  
+
                         <?php foreach ($indicator->indicatorOptions as $option): ?>
                           <?php
                           $selected = ($peerScore == $option->weight) ? 'selected' : '';
                           ?>
-  
+
                           <option value="<?= $option->weight ?>" <?= $selected ?>>
                             <?= Html::encode($option->label) ?> (<?= $option->weight ?>)
                           </option>
@@ -143,14 +143,14 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
                   </tr>
                 <?php endforeach; ?>
               <?php endif; ?>
-  
+
               <tr>
                 <td colspan="2"></td>
                 <td colspan="3" class="text-end fw-bold">Nilai Sub-total <?= Html::encode($subGroup->code) ?></td>
                 <td class="text-center fw-bold s-color-main subgroup-weighted-display" id="subgroup-weighted-<?= $subGroup->id ?>" data-weight="<?= $subGroup->weight ?>"><?= number_format($subGroupResults[$subGroup->id]['weighted'], 2) ?></td>
               </tr>
             <?php endforeach; ?>
-  
+
             <tr class="table-secondary">
               <th scope="row"></th>
               <th colspan="4" class="text-end">Nilai Total <?= Html::encode($current_root_group->code) ?> (<?= Html::encode($current_root_group->label) ?>)</th>

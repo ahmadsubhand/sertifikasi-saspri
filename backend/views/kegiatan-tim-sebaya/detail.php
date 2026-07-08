@@ -5,6 +5,7 @@ use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
+use common\enums\TeamRole;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
@@ -21,6 +22,15 @@ use yii\helpers\ArrayHelper;
 $user_ids = ArrayHelper::getColumn($peer_team, 'user_id');
 $this->title = (string)'Detail Sertifikasi SASPRI-K ' . $saspri->region_name;
 
+$current_user_id = Yii::$app->user->id;
+$curr_role = null;
+
+foreach ($peer_team as $member) {
+    if ($member->user_id == $current_user_id) {
+        $curr_role = $member->role;
+        break;
+    }
+}
 
 $label = [
   'SASPRI-K',
@@ -115,14 +125,22 @@ $shingles = [
             </p>
             <br>
             <p class="h6 mb-2">Proses <?= (string)CertificationStatus::list()[$cert['status']] ?></p>
-            <p class="h6"> <?= Html::encode($cert['peer_team_due_date'])
-                              ? 'Sebelum tanggal ' . date('d-m-Y', strtotime($cert['peer_team_due_date']))
-                              : '-' ?></p>
+            <?php if ($cert->status === CertificationStatus::PEER_REVIEW ) : ?>
+            <p class="h6">Sebelum tanggal <?= $this->render('/component/_date_comparator', [
+                                              'cert' => $cert
+                                            ]); ?>
+            </p>
+            <?php endif ?>
           </div>
           <div class="px-md-3 px-1 text-center">
-            <?php if ($has_responded) : ?>
-              <small class="text-center mx-auto mb-0">anda sudah merespon</small>
-            <?php endif ?>
+              <small>Anda diminta menjadi <strong><?= TeamRole::list()[$curr_role] ?></strong> tim Sebaya</small>
+              <?php if ($has_responded) : ?>
+                <div class="d-flex align-items-center gap-3 w-100 mb-2 mt-3">
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                  <small class="text-center mx-auto mb-0 text-success">anda sudah merespon</small>
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                </div>
+              <?php endif ?>
             <?php if ($cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-green me-2 w-100 mt-3 ' . ($has_responded == true ? 'disabled' : ''),

@@ -50,7 +50,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
       <span class="badge bg-secondary">Anggota Tim</span>
     <?php endif; ?>
     <div>
-      Sertifikasi SASPRI-K <?= Html::encode($saspri_k->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
+      Sertifikasi<?= $certification->is_rejected == 1 ? ' Ulang' : '' ?> SASPRI-K <?= Html::encode($saspri_k->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
     </div>
   </div>
 

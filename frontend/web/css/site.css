@@ -72,6 +72,10 @@ table thead tr:first-child th:last-child {
   background-color: #0f172a;
   color: white;
 }
+.s-btn-main:disabled {
+  background-color: #0f172a80;
+  color: white;
+}
 .s-btn-main:hover {
   background-color: #0f172a;
   color: white;

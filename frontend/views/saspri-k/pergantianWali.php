@@ -80,15 +80,15 @@ if ($saspri_k->new_coordinator_id) {
 
                 <div class="mb-4">
                     <div class="form-check">
-                        <input class="form-check-input border-black" type="checkbox" id="check-consent" required>
-                        <label class="form-check-label" for="check-consent">
+                        <input class="form-check-input border-black" type="checkbox" id="check-consent" required <?= $new_coordinator && $is_pending ? 'disabled' : '' ?>>
+                        <label class="form-check-label" for="check-consent" >
                             Saya secara sadar mengajukan pergantian posisi Wali SASPRI-K kepada anggota yang saya pilih
                         </label>
                     </div>
                 </div>
 
                 <div class="w-100">
-                    <button type="submit" class="btn s-btn-main w-100 py-2 fw-bold" <?= $new_coordinator ? 'disabled' : '' ?>>
+                    <button type="submit" class="btn s-btn-main w-100 py-2 fw-bold" id="change-btn" <?= $new_coordinator && $is_pending ? 'disabled' : '' ?>>
                         Ajukan pergantian wali
                     </button>
                 </div>
@@ -96,23 +96,23 @@ if ($saspri_k->new_coordinator_id) {
         </div>
     </div>
     <?php if ($saspri_k->change_status != 'approved'): ?>
-    <hr class="text-dark opacity-10 my-3">
+        <hr class="text-dark opacity-10 my-3">
 
-    <div>
-      <?= Html::a(
-        'Batalkan Pergantian Wali',
-        ['batalkan-pergantian-wali'],
-        [
-          'class' => 'btn btn-danger me-2 w-100 mb-3',
-          'disabled' => $saspri_k->change_status == 'approved',
-          'data' => [
-            'method' => 'post',
-            'confirm' => 'Apakah Anda yakin ingin membatalkan pergantian wali?',
-          ],
-        ]
-      ) ?>
-    </div>
-  <?php endif ?>
+        <div>
+            <?= Html::a(
+                'Batalkan Pergantian Wali',
+                ['batalkan-pergantian-wali'],
+                [
+                    'class' => 'btn btn-danger me-2 w-100 mb-3',
+                    'disabled' => $saspri_k->change_status == 'approved',
+                    'data' => [
+                        'method' => 'post',
+                        'confirm' => 'Apakah Anda yakin ingin membatalkan pergantian wali?',
+                    ],
+                ]
+            ) ?>
+        </div>
+    <?php endif ?>
 </div>
 
 <script>
@@ -120,6 +120,14 @@ if ($saspri_k->new_coordinator_id) {
         const input = document.getElementById('user-search-input');
         const dropdown = document.getElementById('search-dropdown');
         const container = document.getElementById('selected-user-container');
+
+        const checkbox = document.getElementById('check-consent');
+        const button = document.getElementById('change-btn');
+        button.disabled = true;
+        checkbox.addEventListener('change', function() {
+            button.disabled = !this.checked;
+        });
+
 
         let timeout = null;
 

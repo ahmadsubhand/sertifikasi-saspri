@@ -5,6 +5,7 @@ use common\enums\CertificateLevel;
 use common\enums\CertificationPurpose;
 use common\enums\CertificationStatus;
 use common\enums\RequestResponse;
+use common\enums\TeamRole;
 use common\models\PeerTeamMember;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -17,6 +18,16 @@ use yii\helpers\Url;
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
+
+$current_user_id = Yii::$app->user->id;
+$curr_role = null;
+
+foreach ($peer_team as $member) {
+    if ($member->user_id == $current_user_id) {
+        $curr_role = $member->role;
+        break;
+    }
+}
 
 $label = [
   'SASPRI-K',
@@ -123,8 +134,13 @@ $this->title = (string) 'Detail Kegiatan Tim Sebaya';
 
           <?php if ($cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
             <div class="px-md-3 px-1 text-center">
+              <small>Anda diminta menjadi <strong><?= TeamRole::list()[$curr_role] ?></strong> tim Sebaya</small>
               <?php if ($has_responded) : ?>
-                <small class="text-center mx-auto mb-0">anda sudah merespon</small>
+                <div class="d-flex align-items-center gap-3 w-100 mb-2 mt-3">
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                  <small class="text-center mx-auto mb-0 text-success">anda sudah merespon</small>
+                  <hr class="flex-grow-1 m-0 text-success-tight opacity-25">
+                </div>
               <?php endif ?>
               <?= Html::a('Setuju', ['tanggapi-permintaan-bergabung', 'peer_team_member_id' => $member_id], [
                 'class' => 'btn s-btn-green me-2 w-100 mt-3 ' . ($has_responded == true ? 'disabled' : ''),
