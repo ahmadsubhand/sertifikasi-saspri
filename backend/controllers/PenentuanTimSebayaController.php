@@ -6,6 +6,7 @@ use common\enums\CertificationStatus;
 use common\enums\TeamRole;
 use common\enums\UserRole;
 use common\helpers\ModelHelper;
+use common\helpers\UserHelper;
 use common\models\Certification;
 use common\models\form\AddMembersForm;
 use common\models\form\ChangeMemberRoleForm;
@@ -124,7 +125,7 @@ class PenentuanTimSebayaController extends Controller
                     ['like', 'LOWER(user.username)', strtolower($q)],
                     ['like', 'LOWER(user.full_name)', strtolower($q)],
                 ])
-                ->select(['id', 'username'])
+                ->select(UserHelper::basicSelect())
                 ->limit(10)
                 ->asArray()
                 ->all();

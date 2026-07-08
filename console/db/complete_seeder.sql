@@ -291,32 +291,32 @@ INSERT INTO certification (id, saspri_k_id, assessment_id, purpose, status, leve
 
 UPDATE saspri_k SET 
     change_status = 'pending', 
-    new_coordinator_id = 9, 
+    new_coordinator_id = 135, 
     change_request_reason = 'Wali lama pindah tugas' 
 WHERE id = 7;
 
 UPDATE saspri_k SET 
     change_status = 'pending', 
-    new_coordinator_id = 10, 
+    new_coordinator_id = 140, 
     change_request_reason = 'Wali lama mengundurkan diri' 
 WHERE id = 8;
 
 UPDATE saspri_k SET 
     change_status = 'pending', 
-    new_coordinator_id = 11, 
+    new_coordinator_id = 145, 
     change_request_reason = 'Wali lama sakit' 
 WHERE id = 9;
 
 UPDATE saspri_k SET 
     change_status = 'rejected', 
-    new_coordinator_id = 12, 
+    new_coordinator_id = 150, 
     change_request_reason = 'Wali lama sibuk',
     change_rejection_reason = 'User belum memenuhi kualifikasi' 
 WHERE id = 10;
 
 UPDATE saspri_k SET 
     change_status = 'rejected', 
-    new_coordinator_id = 13, 
+    new_coordinator_id = 155, 
     change_request_reason = 'Alasan kesehatan',
     change_rejection_reason = 'Alasan pergantian tidak valid' 
 WHERE id = 11;

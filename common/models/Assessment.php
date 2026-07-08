@@ -164,10 +164,19 @@ class Assessment extends \yii\db\ActiveRecord
 
     public static function clone(Assessment $cloned_assessment)
     {
+        $baseTitle = 'Salinan dari ' . $cloned_assessment->title;
+        $title = $baseTitle;
+        $counter = 2;
+
+        while (Assessment::find()->where(['title' => $title])->exists()) {
+            $title = sprintf('%s (%d)', $baseTitle, $counter);
+            $counter++;
+        }
+
         $new_assessment = new Assessment();
-        $new_assessment->title = 'Salinan dari ' . $cloned_assessment->title;
+        $new_assessment->title = $title;
         $new_assessment->level = $cloned_assessment->level;
-        $new_assessment->save(false);
+        $new_assessment->save();
 
         foreach ($cloned_assessment->rootGroups as $old_root_group) {
             $old_root_group->clone($new_assessment->id);

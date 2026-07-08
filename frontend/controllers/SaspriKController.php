@@ -152,7 +152,7 @@ class SaspriKController extends Controller
                     ['like', 'LOWER(user.username)', strtolower($q)],
                     ['like', 'LOWER(user.full_name)', strtolower($q)],
                 ])
-                ->select(['id', 'username'])
+                ->select(UserHelper::basicSelect())
                 ->limit(10)
                 ->asArray()
                 ->all();
@@ -222,7 +222,10 @@ class SaspriKController extends Controller
                 Yii::$app->session->setFlash('error', $error->getMessage());
                 if ($error instanceof ForbiddenHttpException) {
                     return $this->goHome();
-                } elseif ($error instanceof NotFoundHttpException) {
+                } elseif (
+                    $error instanceof NotFoundHttpException || 
+                    $error instanceof UnprocessableEntityHttpException
+                ) {
                     return $this->redirect(['index']);
                 }
             }
@@ -244,7 +247,15 @@ class SaspriKController extends Controller
                     ->getFullSelfTeamMembers()
                     ->with([
                         'user' => function (ActiveQuery $query) {
-                            $query->select(['id', 'username', 'full_name']);
+                            $query->select(UserHelper::basicSelect());
+                        }
+                    ])
+                    ->all(),
+                'peer_team_members' => $certification
+                    ->getFullPeerTeamMembers()
+                    ->with([
+                        'user' => function (ActiveQuery $query) {
+                            $query->select(UserHelper::basicSelect());
                         }
                     ])
                     ->all(),

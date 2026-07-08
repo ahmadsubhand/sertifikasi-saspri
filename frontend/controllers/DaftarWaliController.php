@@ -85,7 +85,7 @@ class DaftarWaliController extends Controller
     public function actionBatalkanPendaftaranSaspriK()
     {
         try {
-            $saspri_k = SaspriKService::cancelCoordinatorChange();
+            $saspri_k = SaspriKService::cancelRegistration();
 
             Yii::$app->session->setFlash(
                 'success',

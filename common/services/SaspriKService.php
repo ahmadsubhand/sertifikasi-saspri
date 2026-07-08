@@ -20,6 +20,8 @@ use common\models\form\CoordinatorChangeForm;
 use common\models\form\RequestResponseForm;
 use common\models\form\SaspriKListForm;
 use common\models\form\UpdateSaspriKForm;
+use common\models\PeerTeamMember;
+use common\models\SelfTeamMember;
 use Exception;
 use Yii;
 use yii\helpers\Url;
@@ -145,11 +147,43 @@ class SaspriKService
     {
         $saspri_k = UserService::findSaspriKAsCoordinatorOrFail();
         $user = SaspriKService::findMember($user_id, $saspri_k->id);
+
         if ($saspri_k->new_coordinator_id === $user->id) {
             throw new UnprocessableEntityHttpException(
                 'Anggota tidak dapat dikeluarkan karena sedang diajukan sebagai Wali baru'
             );
         }
+
+        $activeMemberOfSelfTeam = SelfTeamMember::find()
+            ->joinWith('certification')
+            ->where([
+                'user_id' => $user->id,
+            ])
+            ->andWhere([
+                '!=', Certification::tableName() . '.status', CertificationStatus::COMPLETED
+            ])
+            ->exists();
+        if ($activeMemberOfSelfTeam) {
+            throw new UnprocessableEntityHttpException(
+                'Anggota tidak dapat dikeluarkan karena sedang berpartisipasi dalam Tim Mandiri'
+            );
+        }
+
+        $activeMemberOfPeerTeam = PeerTeamMember::find()
+            ->joinWith('certification')
+            ->where([
+                'user_id' => $user->id,
+            ])
+            ->andWhere([
+                '!=', Certification::tableName() . '.status', CertificationStatus::COMPLETED
+            ])
+            ->exists();
+        if ($activeMemberOfPeerTeam) {
+            throw new UnprocessableEntityHttpException(
+                'Anggota tidak dapat dikeluarkan karena sedang berpartisipasi dalam Tim Sebaya'
+            );
+        }
+
         $user->removeUserFromSaspriK()->save();
 
         return [
