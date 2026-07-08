@@ -43,15 +43,33 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
 
 <div class="page-cont w-100 h-100 p-md-3 d-flex flex-column gap-3">
   <h1><?= Html::encode($this->title) ?></h1>
-  <div class="text-muted d-flex align-items-center gap-2 mb-2">
-    <?php if ($is_leader): ?>
-      <span class="badge s-bg-main">Ketua Tim</span>
-    <?php else: ?>
-      <span class="badge bg-secondary">Anggota Tim</span>
-    <?php endif; ?>
-    <div>
-      Sertifikasi<?= $certification->is_rejected == 1 ? ' Ulang' : '' ?> SASPRI-K <?= Html::encode($saspri_k->region_name) ?> tingkat <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
+  <div class="mb-2">
+    <div class="text-muted d-flex align-items-center gap-2">
+        <?php if ($is_leader): ?>
+            <span class="badge s-bg-main">Ketua Tim Mandiri</span>
+        <?php else: ?>
+            <span class="badge bg-secondary">Anggota Tim Mandiri</span>
+        <?php endif; ?>
+
+        <?php if ($certification->is_rejected): ?>
+            <span class="badge bg-danger">Ditolak</span>
+        <?php endif; ?>
+
+        <div>
+            Sertifikasi SASPRI-K
+            <?= Html::encode($certification->saspriK->region_name) ?>
+            tingkat
+            <?= Html::encode(CertificateLevel::list()[$certification->level] ?? '-') ?>
+        </div>
     </div>
+
+    <?php if ($certification->is_rejected): ?>
+        <div class="alert alert-danger mt-2 mb-0 py-2">
+            <strong>Pengajuan sebelumnya ditolak.</strong><br>
+            <strong>Alasan:</strong>
+            <?= nl2br(Html::encode($certification->rejection_reason ?: 'Tidak ada alasan yang diberikan.')) ?>
+        </div>
+    <?php endif; ?>
   </div>
 
   <div class="bg-white px-3 py-4 rounded-2 shadow border-1 border d-flex flex-column gap-2 w-100">
@@ -173,7 +191,9 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
           <li class="page-item">
             <a class="page-link s-btn-main <?php echo $page == $total_pages && !$is_leader ? 'disabled' : '' ?>">
               <?php if ($page == $total_pages && $is_leader): ?>
-                <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn-none">Selesai Review</button>
+                <button type="submit" id="btn-finish" form="self-review-form" name="finish" value="1" class="btn-none">
+                    <?= $certification->is_rejected ? 'Ajukan Ulang' : 'Selesai Review' ?>
+                </button>
                 <?php else: ?>
                   <button type="submit" id="btn-next" form="self-review-form" name="target_page" value="<?= $page + 1 ?>" class="btn-none w-100 h-100">Berikutnya</button>
               <?php endif; ?>

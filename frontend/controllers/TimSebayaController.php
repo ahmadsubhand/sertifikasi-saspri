@@ -291,6 +291,7 @@ class TimSebayaController extends Controller
             return $this->render('detail', [
                 'id' => $case_id,
                 'member_id' => $member->id,
+                'role' => $member->role,
                 'has_responded' => $has_responded,
                 'saspri' => $saspri_k,
                 'cert' => $cert,

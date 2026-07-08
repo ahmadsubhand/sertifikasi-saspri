@@ -13,21 +13,12 @@ use yii\helpers\Url;
 /** @var int $id
  * @var int $member_id
  * @var bool $has_responded
+ * @var string $role
  *  @var common\models\SaspriK $saspri
  *  @var common\models\Certification $cert
  * @var SelfTeamMember[] $self_team
  * @var PeerTeamMember[] $peer_team
  */
-
-$current_user_id = Yii::$app->user->id;
-$curr_role = null;
-
-foreach ($peer_team as $member) {
-    if ($member->user_id == $current_user_id) {
-        $curr_role = $member->role;
-        break;
-    }
-}
 
 $label = [
   'SASPRI-K',
@@ -134,7 +125,7 @@ $this->title = (string) 'Detail Kegiatan Tim Sebaya';
 
           <?php if ($cert->status == CertificationStatus::PENDING_PEER_TEAM_FORMATION) : ?>
             <div class="px-md-3 px-1 text-center">
-              <small>Anda diminta menjadi <strong><?= TeamRole::list()[$curr_role] ?></strong> tim Sebaya</small>
+              <small>Anda diminta menjadi <strong><?= TeamRole::list()[$role] ?></strong> Tim Sebaya</small>
               <?php if ($has_responded) : ?>
                 <div class="d-flex align-items-center gap-3 w-100 mb-2 mt-3">
                   <hr class="flex-grow-1 m-0 text-success-tight opacity-25">

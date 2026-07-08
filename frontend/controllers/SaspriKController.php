@@ -252,7 +252,7 @@ class SaspriKController extends Controller
                     ])
                     ->all(),
                 'peer_team_members' => $certification
-                    ->getFullPeerTeamMembers()
+                    ->getPeerTeamMembers()
                     ->with([
                         'user' => function (ActiveQuery $query) {
                             $query->select(UserHelper::basicSelect());
