@@ -41,6 +41,8 @@ class UserService
         $user = new User();
         $user->username = $data->username;
         $user->email = $data->email;
+        $user->full_name = $data->full_name;
+        $user->phone_number = $data->phone_number;
         $user->setPassword($data->password);
         $user->generateAuthKey();
         $user->generateEmailVerificationToken();
