@@ -1,0 +1,4089 @@
+{
+  "info": {
+    "_postman_id": "320772ad-df12-4e4a-a5cd-678e52d5ebf3",
+    "name": "Mobile API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53579790",
+    "_collection_link": "https://go.postman.co/collection/53579790-320772ad-df12-4e4a-a5cd-678e52d5ebf3?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Register",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"contoh@gmail.com\",\r\n    \"username\": \"contoh\",\r\n    \"password\": \"12341234\",\r\n    \"phone_number\": \"0896874283749\",\r\n    \"full_name\": \"Nama Lengkap Contoh\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/register",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Resend Verification Email",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"contoh@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/resend-verification-email",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "resend-verification-email"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Verify Email",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"token\": \"JsySoejrAqpFhYLPP4WLinjPYUCWkDBY_1782288316\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/verify-email",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "verify-email"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Request Password Reset",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"contoh@gmail.com\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/request-password-reset",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "request-password-reset"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reset Password",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"token\": \"fFLZ-y20UiCNNxQV6xN27uN7zAy5WllU_1782288582\",\r\n    \"password\": \"43214321\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/reset-password",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "reset-password"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();\r",
+                      "\r",
+                      "pm.environment.set(\r",
+                      "    \"access_token\",\r",
+                      "    response.access_token\r",
+                      ");"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"user.18\",\r\n    \"password\": \"password_0\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/login",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/logout",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "logout"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Coordinator",
+          "item": [
+            {
+              "name": "Available for Saspri K",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/available-for-saspri-k?q=user&limit=5&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "available-for-saspri-k"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "user"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                },
+                "description": "Mencari User yang dapat diundang untuk bergabung ke dalam SASPRI-K dengan rincian sebagai berikut:\n\n1. Bukan Admin SASPRI-N\n    \n2. Belum bergabung dalam SASPRI-K manapun\n    \n3. Tidak sedang dalam proses pendaftaran Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Available for Self Team",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/available-for-self-team?q=user&limit=2&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "available-for-self-team"
+                  ],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "user"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "2"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                },
+                "description": "Mencari User yang dapat diundang untuk bergabung ke dalam Tim Mandiri dengan rincian sebagai berikut:\n\n1. Anggota SASPRI-K yang mengajukan sertifikasi\n    \n2. Bukan Wali SASPRI-K\n    \n3. Belum bergabung dalam Tim Mandiri ini"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Wali SASPRI-K"
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Available for Peer Team",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/user/available-for-peer-team?certification_id=10&q=user&limit=10&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "user",
+                    "available-for-peer-team"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "10"
+                    },
+                    {
+                      "key": "q",
+                      "value": "user"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                },
+                "description": "Mencari User yang dapat diundang untuk bergabung ke dalam Tim Sebaya dengan rincian sebagai berikut:\n\n1. Bukan Anggota SASPRI-K yang mengajukan sertifikasi\n    \n2. Admin SASPRI-N\n    \n3. Belum bergabung dalam Tim Sebaya ini"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+        },
+        {
+          "name": "Me",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/user/me",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/user/detail?user_id=35",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "user",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "35"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Certifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/user/certifications?limit=1&offset=0",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "user",
+                "certifications"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "1"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Menampilkan Sertifikasi (sebagai Tim Mandiri & Tim Sebaya, permintaan disetujui, ditolak, & menunggu, sertifikasi sedan berjalan & selesai) yang berkaitan dengan User yang saat ini sedang login"
+          },
+          "response": []
+        },
+        {
+          "name": "Teams",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/user/teams?status=pending&expand=certification.saspriK",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "user",
+                "teams"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                },
+                {
+                  "key": "expand",
+                  "value": "certification.saspriK"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Saspri K",
+      "item": [
+        {
+          "name": "Coordinator",
+          "item": [
+            {
+              "name": "On Going Certification",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/on-going-certification",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "on-going-certification"
+                  ]
+                },
+                "description": "Menampilkan Sertifikasi yang sedang berjalan untuk SASPRI-K yang terkait dengan Wali yang sedang login"
+              },
+              "response": []
+            },
+            {
+              "name": "Add Members",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"user_ids\": [4]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/add-members",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "add-members"
+                  ]
+                },
+                "description": "Mendaftarkan banyak Anggota sekaligus ke dalam SASPRI-K yang terkait dengan Wali yang sedang login. Daftar anggota yang diperbolehkan bergabung dijelaskan dalam [Available for SASPRI-K](https://asdcode123-4416990.postman.co/workspace/Sertifikasi-SASPRI~d562e135-834a-4fed-9a00-4a322cc4b3d0/request/53579790-961df8ae-dcf3-488e-bc3d-29543074028c?action=share&source=copy-link&creator=53579790&ctx=documentation)"
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Member",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/remove-member?user_id=17",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "remove-member"
+                  ],
+                  "query": [
+                    {
+                      "key": "user_id",
+                      "value": "17"
+                    }
+                  ]
+                },
+                "description": "Mengeluarkan Anggota dari SASPRI-K yang terkait dengan Wali yang sedang login"
+              },
+              "response": []
+            },
+            {
+              "name": "Change Coordinator",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"new_coordinator_id\": 16,\r\n    \"change_request_reason\": \"Pengen ganti aja sih\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/change-coordinator",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "change-coordinator"
+                  ]
+                },
+                "description": "Mengajukan permintaan pergantian Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Detail Change Coordinator",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/detail-change-coordinator",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "detail-change-coordinator"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel Coordinator Change",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/cancel-coordinator-change",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "cancel-coordinator-change"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"district_id\": 1,\r\n    \"region_name\": \"Kecamatan Cibinong\",\r\n    \"address\": \"Jl. Raya Bogor No. 123\",\r\n    \"cooperative_name\": \"Koperasi Ternak Sejahtera\",\r\n    \"number_of_groups\": 5,\r\n    \"number_of_active_members\": 120,\r\n    \"livestock_type\": \"Sapi Perah\",\r\n    \"total_livestock_count\": 350,\r\n    \"breeding_livestock_count\": 80,\r\n    \"productive_heifer_count\": 45\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/update",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "update"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Wali SASPRI-K"
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Coordinator Registration",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-registration?limit=1&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-registration"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "description": "Menampilkan daftar permintaan pendaftaran Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Coordinator Registration Detail",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-registration-detail?saspri_k_id=12&page=1",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-registration-detail"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "12"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change Certification Level",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"level\": \"weania\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/change-registration-level?saspri_k_id=12",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "change-registration-level"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "12"
+                    }
+                  ]
+                },
+                "description": "Mengganti level sertifikat"
+              },
+              "response": []
+            },
+            {
+              "name": "Save Draft Registration",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"indicator_scores\": {\r\n        \"100\" : {\r\n            \"final_score\": 50\r\n        },\r\n        \"101\": {\r\n            \"final_score\": 50\r\n        },\r\n        \"102\": {\r\n            \"final_score\": 50\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/save-draft-registration?saspri_k_id=13",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "save-draft-registration"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "13"
+                    }
+                  ]
+                },
+                "description": "Menyimpan sementara penilaian sertifikasi pada proses pendaftaran Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Coordinator Registration Response",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"action\": \"approve\",\r\n    \"indicator_scores\": {\r\n        \"100\" : {\r\n            \"final_score\": 100\r\n        },\r\n        \"101\": {\r\n            \"final_score\": 75\r\n        },\r\n        \"102\": {\r\n            \"final_score\": 50\r\n        } // kalau tidak dimasukkan berarti tidak berubah\r\n    }\r\n    // \"request_rejection_reason\": \"apa ya?\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-registration-response?saspri_k_id=14",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-registration-response"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "14"
+                    }
+                  ]
+                },
+                "description": "Menyetujui/menolak permintaan pendaftaran Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Coordinator Change",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-change?limit=1&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-change"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "1",
+                      "type": "text"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "description": "Menampilkan daftar permintaan pergantian Wali SASPRI-K"
+              },
+              "response": []
+            },
+            {
+              "name": "Coordinator Change Detail",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-change-detail?saspri_k_id=7",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-change-detail"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "7",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Coordinator Change Response",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"action\": \"reject\",\r\n    \"rejection_reason\": \"apa ya?\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/coordinator-change-response?saspri_k_id=7",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "saspri-k",
+                    "coordinator-change-response"
+                  ],
+                  "query": [
+                    {
+                      "key": "saspri_k_id",
+                      "value": "7"
+                    }
+                  ]
+                },
+                "description": "Menyetujui/menolak permintaan pergantian Wali SASPRI-K"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+        },
+        {
+          "name": "List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k"
+              ],
+              "query": [
+                {
+                  "key": "province_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "regency_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "district_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "coordinator",
+                  "description": "coordinator, certifications, district.regency.province",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Infografis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/infografis",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "infografis"
+              ],
+              "query": [
+                {
+                  "key": "province_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "regency_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "district_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "coordinator",
+                  "description": "coordinator, certifications, district.regency.province",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/detail?saspri_k_id=10",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "saspri_k_id",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/members?saspri_k_id=1&q=user&limit=5&offset=5",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "members"
+              ],
+              "query": [
+                {
+                  "key": "saspri_k_id",
+                  "value": "1"
+                },
+                {
+                  "key": "q",
+                  "value": "user"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                },
+                {
+                  "key": "offset",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "Menampilkan Anggota SASPRI-K saat ini"
+          },
+          "response": []
+        },
+        {
+          "name": "Valid Certificate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/valid-certificate?saspri_k_id=4",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "valid-certificate"
+              ],
+              "query": [
+                {
+                  "key": "saspri_k_id",
+                  "value": "4"
+                }
+              ]
+            },
+            "description": "Menampilkan Sertifikasi terakhir yang telah selesai dan memenuhi standar penilaian"
+          },
+          "response": []
+        },
+        {
+          "name": "Latest Completed Certification",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/latest-completed-certification?saspri_k_id=4",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "latest-completed-certification"
+              ],
+              "query": [
+                {
+                  "key": "saspri_k_id",
+                  "value": "4"
+                }
+              ]
+            },
+            "description": "Menampilkan Sertifikasi terakhir yang telah selesai"
+          },
+          "response": []
+        },
+        {
+          "name": "Certifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/certifications?saspri_k_id=4&limit=2&offset=0",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "certifications"
+              ],
+              "query": [
+                {
+                  "key": "saspri_k_id",
+                  "value": "4"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Menampilkan Sertifikasi (sertifikasi sedan berjalan & selesai) yang berkaitan dengan SASPRI-K yang dipilih"
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "district_id",
+                  "value": "1",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "33cc7b13-beba-4a70-a927-4e3720a65207"
+                },
+                {
+                  "key": "region_name",
+                  "value": "Kecamatan Cibinong",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "c4dd2998-2fa1-4679-9482-1c68e2197874"
+                },
+                {
+                  "key": "address",
+                  "value": "Jl. Raya Bogor No. 123",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "ace25851-004a-4df9-b4b4-a911598aca44"
+                },
+                {
+                  "key": "cooperative_name",
+                  "value": "Koperasi Ternak Sejahtera",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "330c8f7b-0a4c-4aa6-b8e2-902b63da6403"
+                },
+                {
+                  "key": "number_of_groups",
+                  "value": "5",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "98877a2d-176c-4e12-a14f-27fbf46556c1"
+                },
+                {
+                  "key": "number_of_active_members",
+                  "value": "120",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "c460b831-6054-43ca-8512-8c4eb62a7aa9"
+                },
+                {
+                  "key": "livestock_type",
+                  "value": "S{{prefix}} Perah",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "f12c2103-1502-4bf1-be57-5cdb13de603a"
+                },
+                {
+                  "key": "total_livestock_count",
+                  "value": "350",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "0d9c24cc-d349-4848-bb6a-2d572635a504"
+                },
+                {
+                  "key": "breeding_livestock_count",
+                  "value": "80",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "24f04c8b-c00c-41f1-9a61-ecb1152b8da9"
+                },
+                {
+                  "key": "productive_heifer_count",
+                  "value": "45",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "06195fed-e2b9-4749-a6d0-30ca02ee8752"
+                },
+                {
+                  "key": "saspri_k_documents[0]",
+                  "value": "Nama tipe dokumen pertama",
+                  "description": "*",
+                  "type": "text",
+                  "uuid": "52010b8e-36cb-429b-b40e-8b78835367cc"
+                },
+                {
+                  "key": "saspri_k_documents[0]",
+                  "description": "*",
+                  "type": "file",
+                  "uuid": "25b0d502-ab52-438b-8e33-fd6cf262eec4",
+                  "src": "/C:/Users/ahmad/OneDrive/Pictures/Screenshots/Screenshot 2026-05-24 073123.png"
+                },
+                {
+                  "key": "saspri_k_documents[1]",
+                  "type": "text",
+                  "uuid": "f02d4a95-7f9e-4828-b2fb-360388ac6c2e",
+                  "value": "Profile peternakan"
+                },
+                {
+                  "key": "saspri_k_documents[1]",
+                  "type": "file",
+                  "uuid": "03bf7f19-1ee6-4db2-9727-3a53a50fd6b7",
+                  "src": "/C:/Users/ahmad/OneDrive/Documents/CO2 Emissions_Canada.csv"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/register",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "register"
+              ]
+            },
+            "description": "Mengajukan permintaan pendaftaran Wali SASPRI-K"
+          },
+          "response": []
+        },
+        {
+          "name": "Detail Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/detail-registration",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "detail-registration"
+              ]
+            },
+            "description": "Detail pengajuan permintaan pendaftaran Wali SASPRI-K"
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Registration",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/saspri-k/cancel-registration",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "saspri-k",
+                "cancel-registration"
+              ]
+            },
+            "description": "Membatalkan proses pendaftaran Wali SASPRI-K sehingga User dalam diundang untuk bergabung ke dalam SASPRI-K lainnya."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Certification",
+      "item": [
+        {
+          "name": "Coordinator",
+          "item": [
+            {
+              "name": "Self Team",
+              "item": [
+                {
+                  "name": "Full Self Team Members",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/full-self-team-members?limit=5&offset=0",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "full-self-team-members"
+                      ],
+                      "query": [
+                        {
+                          "key": "limit",
+                          "value": "5"
+                        },
+                        {
+                          "key": "offset",
+                          "value": "0"
+                        }
+                      ]
+                    },
+                    "description": "Menampilkan Anggota Tim Mandiri (permintaan disetujui, ditolak, menunggu)"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Add Self Team Members",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"user_ids\": [19]\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/add-self-team-members",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "add-self-team-members"
+                      ]
+                    },
+                    "description": "Menambahkan banyak Anggota Tim Mandiri sekaligus. Daftar anggota yang diperbolehkan bergabung dijelaskan dalam [Available for Self Team](https://asdcode123-4416990.postman.co/workspace/Sertifikasi-SASPRI~d562e135-834a-4fed-9a00-4a322cc4b3d0/request/53579790-934be04e-a5f9-4064-bb65-64dec1003802?action=share&source=copy-link&creator=53579790&ctx=documentation)"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Remove Self Team Member",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/remove-self-team-member?user_id=15",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "remove-self-team-member"
+                      ],
+                      "query": [
+                        {
+                          "key": "user_id",
+                          "value": "15"
+                        }
+                      ]
+                    },
+                    "description": "Menghapus Anggota Tim Mandiri"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Change Self Team Member Role",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"role\": \"leader\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/change-self-team-member-role?user_id=16",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "change-self-team-member-role"
+                      ],
+                      "query": [
+                        {
+                          "key": "user_id",
+                          "value": "16"
+                        }
+                      ]
+                    },
+                    "description": "Mengganti peran Anggota Tim Mandiri"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Submit For Self Review",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/submit-for-self-review",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "submit-for-self-review"
+                      ]
+                    },
+                    "description": "Finalisasi Anggota Tim Mandiri untuk lanjut ke tahap Self Review dengan komposisi anggota sebagai berikut:\n\n1. Jumlah Anggota yang setuju bergabung harus kelipatan 3\n    \n2. Terdiri dari 1 Ketua\n    \n3. Terdiri dari minimal 2 Anggota lainnya selain Ketua"
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Cancel",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/cancel",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "cancel"
+                  ]
+                },
+                "description": "Membatalkan proses sertifikasi yang ditolak oleh Admin SASPRI-N jika Wali SASPRI-K tidak berniat untuk melanjutkan proses sertifikasi"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Wali SASPRI-K"
+        },
+        {
+          "name": "Admin",
+          "item": [
+            {
+              "name": "Peer Team",
+              "item": [
+                {
+                  "name": "Full Peer Team Members",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/full-peer-team-members?certification_id=9&limit=5&offset=0",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "full-peer-team-members"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "5"
+                        },
+                        {
+                          "key": "offset",
+                          "value": "0"
+                        }
+                      ]
+                    },
+                    "description": "Menampilkan Anggota Tim Sebaya (permintaan disetujui, ditolak, menunggu)"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Add Peer Team Members",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"user_ids\": [41, 51, 21]\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/add-peer-team-members?certification_id=9",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "add-peer-team-members"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        }
+                      ]
+                    },
+                    "description": "Menambahkan banyak Anggota Tim Sebaya sekaligus. Daftar anggota yang diperbolehkan bergabung dijelaskan dalam [Available for Peer Team](https://asdcode123-4416990.postman.co/workspace/Sertifikasi-SASPRI~d562e135-834a-4fed-9a00-4a322cc4b3d0/request/53579790-77b3ebe7-3e43-4274-b33c-861f9229ad50?action=share&source=copy-link&creator=53579790&ctx=documentation)"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Remove Peer Team Member",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/remove-peer-team-member?certification_id=9&user_id=21",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "remove-peer-team-member"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        },
+                        {
+                          "key": "user_id",
+                          "value": "21"
+                        }
+                      ]
+                    },
+                    "description": "Menghapus Anggota Tim Sebaya"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Change Peer Team Member Role",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"role\": \"leader\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/change-peer-team-member-role?certification_id=9&user_id=51",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "change-peer-team-member-role"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        },
+                        {
+                          "key": "user_id",
+                          "value": "51"
+                        }
+                      ]
+                    },
+                    "description": "Mengganti peran Anggota Tim Sebaya"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Submit For Peer Review",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/submit-for-peer-review?certification_id=9",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "submit-for-peer-review"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        }
+                      ]
+                    },
+                    "description": "Finalisasi Anggota Tim Mandiri untuk lanjut ke tahap Peer Review dengan komposisi anggota sebagai berikut:\n\n1. 1 Pendamping dari Admin SASPRI-N\n    \n2. 1 Ketua dari Anggota SASPRI-K lainnya\n    \n3. Minimal 2 Anggota SASPRI-K lainnya selain ketua"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Reject Peer Team Formation Request",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"rejection_reason\": \"Bukti tidak lengkap\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/reject-peer-team-formation-request?certification_id=9",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "reject-peer-team-formation-request"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "9"
+                        }
+                      ]
+                    },
+                    "description": "Menolak permintaan pembentukan Tim Sebaya. Sertifikasi akan ditahan dan akan dikembalikan ke status Self Review"
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "External Review",
+              "item": [
+                {
+                  "name": "External Review",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/external-review?certification_id=11",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "external-review"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "11"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Save External Review",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"indicator_scores\": {\r\n        \"1\" : {\r\n            \"final_score\": 50\r\n        },\r\n        \"2\": {\r\n            \"final_score\": 50\r\n        },\r\n        \"3\": {\r\n            \"final_score\": 50\r\n        }\r\n    }\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/save-external-review?certification_id=11",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "save-external-review"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "11"
+                        }
+                      ]
+                    },
+                    "description": "Menampilkan transkrip nilai sebelum diterbitkan"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Transcripts",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/transcripts?certification_id=11",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "transcripts"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "11"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Finalize External Review",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/finalize-external-review?certification_id=11",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "finalize-external-review"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "11"
+                        }
+                      ]
+                    },
+                    "description": "Finalisasi penilaian External Review dan menerbitkan sertifikat"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Reject External Review Request",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{access_token}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n    \"rejection_reason\": \"Bukti tidak lengkap\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{url}}:{{port}}/{{prefix}}/certification/reject-external-review-request?certification_id=11",
+                      "host": [
+                        "{{url}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "{{prefix}}",
+                        "certification",
+                        "reject-external-review-request"
+                      ],
+                      "query": [
+                        {
+                          "key": "certification_id",
+                          "value": "11"
+                        }
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+        },
+        {
+          "name": "Self Review",
+          "item": [
+            {
+              "name": "Self Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/self-review?certification_id=8",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "self-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "8"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "description": "Menampilkan asesmen beserta skor sertifikasi saat ini"
+              },
+              "response": []
+            },
+            {
+              "name": "Save Self Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"indicator_scores\": {\r\n        \"1\" : {\r\n            \"self_team_score\": 50\r\n        },\r\n        \"2\": {\r\n            \"self_team_score\": 50\r\n        },\r\n        \"3\": {\r\n            \"self_team_score\": 50\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/save-self-review?certification_id=8",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "save-self-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "8"
+                    }
+                  ]
+                },
+                "description": "Simpan sementara penilaian Self Review"
+              },
+              "response": []
+            },
+            {
+              "name": "Finalize Self Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"indicator_scores\": {\r\n        \"1\" : {\r\n            \"self_team_score\": 50\r\n        },\r\n        \"2\": {\r\n            \"self_team_score\": 50\r\n        },\r\n        \"3\": {\r\n            \"self_team_score\": 50\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/finalize-self-review?certification_id=8",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "finalize-self-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "8"
+                    }
+                  ]
+                },
+                "description": "Finalisasi penilaian Self Review oleh Ketua Tim Mandiri"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Anggota Tim Mandiri"
+        },
+        {
+          "name": "Peer Review",
+          "item": [
+            {
+              "name": "Peer Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/peer-review?certification_id=10",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "peer-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Menampilkan asesmen beserta skor sertifikasi saat ini"
+              },
+              "response": []
+            },
+            {
+              "name": "Save Peer Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"indicator_scores\": {\r\n        \"1\" : {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"identical\"\r\n        },\r\n        \"2\": {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"identical\"\r\n        },\r\n        \"3\": {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"identical\"\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/save-peer-review?certification_id=10",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "save-peer-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Simpan sementara penilaian Peer Review"
+              },
+              "response": []
+            },
+            {
+              "name": "Finalize Peer Review",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{access_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"indicator_scores\": {\r\n        \"1\" : {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"agreed\"\r\n        },\r\n        \"2\": {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"identical\"\r\n        },\r\n        \"3\": {\r\n            \"peer_team_score\": 50,\r\n            \"status\": \"different\"\r\n        }\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/certification/finalize-peer-review?certification_id=10",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "certification",
+                    "finalize-peer-review"
+                  ],
+                  "query": [
+                    {
+                      "key": "certification_id",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Finalisasi penilaian Peer Review oleh Ketua Tim Sebaya"
+              },
+              "response": []
+            }
+          ],
+          "description": "Hanya boleh diakses oleh Anggota Tim Sebaya"
+        },
+        {
+          "name": "List",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification"
+              ],
+              "query": [
+                {
+                  "key": "province_id",
+                  "value": "1",
+                  "disabled": true
+                },
+                {
+                  "key": "regency_id",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "district_id",
+                  "value": "",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "all, completed, on_going",
+                  "disabled": true
+                },
+                {
+                  "key": "level",
+                  "value": "",
+                  "description": "natalia, weania, prematura, matura",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "disabled": true
+                },
+                {
+                  "key": "expand",
+                  "value": "saspriK.district.regency.province",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification/detail?certification_id=12",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "certification_id",
+                  "value": "12"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification/download?certification_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification",
+                "download"
+              ],
+              "query": [
+                {
+                  "key": "certification_id",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Saspri K",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification/saspri-k?certification_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification",
+                "saspri-k"
+              ],
+              "query": [
+                {
+                  "key": "certification_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Self Team Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification/self-team-members?certification_id=7",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification",
+                "self-team-members"
+              ],
+              "query": [
+                {
+                  "key": "certification_id",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Menampilkan Anggota Tim Mandiri (hanya yang telah disetujui)"
+          },
+          "response": []
+        },
+        {
+          "name": "Peer Team Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/certification/peer-team-members?certification_id=9",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "certification",
+                "peer-team-members"
+              ],
+              "query": [
+                {
+                  "key": "certification_id",
+                  "value": "9"
+                }
+              ]
+            },
+            "description": "Menampilkan Anggota Tim Sebaya (hanya yang telah disetujui)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Self Team Member",
+      "item": [
+        {
+          "name": "Join Request Response",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"action\": \"reject\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/self-team-member/join-request-response?self_team_member_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "self-team-member",
+                "join-request-response"
+              ],
+              "query": [
+                {
+                  "key": "self_team_member_id",
+                  "value": "3"
+                }
+              ]
+            },
+            "description": "Menyetujui/menolak permintaan bergabung ke dalam Tim Mandiri"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Peer Team Member",
+      "item": [
+        {
+          "name": "Join Request Response",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"action\": \"reject\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/peer-team-member/join-request-response?peer_team_member_id=2",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "peer-team-member",
+                "join-request-response"
+              ],
+              "query": [
+                {
+                  "key": "peer_team_member_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Menyetujui/menolak permintaan bergabung ke dalam Tim Sebaya"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Region",
+      "item": [
+        {
+          "name": "Province",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/region/province",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "region",
+                "province"
+              ]
+            },
+            "description": "Menampilkan seluruh provinsi yang ada di Indonesia"
+          },
+          "response": []
+        },
+        {
+          "name": "Regency",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/region/regency?province_id=2",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "region",
+                "regency"
+              ],
+              "query": [
+                {
+                  "key": "province_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Menampilkan seluruh kabupaten/kota dari provinsi yang dipilih"
+          },
+          "response": []
+        },
+        {
+          "name": "District",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/region/district?regency_id=2",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "region",
+                "district"
+              ],
+              "query": [
+                {
+                  "key": "regency_id",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Menampilkan seluruh kecamatan dari kabupaten/kota yang dipilih"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Assessment",
+      "item": [
+        {
+          "name": "All",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Asesmen Baru Nih\",\r\n    \"level\": \"weania\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/create",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "create"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "1",
+                  "description": "hanya dipakai jika ingin duplikat asesmen lama",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Buat asesmen baru atau duplikasi asesmen yang sudah ada"
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/detail?assessment_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Title",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\": \"Asesmen Baru Nih\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/update-title?assessment_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "update-title"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Activate",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/activate?assessment_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "activate"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "3"
+                }
+              ]
+            },
+            "description": "Mengaktifkan asesmen dan menonaktifkan asesmen lain yang aktif pada tingkat sertifikasi yang sama"
+          },
+          "response": []
+        },
+        {
+          "name": "Change Level",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"level\": \"matura\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/change-level?assessment_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "change-level"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "3"
+                }
+              ]
+            },
+            "description": "Mengubah tingkat sertifikasi yang hanya berlaku pada asesmen yang tidak aktif atau belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/assessment/delete?assessment_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "assessment",
+                "delete"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "3"
+                }
+              ]
+            },
+            "description": "Menghapus asesmen yang hanya berlaku pada asesmen yang tidak aktif atau belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        }
+      ],
+      "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+    },
+    {
+      "name": "Indicator Group",
+      "item": [
+        {
+          "name": "All",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"code\": \"A2\",\r\n    \"label\": \"Group Kedua\",\r\n    \"order\": 2,\r\n    \"weight\": 10,\r\n    \"parent_group_id\": 106,\r\n    \"assessment_id\": 3\r\n}"
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-group?assessment_id=3",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-group"
+              ],
+              "query": [
+                {
+                  "key": "assessment_id",
+                  "value": "3"
+                },
+                {
+                  "key": "parent_group_id",
+                  "value": null,
+                  "description": "kalau dikosongkan akan mengambil grup utama (parent)",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Save",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"code\": \"Z\",\r\n    \"label\": \"Group Induk Pertama\",\r\n    \"order\": 1,\r\n    \"weight\": 10,\r\n    \"parent_group_id\": null,\r\n    \"assessment_id\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-group/save?indicator_group_id=106",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-group",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "indicator_group_id",
+                  "value": "106",
+                  "description": "hanya dipakai jika ingin update"
+                }
+              ]
+            },
+            "description": "Membuat grup baru atau memperbarui grup yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-group/detail?indicator_group_id=110",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-group",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "indicator_group_id",
+                  "value": "110"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-group/delete?indicator_group_id=111",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-group",
+                "delete"
+              ],
+              "query": [
+                {
+                  "key": "indicator_group_id",
+                  "value": "111"
+                }
+              ]
+            },
+            "description": "Menghapus grup yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        }
+      ],
+      "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+    },
+    {
+      "name": "Indicator",
+      "item": [
+        {
+          "name": "All",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator?indicator_group_id=2",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator"
+              ],
+              "query": [
+                {
+                  "key": "indicator_group_id",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Save",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"code\": \"12\",\r\n    \"label\": \"Indikator Kedua\",\r\n    \"order\": 1,\r\n    \"weight\": 20,\r\n    \"indicator_group_id\": 9\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator/save",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "indicator_id",
+                  "value": null,
+                  "description": "hanya dipakai jika ingin update",
+                  "type": "text",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Membuat indikator baru atau memperbarui indikator yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator/detail?indicator_id=8",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "indicator_id",
+                  "value": "8"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator/delete?indicator_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator",
+                "delete"
+              ],
+              "query": [
+                {
+                  "key": "indicator_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Menghapus indikator yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        }
+      ],
+      "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+    },
+    {
+      "name": "Indicator Option",
+      "item": [
+        {
+          "name": "All",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-option?indicator_id=8",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-option"
+              ],
+              "query": [
+                {
+                  "key": "indicator_id",
+                  "value": "8"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Save",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"code\": \"F\",\r\n    \"label\": \"Opsi Pertama\",\r\n    \"order\": 1,\r\n    \"weight\": 20,\r\n    \"indicator_id\": 105\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-option/save?indicator_option_id=13",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-option",
+                "save"
+              ],
+              "query": [
+                {
+                  "key": "indicator_option_id",
+                  "value": "13",
+                  "description": "hanya dipakai jika ingin update"
+                }
+              ]
+            },
+            "description": "Membuat opsi baru atau memperbarui opsi yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        },
+        {
+          "name": "Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-option/detail?indicator_option_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-option",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "indicator_option_id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/indicator-option/delete?indicator_option_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "indicator-option",
+                "delete"
+              ],
+              "query": [
+                {
+                  "key": "indicator_option_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Menghapus opsi yang sudah ada. Hanya berlaku pada asesmen yang belum pernah digunakan dalam proses sertifikasi"
+          },
+          "response": []
+        }
+      ],
+      "description": "Hanya boleh diakses oleh Admin SASPRI-N"
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get All",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification?limit=10&offset=0",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Mengambil semua notifikasi user yang sedang login."
+          },
+          "response": [
+            {
+              "name": "200",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{url}}:{{port}}/{{prefix}}/notification?limit=10&offset=0",
+                  "host": [
+                    "{{url}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "{{prefix}}",
+                    "notification"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "nginx/1.28.2"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 25 Jun 2026 04:41:31 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                },
+                {
+                  "key": "Transfer-Encoding",
+                  "value": "chunked"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.5"
+                },
+                {
+                  "key": "Expires",
+                  "value": "Thu, 19 Nov 1981 08:52:00 GMT"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-store, no-cache, must-revalidate"
+                },
+                {
+                  "key": "Pragma",
+                  "value": "no-cache"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "advanced-frontend=284cba3c1201d910d0e7bbdb4283e812; path=/; HttpOnly"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "_identity-frontend=deleted; expires=Thu, 01 Jan 1970 00:00:01 GMT; Max-Age=0; path=/; HttpOnly; SameSite=Lax"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "_csrf-frontend=e409f78c924e7ed826d34c99a3a8a3a4d2f5b563bc5a68fb6c3b918d531867b1a%3A2%3A%7Bi%3A0%3Bs%3A14%3A%22_csrf-frontend%22%3Bi%3A1%3Bs%3A32%3A%22vbxumGW9QUzhzlC1a8gQmAxwkTHpRJpq%22%3B%7D; path=/; HttpOnly; SameSite=Lax"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Accept"
+                },
+                {
+                  "key": "X-Debug-Tag",
+                  "value": "6a3cb17b2344d"
+                },
+                {
+                  "key": "X-Debug-Duration",
+                  "value": "92"
+                },
+                {
+                  "key": "X-Debug-Link",
+                  "value": "/debug/default/view?tag=6a3cb17b2344d"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"notifications\": [\n        {\n            \"id\": 7,\n            \"recipient_id\": 100,\n            \"sender_id\": 94,\n            \"title\": \"Pergantian Wali Dibatalkan\",\n            \"body\": \"Pengajuan pergantian Wali telah dibatalkan oleh Wali SASPRI-K kawasan Sukasari.\",\n            \"web_link\": \"site/index\",\n            \"api_link\": \"saspri-k/detail?saspri_k_id=5\",\n            \"read_at\": null,\n            \"created_at\": 1782361157,\n            \"updated_at\": 1782361157,\n            \"recipient\": {\n                \"id\": 100,\n                \"username\": \"user.100\",\n                \"phone_number\": \"08130000100\",\n                \"role\": {\n                    \"item_name\": \"user\",\n                    \"user_id\": \"100\",\n                    \"created_at\": 1714876800\n                }\n            },\n            \"sender\": {\n                \"id\": 94,\n                \"username\": \"nadiem.makarim\",\n                \"phone_number\": \"08130000005\",\n                \"role\": {\n                    \"item_name\": \"coordinator\",\n                    \"user_id\": \"94\",\n                    \"created_at\": 1714876800\n                }\n            }\n        },\n        {\n            \"id\": 6,\n            \"recipient_id\": 100,\n            \"sender_id\": 94,\n            \"title\": \"Pergantian Wali SASPRI-K\",\n            \"body\": \"Anda diajukan sebagai Wali baru untuk SASPRI-K kawasan Sukasari.\",\n            \"web_link\": \"site/index\",\n            \"api_link\": \"saspri-k/detail?saspri_k_id=5\",\n            \"read_at\": null,\n            \"created_at\": 1782361095,\n            \"updated_at\": 1782361095,\n            \"recipient\": {\n                \"id\": 100,\n                \"username\": \"user.100\",\n                \"phone_number\": \"08130000100\",\n                \"role\": {\n                    \"item_name\": \"user\",\n                    \"user_id\": \"100\",\n                    \"created_at\": 1714876800\n                }\n            },\n            \"sender\": {\n                \"id\": 94,\n                \"username\": \"nadiem.makarim\",\n                \"phone_number\": \"08130000005\",\n                \"role\": {\n                    \"item_name\": \"coordinator\",\n                    \"user_id\": \"94\",\n                    \"created_at\": 1714876800\n                }\n            }\n        }\n    ],\n    \"prev_link\": null,\n    \"next_link\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Number of Unread",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification/unread-count",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification",
+                "unread-count"
+              ]
+            },
+            "description": "Mendapatkan jumlah pesan yang belum dibaca oleh user yang sedang login."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification/mark-read?notification_id=1",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification",
+                "mark-read"
+              ],
+              "query": [
+                {
+                  "key": "notification_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Menandai suatu notifikasi sebagai sudah dibaca."
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification/mark-all-read",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification",
+                "mark-all-read"
+              ]
+            },
+            "description": "Menandai semua notifikasi sebagai sudah dibaca."
+          },
+          "response": []
+        },
+        {
+          "name": "Register FCM Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"token\": \"afdskffdkfjlakfjlkjeijwijr8e9ue9uy8ewyrwhu0qwe0qw\",\r\n    \"device_type\": \"web\" // android, ios, web\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification/register-token",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification",
+                "register-token"
+              ]
+            },
+            "description": "Mendaftarkan token firebace cloud messaging untuk push notification. Jika token yang dikirimkan sudah pernah didaftarkan dalam database, maka seluruh informasi data sebelumnya akan ditimpa"
+          },
+          "response": []
+        },
+        {
+          "name": "Unregister FCM Token",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"token\": \"afdskffdkfjlakfjlkjeijwijr8e9ue9uy8ewyrwhu0qwe0qw\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}:{{port}}/{{prefix}}/notification/unregister-token",
+              "host": [
+                "{{url}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "{{prefix}}",
+                "notification",
+                "unregister-token"
+              ]
+            },
+            "description": "Menghapus token firebase cloud messaging dari database"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
