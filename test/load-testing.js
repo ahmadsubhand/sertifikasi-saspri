@@ -4,8 +4,11 @@ import { Trend, Rate, Counter } from 'k6/metrics';
 
 // k6 configuration options
 export const options = {
-  vus: 100,
-  duration: '1m',
+  stages: [
+    { duration: '2m', target: 100 }, // Tahap Ramp-up: 0 hingga 100 VU secara bertahap selama 2 menit
+    { duration: '6m', target: 100 }, // Tahap Peak/Steady: Mempertahankan beban puncak di 100 VU selama 6 menit
+    { duration: '2m', target: 0 },   // Tahap Ramp-down: 100 hingga 0 VU secara bertahap selama 2 menit
+  ],
   thresholds: {
     http_req_failed: ['rate<0.01'], // Fail test if error rate is greater than 1%
     http_req_duration: ['p(95)<500'], // 95% of requests must complete below 500ms
