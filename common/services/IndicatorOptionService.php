@@ -19,8 +19,6 @@ class IndicatorOptionService
 
     public static function save(?int $option_id, IndicatorOptionForm $data)
     {
-        IndicatorService::findOrFail($data->indicator_id);
-
         $indicator_option = $option_id ? self::findOrFail($option_id) : new IndicatorOption();
 
         if ($option_id) {

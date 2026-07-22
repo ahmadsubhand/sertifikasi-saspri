@@ -102,6 +102,7 @@ class UserController extends ActiveController
 
     public function actionRegister()
     {
+        $this->response->statusCode = 201;
         $data = new RegisterForm();
         ModelHelper::loadAndValidateOrFail($data, Yii::$app->request->getBodyParams());
         return UserService::register($data);
