@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use console\db\ComplexFamilySeeder;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -55,6 +56,15 @@ class DbController extends Controller
         }
 
         $this->stdout("\nSeeding process completed.\n", Console::FG_CYAN);
+
+        $this->stdout("Executing ComplexFamilySeeder... ");
+        try {
+            $seeder = new ComplexFamilySeeder();
+            $seeder->run();
+            $this->stdout("DONE\n", Console::FG_GREEN);
+        } catch (\Exception $e) {
+            $this->stdout("ERROR: " . $e->getMessage() . "\n", Console::FG_RED);
+        }
         return ExitCode::OK;
     }
 }
