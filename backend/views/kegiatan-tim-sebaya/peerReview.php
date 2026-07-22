@@ -169,7 +169,7 @@ $finalGroupScore = $groupTotalScore * ($current_root_group->weight / 100);
     </div>
     <div class="ms-auto ms-md-0">
       <nav aria-label="pagination">
-        <ul class="pagination">
+        <ul class="pagination my-custom-component">
           <li class="page-item <?php echo $page > 1 ? '' : 'disabled' ?>">
             <a class="page-link s-btn-sec">
               <button type="submit" id="btn-prev" form="peer-review-form" name="target_page" value="<?= $page - 1 ?>" class="btn-none">Sebelumnya</button>

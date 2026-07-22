@@ -17,6 +17,7 @@ class ComplexFamilySeeder
     private array $livestock = [];
     private array $maleIds = [];
     private array $femaleIds = [];
+    private int $user_id = 14; // Budiman Sujatmiko - SASPRI 1
 
     public function __construct()
     {
@@ -36,7 +37,7 @@ class ComplexFamilySeeder
         $cageIds = [];
         for ($i = 0; $i < 10; $i++) {
             $this->db->createCommand()->insert('{{%cage}}', [
-                'user_id' => 10,
+                'user_id' => $this->user_id,
                 'name' => "Kandang " . chr(65 + $i),
                 'location' => $faker->city,
                 'capacity' => 30,
@@ -137,7 +138,7 @@ class ComplexFamilySeeder
             ])->execute();
 
             $this->db->createCommand()->insert('{{%note}}', [
-                'user_id' => 10,
+                'user_id' => $this->user_id,
                 'livestock_name' => $cow['name'],
                 'livestock_id' => $cow['id'],
                 'livestock_vid' => $cow['vid'],
@@ -182,7 +183,7 @@ class ComplexFamilySeeder
         $name = $opt['name'] ?? 'sapi' . str_pad((string)($this->eidSeq - 1), 2, '0', STR_PAD_LEFT);
 
         $data = [
-            'user_id' => 10,
+            'user_id' => $this->user_id,
             'eid' => $eid,
             'vid' => $vid,
             'cage_id' => $cageId,

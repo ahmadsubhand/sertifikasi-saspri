@@ -179,10 +179,10 @@ table thead tr:first-child th:last-child {
   color: inherit !important;
 }
 
-.page-link {
+.my-custom-component .page-link {
   padding: 0 !important;
 }
-.page-link .btn-none {
+.my-custom-component .page-link .btn-none {
   padding: 0.5rem 0.75rem !important;
 }
 

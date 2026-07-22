@@ -161,7 +161,7 @@ $this->title =(string) 'Detail SASPRI-K'. $saspri_k->region_name;
             </tbody>
           </table>
         </div>
-        <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100">
+        <div aria-label="Certification History Pagination" class="aalign-items-center justify-content-around d-flex mt-3 w-100 my-custom-component">
           <a class="page-link btn-sm btn s-btn-sec pager-btn <?= $cert_prev_link === null ? 'disabled' : '' ?>"
             href="<?= $cert_prev_link ?>"
             data-container="sapri-cert-hist-card">
