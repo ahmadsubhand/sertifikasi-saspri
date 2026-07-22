@@ -91,9 +91,9 @@ class CageController extends Controller
      * Menampilkan data Cage.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex(?Cage $model = null)
     {
-        $model = new Cage();
+        $model ??= new Cage();
         $userId = Yii::$app->user->identity->id;
         $error = [];
 
@@ -204,10 +204,7 @@ class CageController extends Controller
         $model->load(['Cage' => $params]);
         if (!$model->validate()) {
             // Debug validation errors
-            var_dump($model->getErrors());
-            return $this->render('index', [
-                'model' => $model,
-            ]); 
+            return $this->actionIndex($model);
         }else{
             $model->save();
             return $this->redirect(['index']);

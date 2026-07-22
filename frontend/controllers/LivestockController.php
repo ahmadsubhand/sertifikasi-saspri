@@ -76,9 +76,9 @@ class LivestockController extends Controller
         return $behaviors;
     }
 
-    public function actionIndex()
+    public function actionIndex(?Livestock $model = null)
     {
-        $model = new Livestock();
+        $model ??= new Livestock();
         $userId = Yii::$app->user->identity->id;
         $cages = Cage::find()
             ->where(['user_id' => $userId])
@@ -158,10 +158,7 @@ class LivestockController extends Controller
             // Catat error validasi ke log untuk debugging
             Yii::error('Livestock validation error: '.json_encode($model->getErrors(), JSON_PRETTY_PRINT), __METHOD__);
             // Debug validation errors di layar (sementara)
-            var_dump($model->errors);
-            return $this->render('index', [
-                'model' => $model,
-            ]); 
+            return $this->actionIndex($model);
         }else {
             // Simpan data Livestock
             if ($model->save()) {
@@ -176,9 +173,7 @@ class LivestockController extends Controller
                 if (!$bcs->save()) {
                     // Jika gagal menyimpan BCS, tampilkan pesan error
                     Yii::$app->session->setFlash('bcs_error', 'Gagal menyimpan data BCS.');
-                    return $this->render('index', [
-                        'model' => $model,
-                    ]);
+                    return $this->actionIndex($model);
                 }
 
                 // Redirect ke halaman index jika semua berhasil
@@ -189,9 +184,7 @@ class LivestockController extends Controller
                 Yii::error('Livestock save error: '.json_encode($model->getErrors(), JSON_PRETTY_PRINT), __METHOD__);
                 // Jika gagal menyimpan Livestock, tampilkan pesan error
                 Yii::$app->session->setFlash('error', 'Gagal menyimpan data Livestock.');
-                return $this->render('index', [
-                    'model' => $model,
-                ]);
+                return $this->actionIndex($model);
             }
         }
     }

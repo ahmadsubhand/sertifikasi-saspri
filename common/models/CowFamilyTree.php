@@ -17,12 +17,37 @@ class CowFamilyTree extends ActiveRecord
     public function rules()
     {
         return [
-            [['main_cow_id', 'father_id', 'mother_id'], 'required'],
+            [['main_cow_id'], 'required'],
+
             [['main_cow_id', 'father_id', 'mother_id'], 'integer'],
+
             [['partners', 'created_at', 'updated_at'], 'safe'],
             [['partners'], 'validatePartners'],
-            [['main_cow_id', 'father_id', 'mother_id'], 'exist', 'targetClass' => Livestock::class, 'targetAttribute' => ['main_cow_id' => 'id', 'father_id' => 'id', 'mother_id' => 'id'], 'message' => 'Sapi tidak ditemukan.'],
-            [['main_cow_id'], 'unique', 'targetAttribute' => ['main_cow_id', 'father_id', 'mother_id'], 'message' => 'Sapi ini sudah memiliki silsilah yang terdaftar.'],
+
+            [['main_cow_id'], 'exist',
+                'targetClass' => Livestock::class,
+                'targetAttribute' => ['main_cow_id' => 'id'],
+                'message' => 'Sapi tidak ditemukan.',
+            ],
+
+            [['father_id'], 'exist',
+                'targetClass' => Livestock::class,
+                'targetAttribute' => ['father_id' => 'id'],
+                'skipOnEmpty' => true,
+                'message' => 'Sapi pejantan tidak ditemukan.',
+            ],
+
+            [['mother_id'], 'exist',
+                'targetClass' => Livestock::class,
+                'targetAttribute' => ['mother_id' => 'id'],
+                'skipOnEmpty' => true,
+                'message' => 'Sapi induk tidak ditemukan.',
+            ],
+
+            [['main_cow_id'], 'unique',
+                'targetAttribute' => 'main_cow_id',
+                'message' => 'Sapi ini sudah memiliki silsilah yang terdaftar.',
+            ],
         ];
     }
 
