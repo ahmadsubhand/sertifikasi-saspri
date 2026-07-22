@@ -7,6 +7,7 @@ use common\enums\CertificationStatus;
 use common\enums\UserRole;
 use common\helpers\ModelHelper;
 use common\helpers\UserHelper;
+use common\models\Cage;
 use common\models\Certification;
 use common\models\form\LoginForm;
 use common\models\form\RegisterForm;
@@ -14,6 +15,7 @@ use common\models\form\VerifyEmailForm;
 use common\models\form\ResendVerificationEmailForm;
 use common\models\form\PasswordResetRequestForm;
 use common\models\form\ResetPasswordForm;
+use common\models\Livestock;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
@@ -94,6 +96,10 @@ class SiteController extends Controller
         ?int $limit = 20,
         ?int $offset = 0
     ) {
+        // ==================
+        // SERTIFIKASI SASPRI
+        // ==================
+
         $query = SaspriK::find()->andWhere(['request_status' => 'approved'])->joinWith(['coordinator', 'validCertificate']);
         $saspri_counter = (clone $query);
         $certs = Certification::find()->distinct()->andWhere([
@@ -132,6 +138,27 @@ class SiteController extends Controller
             array_pop($saspri);
         }
 
+        // ==================
+        // PETERNAKAN PRIBADI
+        // ==================
+
+        $livestockCount = 0;
+        $cageCount = 0;
+        $cages = [];
+        $livestocks = [];
+        
+        if (!Yii::$app->user->isGuest) {
+            $userId = Yii::$app->user->id;
+            $livestockCount = Livestock::find()->where(['user_id' => $userId])->count();
+            $cageCount = Cage::find()->where(['user_id' => $userId])->count();
+            $cages = Cage::find()
+                ->where(['user_id' => $userId])
+                ->all();
+            $livestocks = Livestock::find()
+                ->where(['user_id' => $userId])
+                ->all();
+        }
+
         return $this->render('index', [
             'saspris' => $saspri,
             'active_saspri' => $saspri_counter->count(),
@@ -140,6 +167,10 @@ class SiteController extends Controller
             'prev_link' => $offset > 0 ? Url::current(['offset' => max(0, $offset - $limit)]) : null,
             'next_link' => $has_next ? Url::current(['offset' => $offset + $limit]) : null,
             'offset' => $offset,
+            'sapi' => $livestockCount,
+            'cage' => $cageCount,
+            'cages'=> $cages,
+            'livestocks'=> $livestocks,
         ]);
     }
 

@@ -65,7 +65,6 @@ class Livestock extends ActiveRecord
             [['body_weight', 'chest_size', 'hips'], 'number', 'min' => 0, 'tooSmall' => '{attribute} harus bernilai positif.', 'message' => '{attribute} harus berupa angka.', 'skipOnEmpty' => true],
             ['name', 'string', 'max' => 255],
             [['livestock_image'], 'string'],
-            [['is_deleted'], 'boolean'],
             [['eid', 'vid'], 'unique', 'message' => '{attribute} sudah digunakan oleh ternak lain.'],
             [['name'], 'match', 'pattern' => '/^[A-Za-z0-9\s]{3,255}$/', 'message' => 'Nama harus terdiri dari 3 sampai 255 karakter dan hanya boleh berisi huruf, angka, dan spasi.'],
             ['eid', 'string', 'max' => 19, 'message' => 'EID tidak boleh lebih dari 19 digit.'],

@@ -11,49 +11,148 @@ $currentRoute = Yii::$app->controller->getRoute();
 
 <aside class="flex-shrink-0 border-md-end s-bg-main" style="width: 4.5rem;">
   <div class=" text-uppercase lh-sm mt-1">
-    <div class="s-bg-side align-items-center">
-      <a class="text-decoration-none text-white h6 align-items-center" id="collapse-trig"
-        href="#collapse-sidenav" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-sidenav">
-        <div class="d-flex py-3 mx-2">
-          <p class="mb-0 ">
-            Sertifikasi
-          </p>
-          <div class="ms-2">
-            <i class="fa-solid fa-chevron-up "></i>
-          </div>
-        </div>
-      </a>
+    <!-- DASHBOARD -->
+    <div class="<?= str_contains($currentRoute, 'site') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+        <a href="<?= Url::to('/site') ?>" class="text-decoration-none text-white w-100 text-white h6">
+            <div class="py-3 mx-2">
+                Dashboard
+            </div>
+        </a>
     </div>
-    <div id="collapse-sidenav" class=" collapse show">
-      <?php if (Yii::$app->user->can(UserRole::COORDINATOR)) : ?>
-        <a href="<?php echo Url::to('/saspri-k') ?>" class="text-decoration-none text-white w-100 ">
-          <div class=" py-2 px-4 <?= str_contains($currentRoute, 'saspri-k') ? 's-bg-sec' : 's-bg-side' ?>">
-            SASPRI-K
-          </div>
-        </a>
-      <?php endif ?>
-      <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
-        <a href="<?php echo Url::to('/tim-mandiri') ?>" class="text-decoration-none text-white w-100 ">
-          <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-mandiri') ? 's-bg-sec' : 's-bg-side' ?>">
-            Kegiatan Tim Mandiri
-          </div>
-        </a>
-      <?php endif ?>
-      <a href="<?php echo Url::to('/tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
-        <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-sebaya') ? 's-bg-sec' : 's-bg-side' ?>">
-          Kegiatan Tim Sebaya
+
+    <!-- PENDAFTARAN TERNAK -->
+    <div>
+        <div class="s-bg-side align-items-center">
+            <a
+                id="collapse-pendaftaran-trig"
+                class="text-decoration-none text-white h6 align-items-center"
+                href="#collapse-pendaftaran"
+                data-bs-toggle="collapse"
+                role="button"
+                aria-expanded="true"
+                aria-controls="collapse-pendaftaran">
+
+                <div class="d-flex py-3 mx-2">
+                    <p class="mb-0">Pendaftaran</p>
+                    <div class="ms-2">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </div>
+                </div>
+            </a>
         </div>
-      </a>
-      <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
-        <div class="p-2">
-          <div class="dropdown-divider border border-1"></div>
+
+        <div id="collapse-pendaftaran" class="collapse show">
+            <a href="<?= Url::to('/cage') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'cage') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Tambah Kandang
+                </div>
+            </a>
+
+            <a href="<?= Url::to('/livestock') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'livestock') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Tambah Sapi
+                </div>
+            </a>
+
+            <a href="<?= Url::to('/bcs') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'bcs') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Tambah BCS
+                </div>
+            </a>
         </div>
-        <a href="<?php echo Url::to('/daftar-wali') ?>" class="text-decoration-none text-white w-100 ">
-          <div class=" py-2 px-4 <?= str_contains($currentRoute, 'wali') ? 's-bg-sec' : 's-bg-side' ?>">
-            Daftar Sebagai Wali SASPRI-K
-          </div>
+    </div>
+
+    <!-- PERHITUNGAN HARGA -->
+    <div>
+        <div class="s-bg-side align-items-center">
+            <a
+                id="collapse-harga-trig"
+                class="text-decoration-none text-white h6 align-items-center"
+                href="#collapse-harga"
+                data-bs-toggle="collapse"
+                role="button"
+                aria-expanded="true"
+                aria-controls="collapse-harga">
+
+                <div class="d-flex py-3 mx-2">
+                    <p class="mb-0">Perhitungan Harga</p>
+                    <div class="ms-2">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div id="collapse-harga" class="collapse show">
+            <a href="<?= Url::to('/harga-jual') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual') && !str_contains($currentRoute, 'history') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Hitung Harga Jual
+                </div>
+            </a>
+
+            <a href="<?= Url::to('/harga-jual/history') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'history') ? 's-bg-sec' : 's-bg-side' ?>">
+                    History Perhitungan
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- SILSILAH HEWAN TERNAK -->
+    <div class="<?= str_contains($currentRoute, 'silsilah') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+        <a href="<?= Url::to('/silsilah') ?>" class="text-decoration-none text-white w-100 text-white h6">
+            <div class="py-3 mx-2">
+                Silsilah Hewan Ternak
+            </div>
         </a>
-      <?php endif ?>
+    </div>
+
+    <!-- SERTIFIKASI SASPRI -->
+    <div>
+        <div class="s-bg-side align-items-center">
+          <a class="text-decoration-none text-white h6 align-items-center" id="collapse-trig"
+            href="#collapse-sidenav" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="collapse-sidenav">
+            <div class="d-flex py-3 mx-2">
+              <p class="mb-0 ">
+                Sertifikasi
+              </p>
+              <div class="ms-2">
+                <i class="fa-solid fa-chevron-up "></i>
+              </div>
+            </div>
+          </a>
+        </div>
+        <div id="collapse-sidenav" class=" collapse show">
+          <?php if (Yii::$app->user->can(UserRole::COORDINATOR)) : ?>
+            <a href="<?php echo Url::to('/saspri-k') ?>" class="text-decoration-none text-white w-100 ">
+              <div class=" py-2 px-4 <?= str_contains($currentRoute, 'saspri-k') ? 's-bg-sec' : 's-bg-side' ?>">
+                SASPRI-K
+              </div>
+            </a>
+          <?php endif ?>
+          <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
+            <a href="<?php echo Url::to('/tim-mandiri') ?>" class="text-decoration-none text-white w-100 ">
+              <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-mandiri') ? 's-bg-sec' : 's-bg-side' ?>">
+                Kegiatan Tim Mandiri
+              </div>
+            </a>
+          <?php endif ?>
+          <a href="<?php echo Url::to('/tim-sebaya') ?>" class="text-decoration-none text-white w-100 ">
+            <div class=" py-2 px-4 <?= str_contains($currentRoute, 'tim-sebaya') ? 's-bg-sec' : 's-bg-side' ?>">
+              Kegiatan Tim Sebaya
+            </div>
+          </a>
+          <?php if (Yii::$app->user->can(UserRole::USER)) : ?>
+            <div class="p-2">
+              <div class="dropdown-divider border border-1"></div>
+            </div>
+            <a href="<?php echo Url::to('/daftar-wali') ?>" class="text-decoration-none text-white w-100 ">
+              <div class=" py-2 px-4 <?= str_contains($currentRoute, 'wali') ? 's-bg-sec' : 's-bg-side' ?>">
+                Daftar Sebagai Wali SASPRI-K
+              </div>
+            </a>
+          <?php endif ?>
+        </div>
     </div>
   </div>
 </aside>
