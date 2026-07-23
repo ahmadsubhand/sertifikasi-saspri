@@ -149,13 +149,23 @@ class SiteController extends Controller
         
         if (!Yii::$app->user->isGuest) {
             $userId = Yii::$app->user->id;
+            
+            // Hitung total keseluruhan untuk badge/info
             $livestockCount = Livestock::find()->where(['user_id' => $userId])->count();
             $cageCount = Cage::find()->where(['user_id' => $userId])->count();
+            
+            // Ambil maksimal 5 data terbaru untuk dashboard
             $cages = Cage::find()
                 ->where(['user_id' => $userId])
+                ->orderBy(['id' => SORT_DESC]) // Mengurutkan dari yang terbaru (sesuaikan jika pakai created_at)
+                ->limit(5)
                 ->all();
+                
+            // Ambil maksimal 5 data sapi terbaru untuk dashboard
             $livestocks = Livestock::find()
                 ->where(['user_id' => $userId])
+                ->orderBy(['id' => SORT_DESC])
+                ->limit(5)
                 ->all();
         }
 
