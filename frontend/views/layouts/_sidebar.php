@@ -20,6 +20,15 @@ $currentRoute = Yii::$app->controller->getRoute();
         </a>
     </div>
 
+    <!-- CATATAN PAKAN TERNAK -->
+    <div class="<?= str_contains($currentRoute, 'note') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+        <a href="<?= Url::to('/note') ?>" class="text-decoration-none text-white w-100 text-white h6">
+            <div class="py-3 mx-2">
+                Buat Catatan Ternak
+            </div>
+        </a>
+    </div>
+
     <!-- PENDAFTARAN TERNAK -->
     <div>
         <div class="s-bg-side align-items-center">
