@@ -72,7 +72,7 @@ $currentRoute = Yii::$app->controller->getRoute();
     </div>
 
     <!-- SIMULASI HARGA JUAL -->
-    <div class="<?= str_contains($currentRoute, '/harga-jual/simulation') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+    <div class="<?= str_contains($currentRoute, 'harga-jual/simulation') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
         <a href="<?= Url::to('/harga-jual/simulation') ?>" class="text-decoration-none text-white w-100 text-white h6">
             <div class="py-3 mx-2">
                 Simulasi Harga Jual
@@ -103,24 +103,24 @@ $currentRoute = Yii::$app->controller->getRoute();
 
         <div id="collapse-harga" class="collapse show">
             <a href="<?= Url::to('/harga-jual/data') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/data') ? 's-bg-sec' : 's-bg-side' ?>">
+                <div class="py-2 px-4 <?= $currentRoute == 'harga-jual/data' ? 's-bg-sec' : 's-bg-side' ?>">
                     Data Biaya Overhead
                 </div>
             </a>
             <a href="<?= Url::to('/harga-jual/index') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/index') ? 's-bg-sec' : 's-bg-side' ?>">
+                <div class="py-2 px-4 <?= $currentRoute == 'harga-jual/index' ? 's-bg-sec' : 's-bg-side' ?>">
                     Hitung Harga Jual
                 </div>
             </a>
 
             <a href="<?= Url::to('/harga-jual/history') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/history') ? 's-bg-sec' : 's-bg-side' ?>">
+                <div class="py-2 px-4 <?= $currentRoute == 'harga-jual/history' ? 's-bg-sec' : 's-bg-side' ?>">
                     History Perhitungan
                 </div>
             </a>
 
             <a href="<?= Url::to('/harga-jual/history-logs') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/history-logs') ? 's-bg-sec' : 's-bg-side' ?>">
+                <div class="py-2 px-4 <?= $currentRoute == 'harga-jual/history-logs' ? 's-bg-sec' : 's-bg-side' ?>">
                     Log Perubahan Harga
                 </div>
             </a>
