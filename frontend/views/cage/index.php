@@ -27,10 +27,17 @@ use yii\helpers\StringHelper;
                                     'method' => 'POST',
                                 ]); ?>
                                 <div class="form-body">
-                                    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'location')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'capacity')->input('number') ?>
-                                    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+                                    <?= $form->field($model, 'name')->textInput(['placeholder' => 'Ketik nama kandang', 'maxlength' => true]) ?>
+                                    <?= $form->field($model, 'location')->textInput(['placeholder' => 'Ketik lokasi kandang', 'maxlength' => true]) ?>
+                                    <?= $form->field($model, 'capacity')->input('number', ['min' => 1, 'placeholder' => 'Masukkan kapasitas kandang']) ?>
+                                    <?= $form->field($model, 'investasi_kandang')->input('number', [
+                                        'min' => 0,
+                                        'placeholder' => 'Total investasi kandang & peralatan (Rp)',
+                                        'class' => 'form-control no-spinner'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'umur_ekonomis')->input('number', ['min' => 0, 'step' => '0.1', 'placeholder' => 'Umur ekonomis (tahun)']) ?>
+                                    <?= $form->field($model, 'description')->textarea(['rows' => 6, 'placeholder' => 'Masukkan deskripsi kandang']) ?>
                                 </div>
                                 <div class="form-actions d-flex justify-content-end mt-3">
                                             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

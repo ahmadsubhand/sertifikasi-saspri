@@ -42,22 +42,6 @@ use yii\widgets\ActiveForm;
  ?>
 
 <div class="page-content"> 
-
-    <!-- Alert Messages untuk BCS -->
-    <?php if (\Yii::$app->session->hasFlash('bcs_success')): ?>
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle"></i> <?= \Yii::$app->session->getFlash('bcs_success') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <?php endif; ?>
-
-    <?php if (\Yii::$app->session->hasFlash('bcs_error')): ?>
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-circle"></i> <?= \Yii::$app->session->getFlash('bcs_error') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    <?php endif; ?>
-
     <section class="row">
         <div class="col-12 col-lg-5">
             <section class="section">

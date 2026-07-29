@@ -33,14 +33,35 @@ class Note extends ActiveRecord
     public function rules()
     {
         return [
-            [['livestock_feed', 'costs', 'feed_weight'], 'required', 'message' => '{attribute} tidak boleh kosong.'],
-            [['costs'], 'required'],
-            [['livestock_name', 'livestock_id', 'livestock_vid', 'livestock_cage', 'location', 'created_at', 'updated_at'], 'safe'],
-            [['costs', 'feed_weight'], 'number', 'min' => 0, 'message' => '{attribute} harus berupa angka positif.'],
-            [['location', 'livestock_feed', 'vitamin'], 'match', 'pattern' => '/^[A-Za-z0-9\s]{3,255}$/', 'message' => '{attribute} harus terdiri dari 3 sampai 255 karakter dan hanya boleh berisi huruf, angka, dan spasi.'],
+            [['livestock_feed', 'forage_costs', 'forage_weight','consentrate_costs', 'consentrate_weight','additive_costs', 'additive_weight'], 'required', 'message' => '{attribute} tidak boleh kosong.'],
+            [['forage_costs', 'forage_weight','consentrate_costs', 'consentrate_weight','additive_costs', 'additive_weight'], 'required'],
+            [['livestock_name', 'livestock_id', 'livestock_vid', 'livestock_cage', 'location', 'note_date', 'created_at', 'updated_at'], 'safe'],
+            [['note_date'], 'date', 'format' => 'php:Y-m-d'],
+            [['forage_costs', 'forage_weight','consentrate_costs', 'consentrate_weight','additive_costs', 'additive_weight','vaccine','insemination','pregnancy_check','antibiotics','anthelmintic','vitamin'], 'number', 'min' => 0, 'message' => '{attribute} harus berupa angka positif.'],
+            [['location', 'livestock_feed'], 'match', 'pattern' => '/^[A-Za-z0-9\s]{3,255}$/', 'message' => '{attribute} harus terdiri dari 3 sampai 255 karakter dan hanya boleh berisi huruf, angka, dan spasi.'],
             [['details'], 'match', 'pattern' => '/^[A-Za-z0-9\s.,-]{3,255}$/', 'message' => '{attribute} harus terdiri dari 3 sampai 255 karakter dan hanya boleh berisi huruf, angka, spasi, dan tanda baca.'],
             [['documentation'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 10, 'extensions' => ['jpg', 'jpeg', 'png'] , 'maxSize' => 1024 * 1024 * 10, 'message' => 'File tidak valid. File harus berformat jpg, jpeg, atau png dan berukuran maksimal 10MB.'],
         ];
+    }
+
+    /**
+     * Normalisasi tanggal ke zona WIB dan format Y-m-d agar validasi tidak gagal
+     * ketika nilai berasal dari kolom datetime (mis. "2025-12-03 00:00:00").
+     */
+    public function beforeValidate()
+    {
+        if (!empty($this->note_date)) {
+            try {
+                $dt = new \DateTime($this->note_date, new \DateTimeZone('Asia/Jakarta'));
+                $this->note_date = $dt->format('Y-m-d');
+            } catch (\Exception $e) {
+                // biarkan validasi date menangani jika parsing gagal
+            }
+        } else {
+            $this->note_date = (new \DateTime('now', new \DateTimeZone('Asia/Jakarta')))->format('Y-m-d');
+        }
+
+        return parent::beforeValidate();
     }
 
     public function fields()
@@ -52,10 +73,20 @@ class Note extends ActiveRecord
             'livestock_name',
             'livestock_cage',
             'location',
+            'note_date',
             'livestock_feed',
-            'feed_weight',
+            'forage_weight',
+            'forage_costs',
+            'consentrate_weight',
+            'consentrate_costs',
+            'additive_weight',
+            'additive_costs',
+            'vaccine',
+            'insemination',
+            'pregnancy_check',
+            'antibiotics',
+            'anthelmintic',
             'vitamin',
-            'costs',
             'details',
         ];
 
@@ -67,6 +98,7 @@ class Note extends ActiveRecord
 
         $fields['created_at'] = 'created_at';
         $fields['updated_at'] = 'updated_at';
+        $fields['note_date'] = 'note_date';
 
         return $fields;
     }
@@ -79,19 +111,42 @@ class Note extends ActiveRecord
             'livestock_cage' => 'Kandang',
             'location' => 'Lokasi',
             'livestock_feed' => 'Pakan Ternak',
-            'feed_weight' => 'Berat Pakan',
-            'vitamin' => 'Vitamin',
-            'costs' => 'Biaya Pakan',
+            'forage_weight'=> 'Berat Pakan Hijauan (kg)',
+            'forage_costs'=> 'Harga Pakan Hijauan (per kg)',
+            'consentrate_weight'=> 'Berat Pakan Konsentrat (kg)',
+            'consentrate_costs'=> 'Harga Pakan Konsentrat (per kg)',
+            'additive_weight'=> 'Berat Pakan additive (kg)',
+            'additive_costs'=> 'Harga Pakan additive (per kg)',
+            'vaccine'=> 'Harga Vaksin',
+            'insemination'=> 'Harga Inseminasi Buatan',
+            'pregnancy_check'=> 'Harga Cek Kebuntingan',
+            'antibiotics'=> 'Harga Antibiotik',
+            'anthelmintic'=> 'Harga Obat Cacing',
+            'vitamin'=> 'Harga Vitamin',
             'details' => 'Deskripsi',
+            'note_date' => 'Tanggal Catatan',
             'documentation' => 'Dokumentasi',
             'created_at'=> 'Dibuat Pada',
             'updated_at'=> 'Diperbarui Pada',
         ];
     }
 
-    public function validateCosts($attribute, $params)
+    public function getCosts()
     {
-        $costs = Yii::$app->getRequest()->getBodyParams()['costs'];
+        return (float) $this->forage_costs * (float) $this->forage_weight
+            + (float) $this->consentrate_costs * (float) $this->consentrate_weight
+            + (float) $this->additive_costs * (float) $this->additive_weight
+            + (float) $this->vaccine
+            + (float) $this->insemination
+            + (float) $this->pregnancy_check
+            + (float) $this->antibiotics
+            + (float) $this->anthelmintic
+            + (float) $this->vitamin;
+    }
+
+    public function validateCosts(string $attribute, $params)
+    {
+        $costs = Yii::$app->getRequest()->getBodyParams()['forage_costs'];
 
         if (is_float($costs)) {
             $this->addError($attribute, 'Biaya harus berupa angka bulat positif.');
@@ -119,10 +174,22 @@ class Note extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Get user_id from the currently logged in user
-        $userId = Yii::$app->user->identity->id;
+        if ($insert && Yii::$app->has('user') && !Yii::$app->user->isGuest) {
+            $this->updateAttributes(['user_id' => Yii::$app->user->identity->id]);
+        }
 
-        // Save user_id
-        $this->updateAttributes(['user_id' => $userId]);
+        $livestock = $this->livestock ?: Livestock::findOne($this->livestock_id);
+        if ($livestock) {
+            History::recalculateForLivestock($livestock);
+        }
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        $livestock = $this->livestock ?: Livestock::findOne($this->livestock_id);
+        if ($livestock) {
+            History::recalculateForLivestock($livestock);
+        }
     }
 }

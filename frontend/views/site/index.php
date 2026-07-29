@@ -276,7 +276,7 @@ $this->title = 'Informasi Sertifikasi SASPRI Kawasan';
                                                                 <ul class="list-group list-group-flush">
                                                                     <?php foreach ($livestock->attributes as $attribute => $value): ?>
                                                                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                                            <strong><?= ucfirst(str_replace('_', ' ', $attribute)) ?></strong> 
+                                                                            <strong><?= $livestock->getAttributeLabel($attribute) ?></strong>
                                                                             <span><?= $value ?: '-' ?></span>
                                                                         </li>
                                                                     <?php endforeach; ?>

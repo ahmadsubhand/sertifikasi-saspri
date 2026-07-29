@@ -1,7 +1,6 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use common\models\Livestock;
 
 /**
  * @var \yii\web\View $this
@@ -9,33 +8,97 @@ use common\models\Livestock;
  * @var common\models\Note $model
  */
 
-$this->title = 'Update Catatan: ' . $model->id;
+$this->title = 'Update Catatan: ' . $model->livestock->name;
 ?>
 
 <div class="cage-update">
-
         <?php $form = ActiveForm::begin([
             'id' => 'update-form',
             'method' => 'put',
         ]); ?>
 <div class="form-body">
-                                        <div class="form-body row">
-                                            <div class = "col">
-                                            <?= $form->field($model, 'livestock_id')->dropDownList(
-                                        \yii\helpers\ArrayHelper::map(Livestock::find()->where(['user_id' => \Yii::$app->user->id])->all(), 'id', 'name'),
-                                        ['prompt' => 'Pilih Sapi']
-                                    ) ?>
-                                    <?= $form->field($model, 'livestock_feed')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'costs')->textInput(['type' => 'number', 'min' => 0]) ?>
-                                    <?= $form->field($model, 'feed_weight')->textInput(['type' => 'number', 'min' => 0]) ?>
-                                    <?= $form->field($model, 'vitamin')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
+    <div class="form-body row">
+        <div class = "col">
+            <br>
+            <h4 class="card-title mb-4">Catatan Ternak</h4>
+            <?= $form->field($model, 'id')->hiddenInput(['value' => $model->id])->label(false) ?>
+
+            <?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
+            <br>
+            <br>
+            <h4 class="card-title mb-4">Data Pakan Hari Ini</h4>
+            <?= $form->field($model, 'livestock_feed')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'forage_costs')->input('number', [
+                'id' => 'forage_costs',
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'forage_weight')->input('number', [
+                'id' => 'forage_weight',
+                'placeholder' => '0 kg'
+            ]) ?>
+
+            <?= $form->field($model, 'consentrate_costs')->input('number', [
+                'id' => 'consentrate_costs',
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'consentrate_weight')->input('number', [
+                'id' => 'consentrate_weight',
+                'placeholder' => '0 kg'
+            ]) ?>
+
+            <?= $form->field($model, 'additive_costs')->input('number', [
+                'id' => 'additive_costs',
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'additive_weight')->input('number', [
+                'id' => 'additive_weight',
+                'placeholder' => '0 kg'
+            ]) ?>
+
+            <br>
+            <br>
+            <h4 class="card-title mb-4">Kesehatan (isi harga apabila dilakukan pada hari ini)</h4>
+            <?= $form->field($model, 'vaccine')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'insemination')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'pregnancy_check')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'antibiotics')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'anthelmintic')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
+
+            <?= $form->field($model, 'vitamin')->input('number', [
+                'class' => 'form-control no-spinner',
+                'placeholder' => 'Rp. 0'
+            ]) ?>
 
         <div class="form-group">
             <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
-            <button type="submit" href= '<?= yii\helpers\Url::toRoute(['note/index']) ?>' class="btn btn-primary me-1">Cancel</button>
+            <a href="<?= \yii\helpers\Url::to(['/note/index']) ?>" class="btn btn-primary me-1">
+                Cancel
+            </a>
         </div>
-
-
-        <?php ActiveForm::end(); ?>
+    <?php ActiveForm::end(); ?>
 </div>

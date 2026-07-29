@@ -126,109 +126,106 @@ class BcsController extends Controller
     //     }
     // }
     public function actionCreate()
-{
-    $model = new BodyCountScore(); // Menggunakan model BCS
+    {
+        $model = new BodyCountScore(); // Menggunakan model BCS
 
-    // Jika request adalah POST
-    if (Yii::$app->request->isPost) {
-        $requestData = Yii::$app->request->post();
+        // Jika request adalah POST
+        if (Yii::$app->request->isPost) {
+            $requestData = Yii::$app->request->post();
 
-        // Cek apakah livestock_id ada di POST data
-        if (isset($requestData['BodyCountScore']['livestock_id'])) {
-            $livestockId = $requestData['BodyCountScore']['livestock_id'];
+            // Cek apakah livestock_id ada di POST data
+            if (isset($requestData['BodyCountScore']['livestock_id'])) {
+                $livestockId = $requestData['BodyCountScore']['livestock_id'];
 
-            // Cari data ternak berdasarkan livestock_id
-            $livestock = Livestock::findOne($livestockId);
+                // Cari data ternak berdasarkan livestock_id
+                $livestock = Livestock::findOne($livestockId);
 
-            // Jika ternak ditemukan, ambil data body_weight dan chest_size
-            if ($livestock !== null) {
-                $model->body_weight = $livestock->body_weight;
-                $model->chest_size = $livestock->chest_size;
+                // Jika ternak ditemukan, ambil data body_weight dan chest_size
+                if ($livestock !== null) {
+                    $model->body_weight = $livestock->body_weight;
+                    $model->chest_size = $livestock->chest_size;
+                }
+            }
+
+            // Muat data POST ke dalam model BCS
+            $model->load($requestData);
+
+            // Simpan data jika validasi berhasil
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Data BCS berhasil dibuat.');
+                return $this->redirect(['index']); // Redirect ke halaman index setelah berhasil
             }
         }
 
-        // Muat data POST ke dalam model BCS
-        $model->load($requestData);
-
-        // Simpan data jika validasi berhasil
-        if ($model->save()) {
-            Yii::$app->session->setFlash('bcs_success', 'Data BCS berhasil dibuat.');
-            return $this->redirect(['index']); // Redirect ke halaman index setelah berhasil
-        }
+        // Render form create
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
-    // Render form create
-    return $this->render('create', [
-        'model' => $model,
-    ]);
-}
+    public function actionUpdate(int $id)
+    {
+        $model = BodyCountScore::findOne($id);
 
-public function actionUpdate(int $id)
-{
-    $model = BodyCountScore::findOne($id);
-
-    // Check if the cage exists
-    if (!$model) {
-        Yii::$app->session->setFlash('bcs_error', 'Data BCS tidak ditemukan.');
-        return $this->redirect(['index']);
-    }
-
-    // If the form is submitted
-    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-        // Save the changes
-        if ($model->save()) {
-            Yii::$app->session->setFlash('bcs_success', 'Data BCS berhasil diperbarui.');
+        // Check if the cage exists
+        if (!$model) {
+            Yii::$app->session->setFlash('errror', 'Data BCS tidak ditemukan.');
             return $this->redirect(['index']);
-        } else {
-            Yii::$app->session->setFlash('bcs_error', 'Gagal memperbarui data BCS.');
         }
-    }
 
-    // Render the update view with the model data
-    return $this->render('update', [
-        'model' => $model,
-    ]);
-}
+        // If the form is submitted
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            // Save the changes
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Data BCS berhasil diperbarui.');
+                return $this->redirect(['index']);
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal memperbarui data BCS.');
+            }
+        }
+
+        // Render the update view with the model data
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
 
 
     public function actionDelete(int $id)
-{
-    Yii::$app->response->format = \yii\web\Response::FORMAT_JSON; // Set response format to JSON
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON; // Set response format to JSON
 
-    // Mulai transaksi untuk menjaga konsistensi data
-    $transaction = Yii::$app->db->beginTransaction();
+        // Mulai transaksi untuk menjaga konsistensi data
+        $transaction = Yii::$app->db->beginTransaction();
 
-    try {
-        $model = BodyCountScore::findOne($id);
+        try {
+            $model = BodyCountScore::findOne($id);
 
-        if ($model !== null) {
-            // Hapus model dan komit transaksi
-            if ($model->delete() !== false) {
-                $transaction->commit();
-                return $this->redirect(['index']);
+            if ($model !== null) {
+                // Hapus model dan komit transaksi
+                if ($model->delete() !== false) {
+                    Yii::$app->session->setFlash('success', 'Data BCS berhasil dihapus.');
+                    $transaction->commit();
+                    return $this->redirect(['index']);
+                } else {
+                    // Rollback jika penghapusan gagal
+                    $transaction->rollBack();
+                    Yii::$app->session->setFlash('error', 'Gagal menghapus data BCS.');
+                    return $this->redirect(['index']);
+                }
             } else {
-                // Rollback jika penghapusan gagal
+                // Jika model tidak ditemukan, rollback dan kembalikan pesan error
                 $transaction->rollBack();
-                return [
-                    'message' => 'Gagal menghapus data BCS.',
-                    'error' => true,
-                ];
+                Yii::$app->session->setFlash('error', 'Gagal menghapus data BCS, data tidak ditemukan.');
+                return $this->redirect(['index']);
             }
-        } else {
-            // Jika model tidak ditemukan, rollback dan kembalikan pesan error
+        } catch (\Exception $e) {
+            // Jika terjadi exception, rollback transaksi dan kembalikan pesan error
             $transaction->rollBack();
-            return [
-                'message' => 'Gagal menghapus data BCS, data tidak ditemukan.',
-                'error' => true,
-            ];
+            Yii::$app->session->setFlash('error', 'Gagal menghapus data BCS. Alasan: ' . $e->getMessage());
+            return $this->redirect(['index']);
         }
-    } catch (\Exception $e) {
-        // Jika terjadi exception, rollback transaksi dan kembalikan pesan error
-        $transaction->rollBack();
-        Yii::$app->session->setFlash('error', 'Gagal menghapus data BCS. Alasan: ' . $e->getMessage());
-        return $this->redirect(['index']);
     }
-}
 
 
     public function actionView(int $id)

@@ -26,7 +26,7 @@ $this->beginContent('@frontend/views/layouts/base.php');
                 id="sidebarOffcanvas"
                 aria-labelledby="sidebarOffcanvasLabel">
 
-                <div class="offcanvas-body p-0 h-100 overflow-y-auto s-bg-main">
+                <div class="offcanvas-body p-0 h-100 s-bg-main">
 
                     <?= $this->render("_sidebar") ?>
                 </div>

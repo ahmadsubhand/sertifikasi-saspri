@@ -4,8 +4,8 @@ namespace common\models;
 
 use Yii;
 use yii\db\ActiveRecord;
-use yii\helpers\ArrayHelper;
 use yii\behaviors\TimestampBehavior;
+use yii\web\UploadedFile;
 
 class Livestock extends ActiveRecord
 {
@@ -39,7 +39,7 @@ class Livestock extends ActiveRecord
      */
     public $hips;
 
-    public $livestock_image;
+    public ?UploadedFile $livestock_image = null;
 
     /**
      * Override daftar atribut agar ActiveRecord mengenali atribut virtual
@@ -58,24 +58,27 @@ class Livestock extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'birthdate', 'type_of_livestock', 'breed_of_livestock', 'purpose', 'maintenance', 'source', 'ownership_status', 'reproduction', 'gender', 'chest_size', 'body_weight', 'health'], 'required', 'message' => '{attribute} tidak boleh kosong.'],
+            [['name', 'birthdate', 'cage_id', 'type_of_livestock', 'breed_of_livestock', 'purpose', 'maintenance', 'source', 'ownership_status', 'reproduction', 'gender', 'chest_size', 'body_weight', 'health'], 'required', 'message' => '{attribute} tidak boleh kosong.'],
             [['birthdate'], 'required', 'message' => 'Masukkan tanggal lahir ternak.'],
             [['user_id', 'cage_id', 'age'], 'integer'],
             ['name', 'validateLivestockName'],
-            [['body_weight', 'chest_size', 'hips'], 'number', 'min' => 0, 'tooSmall' => '{attribute} harus bernilai positif.', 'message' => '{attribute} harus berupa angka.', 'skipOnEmpty' => true],
+            // Wajib numerik
+            [['body_weight', 'chest_size'], 'number', 'min' => 0, 'tooSmall' => '{attribute} harus bernilai positif.', 'message' => '{attribute} harus berupa angka.', 'skipOnEmpty' => false],
+            // Opsional numerik
+            [['hips', 'first_price', 'breeding_investment'], 'number', 'min' => 0, 'tooSmall' => '{attribute} harus bernilai positif.', 'message' => '{attribute} harus berupa angka.', 'skipOnEmpty' => true],
             ['name', 'string', 'max' => 255],
-            [['livestock_image'], 'string'],
+            // [['livestock_image'], 'string'],
+            
             [['eid', 'vid'], 'unique', 'message' => '{attribute} sudah digunakan oleh ternak lain.'],
             [['name'], 'match', 'pattern' => '/^[A-Za-z0-9\s]{3,255}$/', 'message' => 'Nama harus terdiri dari 3 sampai 255 karakter dan hanya boleh berisi huruf, angka, dan spasi.'],
-            ['eid', 'string', 'max' => 19, 'message' => 'EID tidak boleh lebih dari 19 digit.'],
-            ['eid', 'match', 'pattern' => '/^\d+$/', 'message' => 'EID hanya boleh berisi angka.'],
+            ['eid', 'match', 'pattern' => '/^\d{1,32}$/', 'message' => 'EID harus berupa angka maks. 32 digit.'],
             [['vid'], 'string', 'max' => 10],
             [['vid'], 'match', 'pattern' => '/^[A-Z]{3}[0-9]{4}$/', 'message' => 'Visual ID harus mengikuti pola tiga huruf besar diikuti empat digit.', 'on' => 'create'],
             [['created_at', 'updated_at', 'birthdate'], 'safe'],
             [['birthdate'], 'date', 'format' => 'php:Y-m-d', 'message' => 'Format tanggal tidak valid. Tolong gunakan format YYYY-MM-DD.'],
             [['birthdate'], 'validateBirthdate'],
-            [['livestock_image'], 'file', 'extensions' => ['png', 'jpg', 'jpeg'], 'maxSize' => 1024 * 1024 * 5, 'maxFiles' => 5, 'message' => 'Format file tidak valid atau ukuran file terlalu besar (maksimal 5 MB).'],
-            [['livestock_image'], 'file', 'extensions' => 'jpg, png', 'maxFiles' => 5, 'maxSize' => 1024 * 1024 * 5, 'maxFiles' => 5, 'message' => 'Format file tidak valid atau ukuran file terlalu besar (maksimal 5 MB).'],
+            // [['livestock_image'], 'file', 'extensions' => ['png', 'jpg', 'jpeg'], 'maxSize' => 1024 * 1024 * 5, 'maxFiles' => 5, 'message' => 'Format file tidak valid atau ukuran file terlalu besar (maksimal 5 MB).'],
+            [['livestock_image'], 'file', 'extensions' => 'jpg, png', 'maxFiles' => 5, 'maxSize' => 1024 * 1024 * 5, 'message' => 'Format file tidak valid atau ukuran file terlalu besar (maksimal 5 MB).'],
 
 
             // Enum validation rules
@@ -89,6 +92,37 @@ class Livestock extends ActiveRecord
             ['reproduction', 'in', 'range' => ['Tidak Bunting', 'Bunting < 1 bulan', 'Bunting 1 bulan', 'Bunting 2 bulan', 'Bunting 3 bulan', 'Bunting 4 bulan', 'Bunting 5 bulan', 'Bunting 6 bulan', 'Bunting 7 bulan', 'Bunting 8 bulan', 'Bunting 9 bulan', 'Bunting 10 bulan', 'Bunting 11 bulan', 'Bunting > 11 bulan']],
             ['health', 'in', 'range' => ['Sehat', 'Sakit']],
         ];
+    }
+
+    /**
+     * Normalisasi input numerik yang mungkin berisi teks (cm/kg) atau koma.
+     */
+    public function beforeValidate()
+    {
+        $sanitize = static function ($value) {
+            if ($value === null || $value === '') {
+                return $value;
+            }
+            // ganti koma ke titik dan hapus huruf/tekstual satuan
+            $value = str_replace(',', '.', $value);
+            $value = preg_replace('/[^0-9.]/', '', (string)$value);
+            return $value === '' ? null : $value;
+        };
+
+        $this->chest_size = $sanitize($this->chest_size);
+        $this->body_weight = $sanitize($this->body_weight);
+        $this->hips = $sanitize($this->hips);
+        $this->first_price = $sanitize($this->first_price);
+        $this->breeding_investment = $sanitize($this->breeding_investment);
+
+        // Pastikan field numerik tidak null, default 0 jika kosong
+        foreach (['chest_size', 'body_weight', 'hips', 'breeding_investment'] as $attr) {
+            if ($this->$attr === null || $this->$attr === '') {
+                $this->$attr = 0;
+            }
+        }
+
+        return parent::beforeValidate();
     }
 
     public function attributeLabels()
@@ -111,6 +145,8 @@ class Livestock extends ActiveRecord
             'chest_size' => 'Lingkar Dada Pertama',
             'body_weight' => 'Berat Sapi Pertama',
             'hips' => 'Ukuran Pinggul Pertama',
+            'first_price' => 'Harga Pedet (Penggemukan)',
+            'breeding_investment' => 'Harga Investasi Indukan',
             'health' => 'Kesehatan Ternak',
             'livestock_image' => 'Foto Ternak',
             'created_at'=> 'Dibuat Pada',
@@ -169,24 +205,82 @@ class Livestock extends ActiveRecord
         return $fields;
     }
 
-    public function actionBcsData($id)
+    public function actionBcsData(int $id)
     {
-    $bcsData = BodyCountScore::find()->where(['livestock_id' => $id])->all();
+        $bcsData = BodyCountScore::find()->where(['livestock_id' => $id])->all();
 
-    $data = [];
-    foreach ($bcsData as $bcs) {
-        $data[] = [
-            'date' => $bcs->date, // Ganti dengan nama atribut tanggal jika berbeda
-            'chest_size' => $bcs->chest_size,
-            'hips' => $bcs->hips,
-            'body_weight' => $bcs->body_weight,
-        ];
+        $data = [];
+        foreach ($bcsData as $bcs) {
+            $data[] = [
+                'date' => $bcs->date, // Ganti dengan nama atribut tanggal jika berbeda
+                'chest_size' => $bcs->chest_size,
+                'hips' => $bcs->hips,
+                'body_weight' => $bcs->body_weight,
+            ];
+        }
+
+        return $this->asJson($data);
     }
 
-    return $this->asJson($data);
+    public function getNotes()
+    {
+        return $this->hasMany(Note::class, ['livestock_id' => 'id']);
     }
 
-    public function validateBirthdate($attribute, $params)
+    public function actionCreate()
+    {
+        $model = new Livestock();
+        $requestData = Yii::$app->getRequest()->getBodyParams();
+        $model->load($requestData, '');
+
+        // Validasi cage_id berdasarkan user_id
+        $cageId = $model->cage_id;
+        $userId = Yii::$app->user->identity->id;
+
+        if ($cageId === null) {
+            Yii::$app->getResponse()->setStatusCode(400); // Bad Request
+            return [
+                'message' => 'Kandang tidak boleh kosong, mohon buat kandang terlebih dahulu.',
+                'error' => true,
+            ];
+        }
+    
+        $existingCage = Cage::find()
+            ->where(['id' => $cageId, 'user_id' => $userId])
+            ->exists();
+    
+        if (!$existingCage) {
+            Yii::$app->getResponse()->setStatusCode(400); // Bad Request
+            return [
+                'message' => 'Kandang tidak ditemukan, mohon buat kandang sebelum menambahkan ternak.',
+                'error' => true,
+            ];
+        }
+
+        if ($model->save()) {
+            Yii::$app->getResponse()->setStatusCode(201);
+            return [
+                'message' => 'Data ternak berhasil dibuat.',
+                'error' => false,
+                'data' => $model,
+            ];
+        } else {
+            Yii::$app->getResponse()->setStatusCode(400);
+            return [
+                'message' => 'Gagal membuat data ternak.',
+                'error' => true,
+                'details' => $this->getValidationErrors($model),
+            ];
+        }
+    }
+
+    public function getHistories()
+    {
+        return $this->hasMany(History::class, ['livestock_id' => 'id'])
+                    ->orderBy(['date' => SORT_DESC]);
+    }
+
+    public function validateBirthdate(string $attribute, $params)
     {
         $today = new \DateTime();
         $today->setTime(0, 0, 0);
@@ -254,7 +348,22 @@ class Livestock extends ActiveRecord
         return $vid;
     }
 
-    public function validateLivestockName($attribute, $params)
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert && Yii::$app->has('user') && !Yii::$app->user->isGuest) {
+            $this->updateAttributes(['user_id' => Yii::$app->user->identity->id]);
+        }
+
+        $watchFields = ['first_price', 'breeding_investment'];
+        $needsRecalc = array_intersect(array_keys($changedAttributes), $watchFields);
+        if (!empty($needsRecalc)) {
+            History::recalculateForLivestock($this);
+        }
+    }
+
+    public function validateLivestockName(string $attribute, $params)
     {
         if (!$this->isNewRecord && !$this->isAttributeChanged($attribute)) {
             return;
@@ -388,7 +497,7 @@ class Livestock extends ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_UPDATE] = ['name', 'birthdate', 'cage_id', 'type_of_livestock', 'breed_of_livestock', 'maintenance', 'source', 'ownership_status', 'reproduction', 'gender', 'age', 'chest_size', 'body_weight'];
+        $scenarios[self::SCENARIO_UPDATE] = ['name', 'birthdate', 'cage_id', 'type_of_livestock', 'breed_of_livestock', 'maintenance', 'source', 'ownership_status', 'reproduction', 'gender', 'age', 'chest_size', 'body_weight', 'first_price', 'breeding_investment'];
         return $scenarios;
     }
 
@@ -436,6 +545,42 @@ class Livestock extends ActiveRecord
             'years' => $years,
             'months' => $months,
             'total_months' => $this->age
+        ];
+    }
+
+    public function getPrice()
+    {
+        // Ambil semua note terkait ternak ini
+        $notes = $this->notes;
+
+        $totalConsentrate = 0;
+        $totalForage      = 0;
+        $totalAdditive    = 0;
+
+        foreach ($notes as $note) {
+            $totalConsentrate += ((float) $note->consentrate_costs * $note->consentrate_weight);
+            $totalForage      += (float) $note->forage_costs * $note->forage_weight;
+            $totalAdditive    += (float) $note->additive_costs * $note -> additive;
+        }
+
+        // Umur produktif langsung dari atribut
+        //$productiveAge = $this->productive_age;
+                
+        // Harga pertama (first_price)
+        $firstPrice = $this->first_price;
+
+        // Data kandang: harga dan umur ekonomis
+        $cage = $this->cage;
+        $cagePrice = $cage ? (float) $cage->price : null;
+        $cageEconomicLife = $cage ? (int) $cage->economic_life : null;
+
+        return [
+            'total_consentrate_cost' => $totalConsentrate,
+            'total_forage_cost'      => $totalForage,
+            'total_additive_cost'    => $totalAdditive,
+            'initial_price'          => $firstPrice,
+            'investasi_kandang'      => $cagePrice,
+            'umur_ekonomis'          => $cageEconomicLife,
         ];
     }
 }

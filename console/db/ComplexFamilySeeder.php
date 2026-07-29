@@ -145,9 +145,26 @@ class ComplexFamilySeeder
                 'livestock_cage' => 'K' . $cow['cage_id'],
                 'location' => $faker->city,
                 'livestock_feed' => 'Rumput gajah',
-                'feed_weight' => $faker->numberBetween(1, 10),
-                'vitamin' => 'Vitamax',
-                'costs' => $faker->numberBetween(50000, 150000),
+                
+                // Kolom baru pengganti feed_weight dan costs
+                'forage_weight' => $faker->numberBetween(1, 10),
+                'forage_costs' => $faker->numberBetween(15000, 50000),
+                'consentrate_weight' => $faker->numberBetween(1, 5),
+                'consentrate_costs' => $faker->numberBetween(20000, 60000),
+                'additive_weight' => $faker->numberBetween(1, 2),
+                'additive_costs' => $faker->numberBetween(5000, 20000),
+                
+                // Kolom kesehatan
+                'vaccine' => $faker->numberBetween(0, 50000),
+                'vitamin' => $faker->numberBetween(0, 20000),
+                'pregnancy_check' => $faker->numberBetween(0, 100000),
+                'antibiotics' => $faker->numberBetween(0, 30000),
+                'anthelmintic' => $faker->numberBetween(0, 15000),
+                'insemination' => $faker->numberBetween(0, 150000),
+                
+                // Tanggal note
+                'note_date' => $faker->unique()->dateTimeBetween('-1 year', 'now')->format('Y-m-d H:i:s'),
+                
                 'details' => 'Auto seed',
                 'documentation' => null,
                 'created_at' => date('Y-m-d H:i:s'),

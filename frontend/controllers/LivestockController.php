@@ -260,17 +260,54 @@ class LivestockController extends Controller
      */
     public function actionUpdate($id)
     {
-        // Cari model Livestock berdasarkan ID
         $model = $this->findModel($id);
-        
-        // Periksa apakah model ditemukan
-        if (!$model) {
-            throw new NotFoundHttpException('Halaman yang diminta tidak ditemukan.');
-        }
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', 'Data ternak berhasil diperbarui.');
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->livestock_image = UploadedFile::getInstance($model, 'livestock_image');
+            if (!$model->validate()) {
+                $errors = $model->getFirstErrors();
+                Yii::$app->session->setFlash('error', implode('<br>', array_values($errors)));
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
+
+            $dirtySizeFields = $model->getDirtyAttributes(['chest_size', 'body_weight', 'hips']);
+
+            if ($model->save(false)) {
+                // Simpan atau perbarui relasi orang tua dan pasangan
+                $this->saveFamilyRelations($model->id);
+
+                // Set pesan sukses terlebih dahulu
+                Yii::$app->session->setFlash('success', 'Data ternak berhasil diperbarui.');
+
+                // Jika ada perubahan ukuran tubuh, catat sebagai BCS terbaru
+                if (!empty($dirtySizeFields)) {
+                    $bcs = new BodyCountScore();
+                    $bcs->livestock_id = $model->id;
+                    $bcs->chest_size = $model->chest_size;
+                    $bcs->hips = $model->hips;
+                    $bcs->body_weight = $model->body_weight;
+                    $bcs->save(false);
+                }
+
+                if ($model->livestock_image) {
+                    if ($model->uploadImage()) {
+                        return $this->redirect(['index']);
+                    } else {
+                        // Kesalahan dalam mengunggah gambar
+                        Yii::$app->session->setFlash('error', 'Gagal mengunggah gambar.');
+                        return $this->redirect(['update','id'=> $model->id]);
+                    }
+                }
+
+                return $this->redirect(['index']);
+            }
+
+            Yii::$app->session->setFlash('error', 'Gagal menyimpan perubahan data ternak.');
+            return $this->render('update', [
+                'model' => $model,
+            ]);
         }
 
         return $this->render('update', [
@@ -316,9 +353,20 @@ class LivestockController extends Controller
     {
         $livestock = $this->findModel($id);
 
-        return $this->render('update', [
-            'model' => $livestock,
-        ]);
+        if ($livestock) {
+            Yii::$app->response->statusCode = 200;
+            return $this-> render ('create-sapi', [
+                'message' => 'Data ternak berhasil ditemukan.',
+                'error' => false,
+                'data' => $livestock,
+            ]);
+        } else {
+            Yii::$app->response->statusCode = 404;
+            return $this->render('create-sapi',[
+                'message' => "Ternak tidak ditemukan",
+                'error' => true,
+            ]);
+        }
     }
 
     /**

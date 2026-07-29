@@ -9,8 +9,8 @@ $currentRoute = Yii::$app->controller->getRoute();
 
 ?>
 
-<aside class="flex-shrink-0 border-md-end s-bg-main" style="width: 4.5rem;">
-  <div class=" text-uppercase lh-sm mt-1">
+<aside class="flex-shrink-0 border-md-end overflow-y-auto s-bg-main" style="width: 4.5rem;">
+  <div class="text-uppercase lh-sm mt-1">
     <!-- DASHBOARD -->
     <div class="<?= str_contains($currentRoute, 'site') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
         <a href="<?= Url::to('/site') ?>" class="text-decoration-none text-white w-100 text-white h6">
@@ -71,6 +71,15 @@ $currentRoute = Yii::$app->controller->getRoute();
         </div>
     </div>
 
+    <!-- SIMULASI HARGA JUAL -->
+    <div class="<?= str_contains($currentRoute, '/harga-jual/simulation') ? 's-bg-sec' : 's-bg-side' ?> align-items-center">
+        <a href="<?= Url::to('/harga-jual/simulation') ?>" class="text-decoration-none text-white w-100 text-white h6">
+            <div class="py-3 mx-2">
+                Simulasi Harga Jual
+            </div>
+        </a>
+    </div>
+
     <!-- PERHITUNGAN HARGA -->
     <div>
         <div class="s-bg-side align-items-center">
@@ -93,15 +102,26 @@ $currentRoute = Yii::$app->controller->getRoute();
         </div>
 
         <div id="collapse-harga" class="collapse show">
-            <a href="<?= Url::to('/harga-jual') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual') && !str_contains($currentRoute, 'history') ? 's-bg-sec' : 's-bg-side' ?>">
+            <a href="<?= Url::to('/harga-jual/data') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/data') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Data Biaya Overhead
+                </div>
+            </a>
+            <a href="<?= Url::to('/harga-jual/index') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/index') ? 's-bg-sec' : 's-bg-side' ?>">
                     Hitung Harga Jual
                 </div>
             </a>
 
             <a href="<?= Url::to('/harga-jual/history') ?>" class="text-decoration-none text-white w-100">
-                <div class="py-2 px-4 <?= str_contains($currentRoute, 'history') ? 's-bg-sec' : 's-bg-side' ?>">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/history') ? 's-bg-sec' : 's-bg-side' ?>">
                     History Perhitungan
+                </div>
+            </a>
+
+            <a href="<?= Url::to('/harga-jual/history-logs') ?>" class="text-decoration-none text-white w-100">
+                <div class="py-2 px-4 <?= str_contains($currentRoute, 'harga-jual/history-logs') ? 's-bg-sec' : 's-bg-side' ?>">
+                    Log Perubahan Harga
                 </div>
             </a>
         </div>

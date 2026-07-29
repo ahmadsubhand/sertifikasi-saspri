@@ -1,4 +1,6 @@
 <?php
+
+use common\models\Cage;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\LinkPager;
@@ -139,6 +141,14 @@ if (\Yii::$app->session->hasFlash('error')): ?>
                                                      <?= Html::a('Lihat Data BCS', ['livestock/bcs-data', 'id' => $livestock->id], [
                                                         'class' => 'btn btn-info',
                                                     ]) ?>
+                                                    <?= Html::a(
+                                                        '<i class="bi bi-journal-text"></i> Lihat Catatan',
+                                                        ['note/livestock-notes', 'id' => $livestock->id],
+                                                        [
+                                                            'class' => 'btn text-dark',
+                                                            'style' => 'background-color: #4df0ddff; border-color: #4df0ddff; margin-left: 5px;',
+                                                        ]
+                                                    ) ?>
 
 
                                                 </div></td>
@@ -225,15 +235,15 @@ if (\Yii::$app->session->hasFlash('error')): ?>
                                         <div class="form-body row">
                                             <div class = "col">
                                             <?= $form->field($model, 'eid')->textInput([
-                                                'maxlength'   => 19,
-                                                'placeholder' => 'Masukkan kode EID (maksimal 19 digit)',
+                                                'maxlength'   => 32,
+                                                'placeholder' => 'Masukkan kode EID (32 digit angka)',
                                                 'inputmode'   => 'numeric', // tampilkan keypad angka di mobile
-                                                'oninput'     => 'this.value = this.value.replace(/[^0-9]/g, "").slice(0,19);',
+                                                'oninput'     => 'this.value = this.value.replace(/[^0-9]/g, "").slice(0,32);',
                                             ]) ?>
                                             <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'placeholder' => 'Masukkan nama hewan ternak']) ?>
                                             <?= $form->field($model, 'birthdate')->input('date', ['placeholder' => 'Masukkan tanggal lahir']) ?>
                                             <?= $form->field($model, 'cage_id')->dropDownList(
-                                                $cageOptions,
+                                                \yii\helpers\ArrayHelper::map(Cage::find()->where(['user_id' => \Yii::$app->user->id])->all(), 'id', 'name'),
                                                 ['prompt' => 'Pilih Kandang']
                                             ) ?>
 
@@ -261,6 +271,17 @@ if (\Yii::$app->session->hasFlash('error')): ?>
                                                 'Gembala' => 'Gembala',
                                                 'Campuran' => 'Campuran',
                                             ], ['prompt' => 'Pilih jenis pemeliharaan']) ?>
+
+                                            <?= $form->field($model, 'source')->dropDownList([
+                                                'Sejak Lahir' => 'Sejak Lahir',
+                                                'Bantuan Pemerintah' => 'Bantuan Pemerintah',
+                                                'Beli' => 'Beli',
+                                                'Beli dari Luar Kelompok' => 'Beli dari Luar Kelompok',
+                                                'Beli dari Dalam Kelompok' => 'Beli dari Dalam Kelompok',
+                                                'Inseminasi Buatan' => 'Inseminasi Buatan',
+                                                'Kawin Alam' => 'Kawin Alam',
+                                                'Tidak Tahu' => 'Tidak Tahu',
+                                            ], ['prompt' => 'Pilih sumber hewan ternak']) ?>
                                             <!-- <?= $form->field($model, 'livestock_image[]')->fileInput(['multiple' => true, 'class' => 'form-control']) ?> -->
                                             </div>
                                             <div class = "col">
@@ -314,20 +335,30 @@ if (\Yii::$app->session->hasFlash('error')): ?>
                                                 'maxlength'=> true,
                                                 ]) ?>
 
+                                            <div class="business-field business-field-penggemukan" style="display:none;">
+                                                <?= $form->field($model, 'first_price')->input('number', [
+                                                    'placeholder' => 'Masukkan Harga Pedet (Rp)',
+                                                    'id'=> 'first_price',
+                                                    'min' => 0,
+                                                    'class' => 'form-control no-spinner'
+
+                                                ]) ?>
+                                            </div>
+
+                                            <div class="business-field business-field-breeding" style="display:none;">
+                                                <?= $form->field($model, 'breeding_investment')->input('number', [
+                                                    'placeholder' => 'Masukkan Harga Investasi Indukan (Rp)',
+                                                    'id'=> 'breeding_investment',
+                                                    'min' => 0,
+                                                    'class' => 'form-control no-spinner'
+
+                                                ]) ?>
+                                            </div>
+
                                             <?= $form->field($model, 'health')->dropDownList([
                                                 'Sehat' => 'Sehat',
                                                 'Sakit' => 'Sakit',
                                             ], ['prompt' => 'Pilih status kesehatan']) ?>
-                                            <?= $form->field($model, 'source')->dropDownList([
-                                                'Sejak Lahir' => 'Sejak Lahir',
-                                                'Bantuan Pemerintah' => 'Bantuan Pemerintah',
-                                                'Beli' => 'Beli',
-                                                'Beli dari Luar Kelompok' => 'Beli dari Luar Kelompok',
-                                                'Beli dari Dalam Kelompok' => 'Beli dari Dalam Kelompok',
-                                                'Inseminasi Buatan' => 'Inseminasi Buatan',
-                                                'Kawin Alam' => 'Kawin Alam',
-                                                'Tidak Tahu' => 'Tidak Tahu',
-                                            ], ['prompt' => 'Pilih sumber hewan ternak']) ?>
                                             </div>
                                         </div>
                                     </div>
@@ -336,6 +367,27 @@ if (\Yii::$app->session->hasFlash('error')): ?>
                                         <!-- <button type="submit" class="btn btn-primary me-1">Submit</button> -->
                                     </div>
                                 <?php ActiveForm::end(); ?>
+                                <?php
+                                    $this->registerJs(<<<JS
+                                    (function() {
+                                        function toggleBusinessPriceFields() {
+                                            var purpose = $('#livestock-purpose').val();
+                                            if (purpose === 'Penggemukan') {
+                                                $('.business-field-penggemukan').show();
+                                                $('.business-field-breeding').hide();
+                                            } else if (purpose === 'Indukan') {
+                                                $('.business-field-penggemukan').hide();
+                                                $('.business-field-breeding').show();
+                                            } else {
+                                                $('.business-field-penggemukan, .business-field-breeding').hide();
+                                            }
+                                        }
+
+                                        toggleBusinessPriceFields();
+                                        $(document).on('change', '#livestock-purpose', toggleBusinessPriceFields);
+                                    })();
+                                    JS);
+                                ?>
                                 <script>
                                 // Show the modal if there's a flash message
                                 <?php if (\Yii::$app->session->hasFlash('error')): ?>
@@ -360,6 +412,19 @@ if (\Yii::$app->session->hasFlash('error')): ?>
 <!-- Include Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<?php
+$this->registerCss("
+    /* Hilangkan spinner Chrome, Edge, Safari */
+    input.no-spinner::-webkit-outer-spin-button,
+    input.no-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
 
-
+    /* Hilangkan spinner Firefox */
+    input.no-spinner[type=number] {
+        -moz-appearance: textfield;
+    }
+");
+?>

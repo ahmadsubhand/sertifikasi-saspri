@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use console\db\ComplexFamilySeeder;
+use console\db\EconomySeeder;
 use Yii;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -60,6 +61,15 @@ class DbController extends Controller
         $this->stdout("Executing ComplexFamilySeeder... ");
         try {
             $seeder = new ComplexFamilySeeder();
+            $seeder->run();
+            $this->stdout("DONE\n", Console::FG_GREEN);
+        } catch (\Exception $e) {
+            $this->stdout("ERROR: " . $e->getMessage() . "\n", Console::FG_RED);
+        }
+
+        $this->stdout("Executing EconomySeeder... ");
+        try {
+            $seeder = new EconomySeeder();
             $seeder->run();
             $this->stdout("DONE\n", Console::FG_GREEN);
         } catch (\Exception $e) {

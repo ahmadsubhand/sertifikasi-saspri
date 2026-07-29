@@ -40,6 +40,16 @@ $this->params['breadcrumbs'][] = 'Update';
                                 'placeholder' => 'Masukkan kapasitas kandang',
                                 'min' => 1
                             ]) ?>
+                            <?= $form->field($model, 'investasi_kandang')->input('number', [
+                                        'min' => 0,
+                                        'placeholder' => 'Total investasi kandang & peralatan (Rp)',
+                                        'class' => 'form-control no-spinner'
+                            ]) ?>
+                            <?= $form->field($model, 'umur_ekonomis')->input('number', [
+                                'min' => 0,
+                                'step' => '0.1',
+                                'placeholder' => 'Umur ekonomis (tahun)'
+                            ]) ?>
                             <?= $form->field($model, 'description')->textarea([
                                 'rows' => 6,
                                 'placeholder' => 'Masukkan deskripsi kandang'
@@ -72,6 +82,8 @@ $this->params['breadcrumbs'][] = 'Update';
                     <p><strong>Nama Saat Ini:</strong> <?= Html::encode($model->name) ?></p>
                     <p><strong>Lokasi Saat Ini:</strong> <?= Html::encode($model->location) ?></p>
                     <p><strong>Kapasitas Saat Ini:</strong> <?= Html::encode($model->capacity) ?> ekor</p>
+                    <p><strong>Investasi Kandang:</strong> <?= \Yii::$app->formatter->asCurrency($model->investasi_kandang ?? 0, 'IDR') ?></p>
+                    <p><strong>Umur Ekonomis:</strong> <?= Html::encode($model->umur_ekonomis ?? '-') ?> tahun</p>
                     <p><strong>Jumlah Ternak:</strong> <?= $model->getLivestockCount() ?> ekor</p>
                     <hr>
                     <div class="d-grid">
@@ -86,3 +98,19 @@ $this->params['breadcrumbs'][] = 'Update';
         </div>
     </section>
 </div>
+
+<?php
+$this->registerCss("
+    /* Hilangkan spinner Chrome, Edge, Safari */
+    input.no-spinner::-webkit-outer-spin-button,
+    input.no-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Hilangkan spinner Firefox */
+    input.no-spinner[type=number] {
+        -moz-appearance: textfield;
+    }
+");
+?>

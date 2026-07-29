@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\enums\UserRole;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\BadRequestHttpException;
@@ -10,7 +11,11 @@ use common\models\Note;
 use common\models\NoteImage;
 use common\models\Livestock;
 use common\models\Cage;
+use DateInterval;
+use DatePeriod;
+use DateTime;
 use yii\data\Pagination;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 
 class NoteController extends Controller
@@ -47,12 +52,172 @@ class NoteController extends Controller
                 'delete' => ['DELETE'],
                 'view' => ['GET'],
                 'index' => ['GET'],
+                'livestock-notes' => ['GET'],
                 'get-note-by-livestock-id' => ['GET'],
                 'upload-documentation' => ['POST'],
             ],
         ];
 
+        $behaviors['access'] = [
+            'class' => AccessControl::class,
+            'rules' => [
+                [
+                    'allow' => true,
+                    'roles' => [UserRole::USER, UserRole::COORDINATOR],
+                ]
+            ]
+        ];
+
         return $behaviors;
+    }
+
+    public function actionLivestockNotes(int $id)
+    {
+        $userId = Yii::$app->user->id;
+
+        $livestock = Livestock::find()
+            ->where(['id' => $id, 'user_id' => $userId])
+            ->with('notes')
+            ->one();
+
+        if ($livestock === null) {
+            throw new NotFoundHttpException('Data sapi tidak ditemukan.');
+        }
+
+        $notes = $livestock->notes;
+
+        $notesByDate = [];
+        $earliestNoteDate = null;
+
+        foreach ($notes as $note) {
+            $dateString = $note->note_date ?? null;
+            if (empty($dateString) && !empty($note->created_at)) {
+                $dateString = substr($note->created_at, 0, 10);
+            }
+
+            if (empty($dateString)) {
+                continue;
+            }
+
+            $dateKey = (new DateTime($dateString))->format('Y-m-d');
+            $notesByDate[$dateKey][] = $note;
+
+            if ($earliestNoteDate === null || $dateKey < $earliestNoteDate) {
+                $earliestNoteDate = $dateKey;
+            }
+        }
+
+        $today = new DateTime('today');
+        $birthDate = !empty($livestock->birthdate) ? new DateTime($livestock->birthdate) : clone $today;
+        $startReference = clone $birthDate;
+
+        if ($earliestNoteDate !== null) {
+            $earliestNote = new DateTime($earliestNoteDate);
+            if ($earliestNote < $startReference) {
+                $startReference = $earliestNote;
+            }
+        }
+
+        if ($startReference > $today) {
+            $startReference = clone $today;
+        }
+
+        $firstMonthStart = (clone $startReference)->modify('first day of this month');
+        $currentMonthStart = (clone $today)->modify('first day of this month');
+
+        $monthsSummary = [];
+        $monthCursor = clone $firstMonthStart;
+
+        while ($monthCursor <= $currentMonthStart) {
+            $monthKey = $monthCursor->format('Y-m');
+            $monthLabel = Yii::$app->formatter->asDate($monthCursor->format('Y-m-d'), 'php:F Y');
+
+            $monthStart = clone $monthCursor;
+            $monthEnd = (clone $monthCursor)->modify('last day of this month');
+
+            if ($monthStart < $birthDate) {
+                $monthStart = clone $birthDate;
+            }
+
+            if ($monthEnd > $today) {
+                $monthEnd = clone $today;
+            }
+
+            $missingDays = [];
+            $dayIteratorEnd = (clone $monthEnd)->modify('+1 day');
+            $period = new DatePeriod($monthStart, new DateInterval('P1D'), $dayIteratorEnd);
+
+            foreach ($period as $day) {
+                $dayKey = $day->format('Y-m-d');
+                if (empty($notesByDate[$dayKey])) {
+                    $missingDays[] = $dayKey;
+                }
+            }
+
+            $monthsSummary[$monthKey] = [
+                'label' => $monthLabel,
+                'year' => (int) $monthCursor->format('Y'),
+                'month' => (int) $monthCursor->format('m'),
+                'hasMissing' => !empty($missingDays),
+                'missingDays' => $missingDays,
+            ];
+
+            $monthCursor->modify('+1 month');
+        }
+
+        $requestedMonth = Yii::$app->request->get('month');
+        $requestedYear = Yii::$app->request->get('year');
+
+        $selectedKey = null;
+        if ($requestedMonth !== null && $requestedYear !== null) {
+            $selectedKey = sprintf('%04d-%02d', (int) $requestedYear, (int) $requestedMonth);
+        }
+
+        if ($selectedKey === null || !isset($monthsSummary[$selectedKey])) {
+            $selectedKey = $currentMonthStart->format('Y-m');
+            if (!isset($monthsSummary[$selectedKey]) && !empty($monthsSummary)) {
+                $selectedKey = array_key_last($monthsSummary);
+            }
+        }
+
+        $selectedMonthData = $monthsSummary[$selectedKey] ?? reset($monthsSummary);
+
+        if ($selectedMonthData === false) {
+            $selectedMonthData = null;
+        }
+
+        $dailyEntries = [];
+        if ($selectedMonthData !== null) {
+            $monthStart = new DateTime(sprintf('%04d-%02d-01', $selectedMonthData['year'], $selectedMonthData['month']));
+            $monthEnd = (clone $monthStart)->modify('last day of this month');
+
+            if ($monthStart < $birthDate) {
+                $monthStart = clone $birthDate;
+            }
+
+            if ($monthEnd > $today) {
+                $monthEnd = clone $today;
+            }
+
+            $dayIteratorEnd = (clone $monthEnd)->modify('+1 day');
+            $period = new DatePeriod($monthStart, new DateInterval('P1D'), $dayIteratorEnd);
+
+            foreach ($period as $day) {
+                $dayKey = $day->format('Y-m-d');
+                $dailyEntries[] = [
+                    'date' => $dayKey,
+                    'notes' => $notesByDate[$dayKey] ?? [],
+                    'isMissing' => empty($notesByDate[$dayKey]),
+                ];
+            }
+        }
+
+        return $this->render('livestock-notes', [
+            'livestock' => $livestock,
+            'monthsSummary' => $monthsSummary,
+            'selectedKey' => $selectedKey,
+            'dailyEntries' => $dailyEntries,
+        ]);
     }
 
     /**
@@ -96,69 +261,70 @@ class NoteController extends Controller
      * @throws ServerErrorHttpException jika data Note tidak dapat disimpan
      */
     public function actionCreate()
-{
-    $model = new Note();
+    {
+        $model = new Note();
 
-    // Ambil livestock_id dari input POST
-    $livestock_id = Yii::$app->request->post('Note')['livestock_id'];
+        // Ambil livestock_id dari input POST
+        $livestock_id = Yii::$app->request->post('Note')['livestock_id'];
 
-    // Validasi apakah livestock_id ada
-    if (!$livestock_id) {
-        Yii::$app->response->statusCode = 400;
-        return $this->render('error', [
-            'message' => 'Gagal membuat catatan, livestock_id tidak ditemukan.',
-            'error' => true,
-        ]);
-    }
-
-    // Cari ternak berdasarkan livestock_id
-    $livestock = Livestock::findOne($livestock_id);
-
-    if (!$livestock) {
-        Yii::$app->response->statusCode = 400;
-        return $this->render('error', [
-            'message' => 'Gagal membuat catatan, data ternak tidak ditemukan.',
-            'error' => true,
-        ]);
-    }
-
-    // Cari kandang yang terkait dengan ternak
-    $cage = Cage::findOne($livestock->cage_id);
-
-    if (!$cage) {
-        Yii::$app->response->statusCode = 400;
-        return $this->render('error', [
-            'message' => 'Gagal membuat catatan, kandang tidak ditemukan.',
-            'error' => true,
-        ]);
-    }
-
-    // Set atribut-atribut dari Note
-    $model->livestock_id = $livestock->id;
-    $model->livestock_vid = $livestock->vid;
-    $model->livestock_name = $livestock->name;
-    $model->livestock_cage = $cage->name;
-    $model->location = $cage->location;
-
-    // Muat data dari input POST
-    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-        // Simpan model
-        if ($model->save()) {
-            // Set flash message untuk sukses
-            Yii::$app->session->setFlash('success', 'Catatan berhasil dibuat.');
-    
-            // Redirect ke halaman index
+        // Validasi apakah livestock_id ada
+        if (!$livestock_id) {
+            Yii::$app->response->statusCode = 400;
+            Yii::$app->session->setFlash('error', 'Gagal membuat catatan, livestock_id tidak ditemukan.');
             return $this->redirect(['index']);
         }
-    } else {
+
+        // Cari ternak berdasarkan livestock_id
+        $livestock = Livestock::findOne($livestock_id);
+
+        if (!$livestock) {
+            Yii::$app->response->statusCode = 400;
+            Yii::$app->session->setFlash('error', 'Gagal membuat catatan, data ternak tidak ditemukan.');
+            return $this->redirect(['index']);
+        }
+
+        // Cari kandang yang terkait dengan ternak
+        $cage = Cage::findOne($livestock->cage_id);
+
+        if (!$cage) {
+            Yii::$app->response->statusCode = 400;
+            Yii::$app->session->setFlash('error', 'Gagal membuat catatan, kandang tidak ditemukan.');
+            return $this->redirect(['index']);
+        }
+
+        // Set atribut-atribut dari Note
+        $model->livestock_id = $livestock->id;
+        $model->livestock_vid = $livestock->vid;
+        $model->livestock_name = $livestock->name;
+        $model->livestock_cage = $cage->name;
+        $model->location = $cage->location;
+
+        // Muat data dari input POST
+        if ($model->load(Yii::$app->request->post())) {
+            // Cek duplikasi di tanggal yang sama (WIB)
+            $noteDate = $model->note_date ?: (new \DateTime('now', new \DateTimeZone('Asia/Jakarta')))->format('Y-m-d');
+            $existing = Note::find()
+                ->where([
+                    'livestock_id' => $model->livestock_id,
+                    'note_date' => $noteDate,
+                ])
+                ->exists();
+
+            if ($existing) {
+                Yii::$app->session->setFlash('error', 'Catatan pada tanggal ' . Yii::$app->formatter->asDate($noteDate, 'php:d M Y') . ' telah dibuat.');
+                return $this->redirect(['livestock-notes', 'id' => $livestock->id]);
+            }
+
+            if ($model->validate() && $model->save()) {
+                Yii::$app->session->setFlash('success', 'Catatan berhasil dibuat.');
+                return $this->redirect(['livestock-notes', 'id' => $livestock->id]);
+            }
+        }
+
         Yii::$app->response->statusCode = 400;
-        return $this->render('error', [
-            'message' => 'Catatan gagal dibuat.',
-            'error' => true,
-            'details' => $this->getValidationErrors($model),
-        ]);
+        Yii::$app->session->setFlash('error', 'Catatan gagal dibuat.');
+        return $this->redirect(['livestock-notes', 'id' => $livestock->id]);
     }
-}
 
 
 
@@ -171,25 +337,33 @@ class NoteController extends Controller
      * @throws ServerErrorHttpException jika data Note tidak dapat disimpan
      */
     public function actionUpdate($id)
-{
-    $model = $this->findModel($id);
+    {
+        $model = $this->findModel($id);
 
-    if ($model === null) {
-        Yii::$app->session->setFlash('error', 'Catatan tidak ditemukan.');
-        return $this->redirect(['index']);
-    }
+        if ($model === null) {
+            Yii::$app->session->setFlash('error', 'Catatan tidak ditemukan.');
+            return $this->redirect(['livestock-notes', 'id' => Yii::$app->request->get('livestock_id')]);
+        }
 
-    if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-        $model->save();
-        Yii::$app->session->setFlash('success', 'Catatan berhasil diperbarui.');
-        return $this->redirect('index'); // Assuming you have a view page for notes
-    } else {
-        Yii::$app->session->setFlash('error', 'Gagal memperbarui catatan.');
+        if ($model->load(Yii::$app->request->post())) {
+            if (empty($model->note_date)) {
+                $model->note_date = (new \DateTime('now', new \DateTimeZone('Asia/Jakarta')))->format('Y-m-d');
+            }
+
+            if ($model->validate() && $model->save()) {
+                Yii::$app->session->setFlash('success', 'Catatan berhasil diperbarui.');
+                return $this->redirect(['livestock-notes', 'id' => $model->livestock_id]);
+            }
+
+            $errors = $model->getFirstErrors();
+            Yii::$app->session->setFlash('error', implode('<br>', array_values($errors)));
+            return $this->redirect(['update', 'id' => $model->id]);
+        }
+
         return $this->render('update', [
             'model' => $model,
         ]);
     }
-}
 
 
     /**
@@ -200,33 +374,33 @@ class NoteController extends Controller
      * @throws ServerErrorHttpException if the model cannot be deleted
      */
     public function actionDelete($id)
-{
-    $transaction = Yii::$app->db->beginTransaction();
-    try {
-        $model = $this->findModel($id);
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $model = $this->findModel($id);
 
-        if ($model === null) {
-            Yii::$app->session->setFlash('error', 'Gagal menghapus catatan, catatan tidak ditemukan.');
+            if ($model === null) {
+                Yii::$app->session->setFlash('error', 'Gagal menghapus catatan, catatan tidak ditemukan.');
+                return $this->redirect(['index']);
+            }
+
+            // Delete note images first
+            NoteImage::deleteAll(['note_id' => $id]);
+
+            // Then delete the note
+            $model->delete();
+
+            $transaction->commit();
+
+            Yii::$app->session->setFlash('success', 'Catatan berhasil dihapus.');
+            return $this->redirect(['index']);
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+
+            Yii::$app->session->setFlash('error', 'Gagal menghapus catatan: ' . $e->getMessage());
             return $this->redirect(['index']);
         }
-
-        // Delete note images first
-        NoteImage::deleteAll(['note_id' => $id]);
-
-        // Then delete the note
-        $model->delete();
-
-        $transaction->commit();
-
-        Yii::$app->session->setFlash('success', 'Catatan berhasil dihapus.');
-        return $this->redirect(['index']);
-    } catch (\Exception $e) {
-        $transaction->rollBack();
-
-        Yii::$app->session->setFlash('error', 'Gagal menghapus catatan: ' . $e->getMessage());
-        return $this->redirect(['index']);
     }
-}
 
 
     /**
@@ -234,24 +408,33 @@ class NoteController extends Controller
      * @return array
      */
     public function actionIndex()
-{
-    if (Yii::$app->user->isGuest) {
-        // Redirect to login page if user is a guest
-        return $this->redirect(['user/login']);
-    } else {
+    {
         $userId = Yii::$app->user->identity->id;
         $livestock = Livestock::find()
-        ->where(['user_id' => $userId])
-        ->all();
+            ->where(['user_id' => $userId])
+            ->all();
 
-    // Validasi cage_id berdasarkan user_id
+        // Validasi cage_id berdasarkan user_id
         if (empty($livestock)) {
-            return $this->render('error', [
-                'message' => 'Sapi tidak boleh kosong, mohon buat sapi terlebih dahulu.',
-                'error' => true,
-            ]);
+            Yii::$app->session->setFlash('error', 'Sapi tidak boleh kosong, mohon buat sapi terlebih dahulu.');
+            return $this->redirect(['livestock/index']);
         }
         $model = new Note();
+
+        $prefillLivestockId = Yii::$app->request->get('livestock_id');
+        if (!empty($prefillLivestockId)) {
+            $ownsLivestock = Livestock::find()
+                ->where(['id' => $prefillLivestockId, 'user_id' => $userId])
+                ->exists();
+            if ($ownsLivestock) {
+                $model->livestock_id = (int) $prefillLivestockId;
+            }
+        }
+
+        $prefillDate = Yii::$app->request->get('date');
+        if (!empty($prefillDate)) {
+            $model->note_date = $prefillDate;
+        }
         // First, get the query object
         $query = Note::find()->where(['user_id' => Yii::$app->user->id])->orderBy(['created_at' => SORT_DESC]);
 
@@ -272,7 +455,6 @@ class NoteController extends Controller
             'model' => $model,
         ]);
     }
-}
 
 
     /**
@@ -280,26 +462,48 @@ class NoteController extends Controller
      * @return mixed
      */
     public function actionGetNoteByLivestockId()
-{
-    $livestock_id = Yii::$app->request->get('livestock_id'); // Retrieve the livestock_id from the GET request
+    {
+        $livestock_id = Yii::$app->request->get('livestock_id'); // Retrieve the livestock_id from the GET request
 
-    if ($livestock_id) {
-        $notes = Note::find()->where(['livestock_id' => $livestock_id])->all();
+        if (!$livestock_id) {
+            Yii::$app->session->setFlash('error', 'Livestock ID tidak valid.');
+            return $this->redirect(['index']);
+        }
 
-        if (!empty($notes)) {
-            return $this->render('index', [
-                'notes' => $notes,
+        $userId = Yii::$app->user->id;
+
+        $query = Note::find()
+            ->where([
                 'livestock_id' => $livestock_id,
-            ]);
-        } else {
+                'user_id' => $userId,
+            ])
+            ->orderBy(['created_at' => SORT_DESC]);
+
+        if (!$query->exists()) {
             Yii::$app->session->setFlash('error', 'Catatan tidak ditemukan.');
             return $this->redirect(['index']);
         }
-    } else {
-        Yii::$app->session->setFlash('error', 'Livestock ID tidak valid.');
-        return $this->redirect(['index']);
+
+        $pagination = new Pagination([
+            'defaultPageSize' => 10,
+            'totalCount' => $query->count(),
+        ]);
+
+        $notes = $query
+            ->offset($pagination->offset)
+            ->limit($pagination->limit)
+            ->all();
+
+        $model = new Note();
+        $model->livestock_id = (int) $livestock_id;
+
+        return $this->render('index', [
+            'notes' => $notes,
+            'pagination' => $pagination,
+            'model' => $model,
+            'livestock_id' => $livestock_id,
+        ]);
     }
-}
 
 
     /**

@@ -48,6 +48,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => $model->capacity . ' ekor',
                             ],
                             [
+                                'attribute' => 'investasi_kandang',
+                                'label' => 'Biaya Total Kandang dan Peralatan',
+                                'value' => 'Rp. ' . $model->investasi_kandang ,
+                            ],
+                            [
+                                'attribute' => 'umur_ekonomis',
+                                'label' => 'Umur Ekonomis',
+                                'value' => $model->umur_ekonomis . ' tahun',
+                            ],
+                            [
                                 'attribute' => 'description',
                                 'label' => 'Deskripsi',
                                 'value' => $model->description ?: '-',

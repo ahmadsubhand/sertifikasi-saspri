@@ -40,7 +40,6 @@ $this->title = 'Pencatatan Pakan Ternak';
 <div class="page-content"> 
     <div class ="row">
         <div class="col-12 col-lg-9">
-            
             <section class="section">
                         <div class="card">
                             <div class="card-content">
@@ -56,22 +55,77 @@ $this->title = 'Pencatatan Pakan Ternak';
                                         \yii\helpers\ArrayHelper::map(Livestock::find()->where(['user_id' => \Yii::$app->user->id])->all(), 'id', 'name'),
                                         ['prompt' => 'Pilih Sapi']
                                     )-> label('Nama Sapi') ?>
+                                    <?= $form->field($model, 'note_date')->input('date') ?>
+                                    <?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
+                                    <br>
+                                    <br>
+                                    <h4 class="card-title mb-4">Data Pakan Hari Ini</h4>
                                     <?= $form->field($model, 'livestock_feed')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'costs')->textInput([
-                                        'id' => 'costs',
-                                        'type' => 'text',
-                                        'maxlength' => true,
+                                    <?= $form->field($model, 'forage_costs')->input('number', [
+                                        'id' => 'forage_costs',
+                                        'class' => 'form-control no-spinner',
                                         'placeholder' => 'Rp. 0'
                                     ]) ?>
 
-                                    <?= $form->field($model, 'feed_weight')->textInput([
-                                        'id' => 'feed_weight',
-                                        'type' => 'text',
-                                        'maxlength' => true,
+                                    <?= $form->field($model, 'forage_weight')->input('number', [
+                                        'id' => 'forage_weight',
                                         'placeholder' => '0 kg'
                                     ]) ?>
-                                    <?= $form->field($model, 'vitamin')->textInput(['maxlength' => true]) ?>
-                                    <?= $form->field($model, 'details')->textarea(['rows' => 6]) ?>
+
+                                    <?= $form->field($model, 'consentrate_costs')->input('number', [
+                                        'id' => 'consentrate_costs',
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'consentrate_weight')->input('number', [
+                                        'id' => 'consentrate_weight',
+                                        'placeholder' => '0 kg'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'additive_costs')->input('number', [
+                                        'id' => 'additive_costs',
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'additive_weight')->input('number', [
+                                        'id' => 'additive_weight',
+                                        'placeholder' => '0 kg'
+                                    ]) ?>
+
+                                    <br>
+                                    <br>
+                                    <h4 class="card-title mb-4">Kesehatan (isi harga apabila dilakukan pada hari ini)</h4>
+                                    <?= $form->field($model, 'vaccine')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'insemination')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'pregnancy_check')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'antibiotics')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'anthelmintic')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
+
+                                    <?= $form->field($model, 'vitamin')->input('number', [
+                                        'class' => 'form-control no-spinner',
+                                        'placeholder' => 'Rp. 0'
+                                    ]) ?>
 
                                     <div class="form-group">
                                         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
@@ -197,3 +251,19 @@ $this->title = 'Pencatatan Pakan Ternak';
 
 <!-- Bootstrap JS (termasuk Popper.js) -->
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+<?php
+$this->registerCss("
+    /* Hilangkan spinner Chrome, Edge, Safari */
+    input.no-spinner::-webkit-outer-spin-button,
+    input.no-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Hilangkan spinner Firefox */
+    input.no-spinner[type=number] {
+        -moz-appearance: textfield;
+    }
+");
+?>

@@ -142,7 +142,7 @@ class CowFamilyTree extends ActiveRecord
         return parent::beforeValidate();
     }
 
-    public function validatePartners($attribute, $params)
+    public function validatePartners(string $attribute, $params)
     {
         $userId = Yii::$app->user->id;
 
@@ -175,7 +175,7 @@ class CowFamilyTree extends ActiveRecord
     /**
      * Mengecek apakah terjadi circular relationship.
      */
-    protected function createsCircularRelation($mainCowId, $potentialParentId)
+    protected function createsCircularRelation(int $mainCowId, int $potentialParentId)
     {
         // Hindari validasi jika parent tidak diset
         if (!$potentialParentId) {
@@ -455,6 +455,99 @@ class CowFamilyTree extends ActiveRecord
             'nodeDataArray' => $nodeDataArray,
             'linkDataArray' => $linkDataArray,
         ];
+    }
+
+    /**
+     * Mengembalikan daftar keturunan (anak, cucu, dst.) yang dikelompokkan per generasi.
+     * Generasi 1 = anak langsung, Generasi 2 = cucu, dan seterusnya.
+     *
+     * @param int $cowId ID sapi utama
+     * @return array<int, \common\models\Livestock[]> Array dengan key nomor generasi dan value array model Livestock
+     */
+    public static function getDescendantsGrouped(int $cowId): array
+    {
+        $result = [];
+        $visited = [$cowId];
+        self::collectDescendantsRecursive($cowId, 1, $result, $visited);
+        return $result;
+    }
+
+    /**
+     * Rekursif internal untuk membangun daftar keturunan per generasi.
+     *
+     * @param int $cowId ID sapi yang sedang diproses
+     * @param int $generation Urutan generasi saat ini (anak = 1)
+     * @param array $result Referensi array hasil akhir
+     * @param array $visited Referensi array ID sapi yang sudah diproses untuk mencegah loop siklis
+     * @return void
+     */
+    private static function collectDescendantsRecursive(int $cowId, int $generation, array &$result, array &$visited): void
+    {
+        $childrenIds = self::getChildrenIds($cowId);
+        if (empty($childrenIds)) {
+            return;
+        }
+
+        foreach ($childrenIds as $childId) {
+            // Hindari loop tak hingga jika ada data siklis
+            if (in_array($childId, $visited, true)) {
+                continue;
+            }
+            $visited[] = $childId;
+            $childModel = Livestock::findOne($childId);
+            if ($childModel) {
+                $result[$generation][] = $childModel;
+            }
+            // Proses keturunan berikutnya
+            self::collectDescendantsRecursive($childId, $generation + 1, $result, $visited);
+        }
+    }
+
+    /**
+     * Mengambil daftar ID saudara kandung langsung dari seekor sapi.
+     * Saudara kandung didefinisikan sebagai hewan ternak yang memiliki minimal
+     * salah satu orang tua (father_id atau mother_id) yang sama dengan hewan utama
+     * dan bukan dirinya sendiri.
+     *
+     * @param int $cowId ID sapi utama
+     * @return int[] Daftar ID saudara kandung unik
+     */
+    public static function getSiblingIds(int $cowId): array
+    {
+        // Ambil entry family tree untuk sapi utama
+        $entry = self::findOne(['main_cow_id' => $cowId]);
+        if (!$entry) {
+            return [];
+        }
+
+        $siblings = [];
+
+        // Cari saudara dengan ayah yang sama (tidak termasuk diri sendiri)
+        if ($entry->father_id) {
+            $fatherSiblings = self::find()
+                ->where(['father_id' => $entry->father_id])
+                ->andWhere(['<>', 'main_cow_id', $cowId])
+                ->all();
+            
+            foreach ($fatherSiblings as $sibling) {
+                $siblings[] = (int) $sibling->main_cow_id;
+            }
+        }
+
+        // Cari saudara dengan ibu yang sama (tidak termasuk diri sendiri)
+        if ($entry->mother_id) {
+            $motherSiblings = self::find()
+                ->where(['mother_id' => $entry->mother_id])
+                ->andWhere(['<>', 'main_cow_id', $cowId])
+                ->all();
+            
+            foreach ($motherSiblings as $sibling) {
+                $siblings[] = (int) $sibling->main_cow_id;
+            }
+        }
+
+        // Hapus duplikat dan kembalikan array unik
+        return array_values(array_unique($siblings));
     }
 
     private static function createNode(

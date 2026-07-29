@@ -198,17 +198,22 @@ class CageController extends Controller
     public function actionCreate()
     {
         $model = new Cage();
-        // $model->scenario = Cage::SCENARIO_CREATE;
-        $model->user_id = Yii::$app->user->id;
-        $params = Yii::$app->request->post('Cage', []);
-        $model->load(['Cage' => $params]);
-        if (!$model->validate()) {
-            // Debug validation errors
-            return $this->actionIndex($model);
-        }else{
-            $model->save();
-            return $this->redirect(['index']);
+        $model->scenario = Cage::SCENARIO_CREATE;
+        
+        if (Yii::$app->request->isPost) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->user_id = Yii::$app->user->id;
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', 'Kandang berhasil dibuat.');
+                    return $this->redirect(['index']);
+                }
+            }
+            Yii::$app->session->setFlash('error', implode('<br>', array_map(static function ($errors) {
+                return implode(', ', $errors);
+            }, $model->getErrors())));
         }
+
+        return $this->redirect(['index']);
     }
     
     /**
@@ -226,6 +231,8 @@ class CageController extends Controller
             Yii::$app->session->setFlash('error', 'Kandang tidak ditemukan.');
             return $this->redirect(['index']);
         }
+
+        $model->scenario = Cage::SCENARIO_UPDATE;
 
         // If the form is submitted
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -250,58 +257,57 @@ class CageController extends Controller
      * @return mixed
      */
     public function actionDelete($id)
-{
-    $transaction = Yii::$app->db->beginTransaction();
-    try {
-        // Cari cage berdasarkan ID
-        $cage = Cage::findOne($id);
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // Cari cage berdasarkan ID
+            $cage = Cage::findOne($id);
 
-        // Jika cage tidak ditemukan, tampilkan pesan error
-        if ($cage === null) {
-            Yii::$app->session->setFlash('error', 'Gagal menghapus data kandang. Data kandang tidak ditemukan.');
-            return $this->redirect(['index']);
-        }
-
-        // Dapatkan semua livestock yang terkait dengan cage
-        $livestockList = Livestock::find()->where(['cage_id' => $id])->all();
-
-        foreach ($livestockList as $livestock) {
-            // Hapus semua catatan yang terkait dengan livestock
-            $notes = Note::find()->where(['livestock_id' => $livestock->id])->all();
-            foreach ($notes as $note) {
-                // Hapus gambar yang terkait dengan catatan terlebih dahulu
-                NoteImage::deleteAll(['note_id' => $note->id]);
-
-                // Hapus catatan
-                $note->delete();
+            // Jika cage tidak ditemukan, tampilkan pesan error
+            if ($cage === null) {
+                Yii::$app->session->setFlash('error', 'Gagal menghapus data kandang. Data kandang tidak ditemukan.');
+                return $this->redirect(['index']);
             }
 
-            // Hapus semua BCS yang terkait dengan livestock
-            BodyCountScore::deleteAll(['livestock_id' => $livestock->id]);
+            // Dapatkan semua livestock yang terkait dengan cage
+            $livestockList = Livestock::find()->where(['cage_id' => $id])->all();
 
-            // Hapus gambar livestock
-            LivestockImage::deleteAll(['livestock_id' => $livestock->id]);
+            foreach ($livestockList as $livestock) {
+                // Hapus semua catatan yang terkait dengan livestock
+                $notes = Note::find()->where(['livestock_id' => $livestock->id])->all();
+                foreach ($notes as $note) {
+                    // Hapus gambar yang terkait dengan catatan terlebih dahulu
+                    NoteImage::deleteAll(['note_id' => $note->id]);
 
-            // Hapus livestock
-            $livestock->delete();
+                    // Hapus catatan
+                    $note->delete();
+                }
+
+                // Hapus semua BCS yang terkait dengan livestock
+                BodyCountScore::deleteAll(['livestock_id' => $livestock->id]);
+
+                // Hapus gambar livestock
+                LivestockImage::deleteAll(['livestock_id' => $livestock->id]);
+
+                // Hapus livestock
+                $livestock->delete();
+            }
+
+            // Hapus cage
+            $cage->delete();
+
+            // Commit transaksi
+            $transaction->commit();
+
+            // Set flash message untuk sukses
+            Yii::$app->session->setFlash('success', 'Data kandang dan semua ternak di dalamnya berhasil dihapus.');
+        } catch (\Exception $e) {
+            // Rollback transaksi jika terjadi kesalahan
+            $transaction->rollBack();
+            Yii::$app->session->setFlash('error', 'Gagal menghapus data kandang. Alasan: ' . $e->getMessage());
         }
 
-        // Hapus cage
-        $cage->delete();
-
-        // Commit transaksi
-        $transaction->commit();
-
-        // Set flash message untuk sukses
-        Yii::$app->session->setFlash('success', 'Data kandang dan semua ternak di dalamnya berhasil dihapus.');
-    } catch (\Exception $e) {
-        // Rollback transaksi jika terjadi kesalahan
-        $transaction->rollBack();
-        Yii::$app->session->setFlash('error', 'Gagal menghapus data kandang. Alasan: ' . $e->getMessage());
+        // Redirect ke halaman index setelah operasi selesai
+        return $this->redirect(['index']);
     }
-
-    // Redirect ke halaman index setelah operasi selesai
-    return $this->redirect(['index']);
-}
-
 }
