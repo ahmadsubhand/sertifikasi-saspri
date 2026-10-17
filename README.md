@@ -1,186 +1,264 @@
-# 🚀 Sertifikasi SASPRI
+<p align="center">
+    <img
+      src="assets/logo.svg"
+      alt="MATASAPI Logo"
+      width="300"
+    />
+</p>
 
-Aplikasi Sertifikasi SASPRI berbasis Yii2 yang terdiri dari frontend dan backend.
+<p align="center">
+  <em>Digitize livestock certification workflows, centralize compliance documentation, and streamline multi-tier verification.</em>
+</p>
 
-Dokumen ini mencakup:
+<p align="center">
+  <a href="https://sertifikasi.digdaya.net/">
+    <strong>🌐 Visit SASPRI Certification System</strong>
+  </a>
+</p>
 
-1. Setup lingkungan pengembangan lokal menggunakan Laragon.
-2. Deployment aplikasi ke server menggunakan Podman, Nginx, dan Let's Encrypt SSL.
-3. Troubleshooting yang umum ditemui selama proses deployment.
+<p align="center">
+  <img src="assets/icon/php.svg" alt="php" height="20" />
+  &nbsp;&nbsp;
+  <img src="assets/icon/yii.svg" alt="Yii" height="20" />
+  &nbsp;&nbsp;
+  <img src="assets/icon/bootstrap5.svg" alt="Bootstrap 5" height="20" />
+  &nbsp;&nbsp;
+  <img src="assets/icon/mysql.svg" alt="MySQL" height="20" />
+  &nbsp;&nbsp;
+  <img src="assets/icon/firebase.svg" alt="Firebase" height="20" />
+</p>
 
----
+## 🚀 Core Features
 
-# 📋 Prasyarat
+- **Multi-Tier Certification Workflow:** Supports Self-Review (*Tim Mandiri*), Peer Review (*Tim Sebaya*), and External Review by SASPRI National.
+- **Centralized Document & Evidence Management:** Provides a centralized repository for certification documents and supporting evidence.
+- **Role-Based Access Control (RBAC):** Manages access permissions for administrators, reviewers, coordinators, and other authorized stakeholders.
+- **RESTful API:** Exposes certification, assessment, indicator, team management, user, regional, and notification endpoints for application integration.
+- **Asynchronous Queue & Notifications:** Processes background jobs for automated notifications and other time-consuming tasks.
+- **Automated PDF Certificate Generation:** Generates digital certification documents from verified assessment and certification data.
 
-## Untuk Pengembangan Lokal
+## 💡 Key Highlights & Engineering Impact
 
-Pastikan perangkat Anda telah terinstal:
+The **Saspri Certification System** modernizes agricultural certification operations while emphasizing data integrity, maintainability, and reliable business process execution.
 
-* Laragon (PHP ^8.4.1, MySQL, Nginx)
-* Composer
-* Git
+- **Centralized and Traceable Certification Records:** Replaces fragmented document management across spreadsheets, WhatsApp groups, and separate storage locations with a centralized repository that improves document accessibility and traceability.
+- **Structured and Transparent Review Process:** Standardizes the three-stage certification lifecycle, making review progression and certification status easier to track across participating teams and SASPRI National.
+- **Reduced Manual Administrative Work:** Automates background notifications and PDF certificate generation, reducing repetitive administrative tasks and manual coordination.
+- **Strict Data Integrity & Validation:** Combines ActiveRecord validation, custom behaviors, enums, and database-level constraints to maintain data consistency and protect multi-step certification state transitions through database transactions.
+- **Reusable Service Layer Architecture:** Extracts business logic into dedicated service classes under `common/services/`, separating domain operations from controllers while enabling the same business logic to be reused by both web and REST API controllers.
+- **Consistent Access Control & Data Isolation:** Enforces role-based permissions and backend authorization to ensure users can access only the operations and records permitted by their roles.
 
-## Untuk Deployment Server
+## 🛠️ Architecture & Technology Stack
 
-Pastikan server telah memiliki:
+The project is structured around a multi-tier PHP architecture ensuring high maintainability, testability, and security.
 
-* Podman
-* Podman Compose
-* MySQL Container
-* Nginx Reverse Proxy Container
-* Git
-* Certbot
-* Domain yang sudah mengarah ke alamat IP server
+### Backend & Core Framework
 
----
+- [**Yii 2 Framework**](https://www.yiiframework.com/): Chosen for its high performance, rich component-based architecture, and out-of-the-box security defenses against SQL injection, XSS, and CSRF.
+- [**Bootstrap 5 & Bootstrap Icons**](https://getbootstrap.com/): Powers a clean, responsive, and accessible user interface across both admin and participant portals.
+- [**Kartik-v mPDF**](https://github.com/kartik-v/yii2-mpdf): Generates pixel-perfect PDF documents and official certification files directly from HTML/CSS templates.
+- [**Firebase Cloud Messaging (FCM)**](https://firebase.google.com/docs/cloud-messaging): Enables push notifications to deliver certification updates and important information to users.
+- [**Yii2 Queue**](https://github.com/yiisoft/yii2-queue): Manages background worker jobs for asynchronous email notifications and system maintenance.
 
-# 🛠️ Setup Lokal dengan Laragon
+### Code Quality & Testing
 
-## 1. Clone Repository
+- **PHP 8.5+:** Utilizes modern PHP typing, error handling, and performance optimizations.
+- **Codeception & PHPUnit:** Comprehensive test suites covering unit, functional, and acceptance testing across common, backend, and frontend modules.
 
-Buka terminal Laragon kemudian jalankan:
+## 📁 Repository Structure
 
-```bash
-git clone <URL_REPOSITORY> nama-folder-proyek
-cd nama-folder-proyek
+The project follows the strict separation of concerns mandated by the Yii 2 Advanced Project Template, enhanced with custom service and job layers:
+
+```text
+sertifikasi-saspri/
+├── common/                  # Shared components across frontend, backend, & console
+│   ├── behaviors/           # Reusable ActiveRecord behaviors
+│   ├── config/              # Shared application configurations
+│   ├── enums/               # Application-wide enumerations and status definitions
+│   ├── fixtures/            # Test data fixtures
+│   ├── helpers/             # Utility and formatting helpers
+│   ├── jobs/                # Background queue job handlers (Yii2-Queue)
+│   ├── mail/                # Email view templates
+│   ├── models/              # Shared database models and business logic
+│   ├── services/            # Dedicated domain service layers
+│   ├── tests/               # Common test suites
+│   ├── widgets/             # Shared UI widgets
+│   └── codeception.yml      # Codeception configuration for common tests
+│
+├── backend/                 # Administrative Web Application (SASPRI National & Management)
+│   ├── assets/              # Backend CSS/JS assets
+│   ├── config/              # Backend routing and component configs
+│   ├── controllers/         # Admin request controllers
+│   ├── models/              # Backend-specific form models
+│   ├── views/               # Admin panel view files
+│   └── web/                 # Backend entry script (index.php)
+│
+├── frontend/                # Participant & Reviewer Web Portal (Tim Mandiri & Tim Sebaya)
+│   ├── assets/              # Frontend CSS/JS assets
+│   ├── config/              # Frontend routing configs
+│   ├── controllers/         # Portal controllers
+│   │   ├── api/             # REST API controllers
+│   │   ├── *Controller.php  # Web request controllers
+│   ├── models/              # Portal user models & forms
+│   ├── views/               # Portal view files
+│   ├── widgets/             # Frontend-specific widgets
+│   └── web/                 # Frontend entry script (index.php)
+│
+├── console/                 # Command Line Application & Background Workers
+│   ├── controllers/         # Console CLI commands
+│   ├── migrations/          # Database migration files
+│   └── config/              # Console configurations
+│
+├── docs/                    # Documentation and setup guides
+│
+├── environments/            # Environment-specific configuration overrides
+├── vendor/                  # Composer dependencies
+└── composer.json            # Project dependencies and PHP requirements
 ```
 
-> Ganti `<URL_REPOSITORY>` dengan URL repository proyek.
+## 🚀 Installation
 
----
+This document provides step-by-step instructions for setting up the SASPRI Certification System locally using Laragon.
 
-## 2. Install Dependency
+### 📋 Prerequisites
 
-Install seluruh dependency yang dibutuhkan aplikasi:
+Ensure your local development environment has the following installed:
+
+- Laragon (PHP ^8.4.1, MySQL, Nginx)
+- Composer
+- Git
+
+### 🛠️ Step-by-Step Setup
+
+#### 1. Clone the Repository
+
+Open your Laragon terminal and run:
+
+```bash
+git clone <URL_REPOSITORY> saspri-app
+cd saspri-app
+```
+
+Replace `<URL_REPOSITORY>` with your actual repository URL.
+
+#### 2. Install Dependencies
+
+Install all required application dependencies:
 
 ```bash
 composer install
 ```
 
----
+#### 3. Initialize the Yii2 Project
 
-## 3. Inisialisasi Proyek Yii2
-
-Jalankan perintah berikut:
+Run the following command:
 
 ```bash
 php init
 ```
 
-Kemudian pilih:
+Then select:
 
-* `0` → Development Environment
-* `yes` → Konfirmasi inisialisasi
+- `0` → Development Environment
+- `yes` → Confirm initialization
 
-Perintah ini akan membuat file konfigurasi lokal seperti:
+This will generate local configuration files such as:
 
-* `common/config/main-local.php`
-* `frontend/config/main-local.php`
-* `backend/config/main-local.php`
+- `common/config/main-local.php`
+- `frontend/config/main-local.php`
+- `backend/config/main-local.php`
 
----
+#### 4. Setup Laragon Web Server (Virtual Host & HTTPS)
 
-## 4. Setup Web Server Laragon (Virtual Host & HTTPS)
+**Laragon Virtual Host Setup**
 
-### Setup Virtual Host Laragon
+To access the application using `.test` domains, create symbolic links from the Yii2 web folders to Laragon's `www` directory.
 
-Agar aplikasi dapat diakses menggunakan domain `.test`, buat symbolic link dari folder `web` Yii2 ke folder `www` milik Laragon.
+Run Command Prompt as Administrator:
 
-#### Frontend
-
-Jalankan Command Prompt sebagai Administrator:
+**Frontend**
 
 ```cmd
-mklink /D "C:\laragon\www\frontend" "C:\path\ke\proyek\frontend\web"
+mklink /D "C:\laragon\www\frontend" "C:\path\to\project\frontend\web"
 ```
 
-#### Backend
+**Backend**
 
 ```cmd
-mklink /D "C:\laragon\www\backend" "C:\path\ke\proyek\backend\web"
+mklink /D "C:\laragon\www\backend" "C:\path\to\project\backend\web"
 ```
 
-#### Contoh
+**Example**
 
-Jika proyek berada di:
+If your project is located at:
 
 ```text
 D:\Projects\saspri-app
 ```
 
-Maka perintahnya menjadi:
+Run the following commands:
 
 ```cmd
 mklink /D "C:\laragon\www\frontend" "D:\Projects\saspri-app\frontend\web"
-
 mklink /D "C:\laragon\www\backend" "D:\Projects\saspri-app\backend\web"
 ```
 
-### Konfigurasi HTTPS untuk FCM (Laragon)
+**HTTPS Configuration for FCM (Laragon)**
 
-Firebase Cloud Messaging pada browser mewajibkan aplikasi berjalan melalui HTTPS.
+Firebase Cloud Messaging on web browsers requires the application to run over HTTPS.
 
-1. Buka Laragon.
-2. Pilih:
+1. Open Laragon.
+2. Go to:
 
-```text
-Menu → SSL → Add laragon.crt to Trust Store
-```
+   `Menu → SSL → Add laragon.crt to Trust Store`
 
-Jalankan langkah tersebut apabila sertifikat Laragon belum pernah ditambahkan ke Windows Trust Store.
+   Run this step if the Laragon certificate has not been added to your Windows Trust Store yet.
 
-3. Aktifkan SSL:
+3. Enable SSL:
 
-```text
-Menu → SSL → Enabled
-```
+   `Menu → SSL → Enabled`
 
 4. Restart Laragon.
 
-Setelah SSL aktif, aplikasi dapat diakses melalui:
+Once SSL is active, access the app via:
 
-```text
-https://frontend.test:8443
-https://backend.test:8443
-```
+- [https://frontend.test:8443](https://frontend.test:8443)
+- [https://backend.test:8443](https://backend.test:8443)
 
-> Pastikan port SSL pada konfigurasi Nginx di Laragon disetel ke 8443. Jika menggunakan port default, hilangkan :8443 pada URL.
-> Tanpa HTTPS, fitur push notification pada browser tidak akan berfungsi.
----
+Ensure the SSL port in Laragon's Nginx configuration is set to `8443`. If using default ports, omit `:8443` from the URL.
 
-## 5. Konfigurasi main-local.php (Database & SMTP)
+Browser push notifications will not work without HTTPS.
 
-### Buat Database
+#### 5. Configure `main-local.php` (Database & SMTP)
 
-Melalui HeidiSQL, phpMyAdmin, atau tool database lainnya, buat database baru:
+**Create Database**
+
+Using HeidiSQL, phpMyAdmin, or any database management tool, create a new database:
 
 ```sql
 CREATE DATABASE sertifikasi_saspri;
 ```
 
-### Setup Gmail
+**Setup Gmail SMTP**
 
-Aplikasi menggunakan SMTP untuk mengirim email seperti notifikasi dan proses terkait akun.
+The application uses SMTP for transactional emails and account-related notifications.
 
-Jika menggunakan Gmail:
+If using Gmail:
 
-1. Aktifkan Two-Factor Authentication (2FA) pada akun Google.
-2. Buka halaman App Password Google.
-3. Buat App Password baru.
-4. Gunakan App Password yang dihasilkan sebagai nilai `password`.
+1. Enable Two-Factor Authentication (2FA) on your Google account.
+2. Navigate to Google App Passwords.
+3. Generate a new App Password.
+4. Use the generated App Password as your password value.
 
-> Jangan menggunakan password login Gmail biasa karena tidak akan berfungsi untuk autentikasi SMTP.
+Do not use your regular Gmail login password; it will not work for SMTP authentication.
 
+**Update Configuration**
 
-### Sesuaikan Konfigurasi
+Open:
 
-Buka file:
+`common/config/main-local.php`
 
-```text
-common/config/main-local.php
-```
-
-Lalu sesuaikan konfigurasi berikut:
+Update the configuration as follows:
 
 ```php
 return [
@@ -199,8 +277,8 @@ return [
             'transport' => [
                 'scheme' => 'smtps',
                 'host' => 'smtp.gmail.com',
-                'username' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
-                'password' => '{{ 16 HURUF APP PASSWORD GMAIL TANPA SPASI }}',
+                'username' => '{{ YOUR_EMAIL_ADDRESS }}',
+                'password' => '{{ 16_CHARACTER_GMAIL_APP_PASSWORD_WITHOUT_SPACES }}',
                 'port' => 465,
             ],
         ],
@@ -208,19 +286,15 @@ return [
 ];
 ```
 
----
+#### 6. Configure `params-local.php` (Global Params & Firebase)
 
-## 6. Konfigurasi params-local.php (Global Params & Firebase)
+The application uses Firebase Cloud Messaging (FCM) for push notifications.
 
-Aplikasi menggunakan Firebase Cloud Messaging (FCM) untuk mengirim push notification.
+Open:
 
-Buka file:
+`common/config/params-local.php`
 
-```text
-common/config/params-local.php
-```
-
-Lalu sesuaikan konfigurasi berikut:
+Update the configuration:
 
 ```php
 return [
@@ -234,42 +308,37 @@ return [
         'appId' => '',
         'vapidKey' => '',
     ],
-    'supportEmail' => 'email@contoh.com',
-    'senderEmail' => 'email@contoh.com',
+    'supportEmail' => 'email@example.com',
+    'senderEmail' => 'email@example.com',
 ];
 ```
 
-Keterangan:
+**Notes:**
 
-* Seluruh nilai pada konfigurasi firebase dapat diperoleh dari Firebase Console pada proyek yang digunakan.
-* `supportEmail` dan `senderEmail` digunakan sebagai alamat pengirim email sistem.
-* Disarankan menggunakan alamat email yang sama dengan `username` pada konfigurasi SMTP.
+- All Firebase configuration values can be retrieved from the Firebase Console.
+- `supportEmail` and `senderEmail` are used as system email sender addresses.
+- It is recommended to use the same email address configured in SMTP username.
 
----
+#### 7. Setup Firebase Service Account
 
-## 7. Setup Service Account Firebase
-
-Simpan file kredensial Firebase Service Account pada:
+Save your Firebase Service Account credentials JSON file to:
 
 ```text
 common/config/firebase-credentials.json
 ```
 
-File ini digunakan oleh backend untuk melakukan autentikasi ke Firebase saat mengirim push notification.
+This file is used by the backend to authenticate with Firebase when dispatching push notifications.
 
-> Jangan melakukan commit file `firebase-credentials.json` ke repository karena berisi kredensial rahasia.
+Do not commit `firebase-credentials.json` to version control as it contains sensitive credentials.
 
----
+#### 8. Configure Console URL Manager
 
-## 8. Konfigurasi URL Manager Console
+Open:
 
-Buka file:
+`console/config/main-local.php`
 
-```text
-console/config/main-local.php
-```
+Add the following configuration:
 
-Tambahkan konfigurasi berikut:
 ```php
 return [
     'components' => [
@@ -280,687 +349,73 @@ return [
 ];
 ```
 
----
+#### 9. Database Migration and Seeding
 
-## 9. Migrasi dan Seeding Database
-
-Jalankan perintah berikut:
+Run the following commands:
 
 ```bash
 php yii migrate
 php yii db/seed
 ```
 
----
+#### 10. Running the Queue Worker
 
-## 10. Menjalankan Queue Worker
+The application uses Yii Queue to process asynchronous tasks, such as push notifications.
 
-Aplikasi menggunakan Yii Queue untuk memproses pekerjaan asynchronous, seperti pengiriman push notification.
-
-Pada lingkungan pengembangan, queue worker dijalankan secara manual menggunakan perintah:
+In local development, run the queue worker manually using:
 
 ```bash
 php yii queue/listen
 ```
 
-Perintah tersebut akan terus berjalan dan memproses job yang masuk ke dalam queue.
+This command will keep running and process incoming queue jobs.
 
----
+### Default Login Accounts
 
-# 🚀 Deployment ke Server (Podman + Nginx)
-
-## Struktur Direktori
-
-```text
-/srv/podman
-├── apps/
-│   └── php/
-│       └── sertifikasi-saspri/
-├── data/
-│   └── apps/
-│       └── sertifikasi-saspri/
-└── infra/
-    └── nginx/
-        ├── sites-available/
-        └── sites-enabled/
-```
-
----
-
-## 1. Clone Repository
-
-```bash
-cd /srv/podman/apps/php
-
-mkdir -p sertifikasi-saspri
-cd sertifikasi-saspri
-
-git init
-git remote add origin https://gitlab.com/ahmadsubhand/sertifikasi-saspri.git
-git pull origin main
-```
-
----
-
-## 2. Setup Volume Mount
-
-Edit file:
-
-```bash
-cd /srv/podman
-sudo nano podman-compose.yml
-```
-
-Tambahkan volume berikut pada service `nginx` dan `php85_fpm`:
-
-```yaml
-- ./apps/php/sertifikasi-saspri:/var/www/html/sertifikasi-saspri
-- ./data/apps/sertifikasi-saspri:/var/www/data/sertifikasi-saspri
-```
-
-Pemetaan direktori:
-
-| Host VPS                                   | Container                          |
-| ------------------------------------------ | ---------------------------------- |
-| `/srv/podman/apps/php/sertifikasi-saspri`  | `/var/www/html/sertifikasi-saspri` |
-| `/srv/podman/data/apps/sertifikasi-saspri` | `/var/www/data/sertifikasi-saspri` |
-
----
-
-## 3. Restart Container
-
-```bash
-cd /srv/podman
-sudo podman-compose up -d
-```
-
----
-
-## 4. Install Dependency
-
-```bash
-sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && composer install"
-```
-
----
-
-## 5. Inisialisasi Proyek Yii2
-
-```bash
-sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php init"
-```
-
-Pilih:
-
-```text
-0 -> Development Environment
-yes -> Konfirmasi
-```
-
-atau
-
-```text
-1 -> Production Environment
-yes -> Konfirmasi
-```
-
----
-
-## 6. Konfigurasi main-local.php (Database & SMTP)
-
-### Buat Database
-
-Cek Password Root MySQL:
-
-```bash
-cat /srv/podman/.env
-```
-
-Cari nilai:
-
-```env
-MYSQL_ROOT_PASSWORD=...
-```
-
-Masuk ke MySQL:
-
-```bash
-sudo podman exec -it mysql mysql -u root -p
-```
-
-Buat Database:
-
-```sql
-CREATE DATABASE sertifikasi_saspri
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-```
-
-### Setup Gmail
-
-Jika menggunakan Gmail, ikuti panduan [Setup Gmail](#setup-gmail) seperti pada tahap lokal menggunakan Laragon.
-
-### Sesuaikan konfigurasi
-
-Edit file:
-
-```text
-common/config/main-local.php
-```
-
-Sesuaikan konfigurasi:
-
-```php
-return [
-    'components' => [
-        'db' => [
-            'class' => \yii\db\Connection::class,
-            'dsn' => 'mysql:host=mysql;dbname=sertifikasi_saspri',
-            'username' => 'root',
-            'password' => 'MYSQL_ROOT_PASSWORD',
-            'charset' => 'utf8mb4',
-        ],
-        'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@common/mail',
-            'useFileTransport' => false,
-            'transport' => [
-                'scheme' => 'smtps',
-                'host' => 'smtp.gmail.com',
-                'username' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
-                'password' => '{{ 16 HURUF APP PASSWORD GMAIL TANPA SPASI GMAIL TANPA SPASI }}',
-                'port' => 465,
-            ],
-        ],
-    ],
-];
-```
-
-Gunakan nilai `MYSQL_ROOT_PASSWORD` yang diperoleh pada tahap sebelumnya.
-
----
-
-## 7. Konfigurasi params-local.php (Global Params & Firebase)
-
-Edit file:
-
-```text
-common/config/params-local.php
-```
-
-Sesuaikan konfigurasi:
-
-```php
-return [
-    'frontendUrl' => 'https://sertifikasi.digdaya.net',
-    'firebase' => [
-        'apiKey' => '',
-        'authDomain' => '',
-        'projectId' => '',
-        'storageBucket' => '',
-        'messagingSenderId' => '',
-        'appId' => '',
-        'vapidKey' => '',
-    ],
-    'supportEmail' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
-    'senderEmail' => '{{ ALAMAT EMAIL YANG DIGUNAKAN }}',
-];
-```
-
-Seluruh nilai pada konfigurasi firebase dapat diperoleh dari Firebase Console pada proyek yang digunakan.
-
----
-
-## 8. Setup Service Account Firebase
-
-Simpan file kredensial Firebase Service Account pada:
-
-```text
-common/config/firebase-credentials.json
-```
-
-## 9. Konfigurasi URL Manager Console
-
-Buka file:
-
-```text
-console/config/main-local.php
-```
-
-Tambahkan konfigurasi berikut:
-```php
-return [
-    'components' => [
-        'urlManager' => [
-            'hostInfo' => 'https://sertifikasi.digdaya.net',
-        ],
-    ],
-];
-```
-
----
-
-## 10. Migrasi dan Seeder
-
-```bash
-sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php yii migrate"
-```
-
-```bash
-sudo podman exec -it php85_fpm bash -c "cd /var/www/html/sertifikasi-saspri && php yii db/seed"
-```
-
-> Seeder hanya diperlukan pada lingkungan pengembangan atau saat membutuhkan data awal.
-
----
-
-## 11. Menjalankan Queue Worker
-
-Perintah `php yii queue/listen` perlu dijalankan dalam service podman supaya dapat berjalan secara asinkronus, permanen, dan aman.
-
-Edit file:
-
-```bash
-cd /srv/podman
-sudo nano podman-compose.yml
-```
-
-Tambahkan service berikut sejajar dengan service php85_fpm:
-
-```yaml
-  # -----------------------------------
-  #  Sertifikasi SASPRI Queue Container
-  # -----------------------------------
-  sertifikasi_queue_worker:
-    # Gunakan build context/image yang sama persis dengan service PHP web
-    build:
-      context: ./infra/php/php85 # Sesuaikan dengan versi PHP yang digunakan
-      dockerfile: Dockerfile
-    container_name: ${CONTAINER_PREFIX}sertifikasi_queue_worker
-    hostname: ${CONTAINER_PREFIX}queue_worker
-    restart: unless-stopped
-    # Arahkan working directory LANGSUNG ke folder aplikasi Yii
-    working_dir: /var/www/html/sertifikasi-saspri
-    # Timpa CMD bawaan FPM dengan perintah listener Yii
-    command: ["php", "yii", "queue/listen", "--verbose=1"]
-    volumes:
-      # Mount yang sama dengan service PHP web
-      - ./apps/php/sertifikasi-saspri:/var/www/html/sertifikasi-saspri
-      - ./infra/php/php85/php.ini:/usr/local/etc/php/conf.d/custom.ini
-    environment:
-      TZ: Asia/Jakarta
-    depends_on:
-      - mariadb
-      - mysql
-      - mongodb
-      - postgresql
-      - redis
-    networks:
-      digdaya:
-        ipv4_address: 10.99.0.121 # Pastikan IP ini belum terpakai
-```
-
----
-
-## 12. Setup Nginx
-
-Masuk ke direktori konfigurasi:
-
-```bash
-cd /srv/podman/infra/nginx/sites-available
-```
-
-Buat file:
-
-```bash
-sudo nano site-sertifikasi.conf
-```
-
-Isi dengan konfigurasi berikut.
-
-### HTTP (Sementara untuk Certbot)
-
-```nginx
-server {
-    listen 80;
-    server_name sertifikasi.digdaya.net www.sertifikasi.digdaya.net;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/html/sertifikasi-saspri/frontend/web;
-        allow all;
-    }
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-
-    root /var/www/html/sertifikasi-saspri/frontend/web;
-    index index.php index.html;
-
-    access_log /var/log/nginx/sertifikasi_access.log;
-    error_log  /var/log/nginx/sertifikasi_error.log warn;
-
-    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2|ttf)$ {
-        expires 7d;
-        access_log off;
-        add_header Cache-Control "public, max-age=604800";
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-}
-```
-
-### HTTPS
-
-Gunakan sementara sertifikat utama agar Nginx dapat berjalan sebelum sertifikat domain baru dibuat.
-
-```nginx
-server {
-    listen 443 ssl;
-    http2 on;
-
-    server_name sertifikasi.digdaya.net www.sertifikasi.digdaya.net;
-
-    root /var/www/html/sertifikasi-saspri/frontend/web;
-    index index.php index.html;
-
-    charset utf-8;
-
-    access_log /var/log/nginx/sertifikasi_access.log;
-    error_log  /var/log/nginx/sertifikasi_error.log warn;
-
-    include /etc/nginx/snippets/ssl-params.conf;
-
-    ssl_certificate      /etc/letsencrypt/live/digdaya.net/fullchain.pem;
-    ssl_certificate_key  /etc/letsencrypt/live/digdaya.net/privkey.pem;
-
-    location / {
-        try_files $uri $uri/ /index.php?$args;
-    }
-
-    location = /favicon.ico {
-        access_log off;
-        log_not_found off;
-    }
-
-    location = /robots.txt {
-        access_log off;
-        log_not_found off;
-    }
-
-    location ~ ^/(assets|css|js|images|uploads|themes)/ {
-        try_files $uri =404;
-        expires 30d;
-        access_log off;
-        add_header Cache-Control "public, no-transform";
-    }
-
-    location ~ \.php$ {
-        include /etc/nginx/snippets/fastcgi-common.conf;
-
-        try_files $uri =404;
-
-        fastcgi_param SERVER_PORT 443;
-        fastcgi_param HTTP_HOST $host;
-        fastcgi_param HTTPS on;
-        fastcgi_param REQUEST_SCHEME https;
-
-        fastcgi_pass php85_fpm_nginx;
-    }
-
-    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg|woff|woff2)$ {
-        expires 7d;
-        access_log off;
-    }
-
-    location ~ /\.(ht|git|env|svn) {
-        deny all;
-    }
-}
-```
-
----
-
-### Aktifkan Site
-
-Masuk ke direktori
-
-```bash
-cd /srv/podman/infra/nginx/sites-enabled
-```
-
-Buat symbolic link
-
-```bash
-sudo ln -s ../sites-available/site-sertifikasi.conf site-sertifikasi.conf
-```
-
----
-
-### Reload Nginx
-
-```bash
-sudo podman exec -it nginx_reverse_proxy nginx -s reload
-```
-
----
-
-
-
-## 13. Setup SSL Certificate
-
-Pastikan domain telah mengarah ke server.
-
-### Generate SSL Certificate
-
-```bash
-sudo certbot certonly --webroot -w /srv/podman/apps/php/sertifikasi-saspri/frontend/web -d sertifikasi.digdaya.net
-```
-
-> Jika sertifikat sertifikasi.digdaya.net sudah ada, tahap ini tidak perlu dilakukan
-
-### Pasang SSL Certificate
-
-Edit kembali konfigurasi:
-
-```bash
-sudo nano /srv/podman/infra/nginx/sites-available/site-sertifikasi.conf
-```
-
-Ganti:
-
-```nginx
-ssl_certificate      /etc/letsencrypt/live/digdaya.net/fullchain.pem;
-ssl_certificate_key  /etc/letsencrypt/live/digdaya.net/privkey.pem;
-```
-
-Menjadi:
-
-```nginx
-ssl_certificate      /etc/letsencrypt/live/sertifikasi.digdaya.net/fullchain.pem;
-ssl_certificate_key  /etc/letsencrypt/live/sertifikasi.digdaya.net/privkey.pem;
-```
-
----
-
-### Validasi dan Reload Nginx
-
-Validasi konfigurasi:
-
-```bash
-sudo podman exec -it nginx_reverse_proxy nginx -t
-```
-
-Reload:
-
-```bash
-sudo podman exec -it nginx_reverse_proxy nginx -s reload
-```
-
----
-
-# 👤 Informasi Akun Login Default
-
-Semua akun yang dibuat melalui proses seeding menggunakan password:
+All accounts generated via the seeder use the default password:
 
 ```text
 password_0
 ```
 
-Password tersebut berlaku untuk seluruh role yang tersedia, seperti:
+This password applies to all user roles:
 
-* Admin SASPRI-N (admin)
-* Wali SASPRI-K (coordinator)
-* Anggota SASPRI-K (user)
+- Admin SASPRI-N (`admin`)
+- Coordinator SASPRI-K (`coordinator`)
+- User SASPRI-K (`user`)
 
-# 🔍 Troubleshooting
+## 📚 Related Documentation
 
-## Melihat Daftar Container
+- [Yii 2 Framework Documentation](https://www.yiiframework.com/doc/guide/2.0/en) — Core framework and application architecture.
+- [Bootstrap 5 Documentation](https://getbootstrap.com/docs/5.3/) — Responsive UI components and styling.
+- [mPDF Documentation](https://mpdf.github.io/) — PDF certificate generation.
+- [Firebase Admin SDK for PHP](https://firebase-php.readthedocs.io/) — Firebase integration and push notifications.
 
-```bash
-sudo podman ps -a
-```
+## 🖥️ Screenshots
 
----
+1. Farm Profile
+![home](./assets/screenshots/profile.jpeg)
 
-## Memeriksa Volume Mount
+2. Certification Application Status
 
-Lihat pemetaan folder VPS ke container:
+![home](./assets/screenshots/application.jpeg)
 
-```bash
-sudo podman inspect \
--f '{{range .Mounts}}Dari VPS: {{.Source}} ---> Ke Container: {{.Destination}}{{"\n"}}{{end}}' \
-php85_fpm
-```
+3. Invitation Notifications
 
-Contoh output:
+![home](./assets/screenshots/notification.jpeg)
 
-```text
-Dari VPS: /srv/podman/apps/php/matasapi ---> Ke Container: /var/www/html/matasapi
-Dari VPS: /srv/podman/data/apps/ssmi-erp ---> Ke Container: /var/www/data/ssmi-erp
-```
+4. Invitation Preview
 
-Jika folder `sertifikasi-saspri` belum muncul, kemungkinan volume mount belum terdaftar pada `podman-compose.yml`.
+![home](./assets/screenshots/invitation.jpeg)
 
----
+5. Farm Assessment
 
-## Memastikan Folder Aplikasi Terbaca di Container
+![home](./assets/screenshots/review.jpeg)
 
-Periksa direktori kerja container:
+6. Certificate Issuance
 
-```bash
-sudo podman exec -it php85_fpm pwd
-```
+![home](./assets/screenshots/issuance.jpeg)
 
-Contoh output:
+7. Assessment Management
 
-```text
-/var/www/html
-```
-
-Lihat isi direktori:
-
-```bash
-sudo podman exec -it php85_fpm ls -l /var/www/html
-```
-
-Contoh output:
-
-```text
-total 20
-drwxr-xr-x  2 1007 1007 4096 May 19 00:36 asset-mgmt
-drwxr-xr-x  3 1007 1007 4096 Jun  4 15:15 cassmatech
-drwxr-xr-x  9 1007 1007 4096 May 19 00:53 matasapi
-drwxr-xr-x 16 1007 1007 4096 May 19 00:53 portal
-drwxr-xr-x  9 1007 1007 4096 May 19 00:07 ssmi-erp
-```
-
-Jika folder `sertifikasi-saspri` belum muncul, kemungkinan volume mount belum terdaftar pada `podman-compose.yml`.
-
----
-
-## Mengetahui Konfigurasi Nginx yang Digunakan
-
-Selama pengembangan lokal menggunakan Laragon, virtual host diatur secara otomatis melalui folder `sites-enabled`.
-
-Pada server Podman, konsep yang digunakan sama:
-
-```text
-/srv/podman/infra/nginx/sites-enabled/
-```
-
-Konfigurasi aplikasi lain seperti `site-matasapi.conf` dapat digunakan sebagai referensi.
-
----
-
-## Mengetahui Konfigurasi SSL
-
-Periksa sertifikat yang tersedia:
-
-```text
-/etc/letsencrypt/live/
-```
-
-Atau lihat konfigurasi:
-
-```nginx
-ssl_certificate ...
-ssl_certificate_key ...
-```
-
-Konfigurasi tersebut menunjukkan bahwa SSL dikelola menggunakan **Certbot (Let's Encrypt)**.
-
----
-
-# 📝 Catatan
-
-## Tahap Pengembangan
-
-* Pastikan symbolic link Laragon mengarah ke folder yang benar.
-* Pastikan konfigurasi Firebase pada `common/config/params-local.php` telah diisi dengan benar.
-* Pastikan file `common/config/firebase-credentials.json` tersedia.
-* Push notification berbasis FCM memerlukan HTTPS.
-* Pastikan queue worker sedang berjalan menggunakan:
-
-```bash
-php yii queue/listen
-```
-
-* Jika worker tidak berjalan, push notification tidak akan terkirim meskipun data job berhasil masuk ke queue.
-
-* Jika muncul error seperti:
-
-```text
-Messaging: This browser doesn't support the API's required to use the firebase SDK.
-```
-
-pastikan:
-
-  * Browser mendukung Service Worker dan Push API.
-  * Aplikasi diakses menggunakan HTTPS.
-  * Sertifikat Laragon telah ditambahkan ke Trust Store.
-  * Permission notifikasi browser telah diberikan.
-
-## Volume Mount dan Container
-
-* Container tidak mengakses path fisik VPS secara langsung, melainkan path virtual yang didaftarkan melalui volume mount.
-* Pastikan volume mount Podman telah terpasang dengan benar sebelum menjalankan perintah Yii2 seperti `php init`, `php yii migrate`, atau `php yii db/seed`.
-
-## Database dan Yii2
-
-* Pastikan database sudah dibuat sebelum menjalankan migration.
-* Periksa kembali konfigurasi database pada `common/config/main-local.php`.
-* Jalankan migration kembali apabila terdapat perubahan struktur database.
-* Seeder hanya digunakan untuk kebutuhan data awal atau lingkungan pengembangan.
-
-## Nginx
-
-* Gunakan konfigurasi aplikasi lain yang sudah berjalan sebagai referensi saat membuat konfigurasi Nginx baru.
-* Selalu lakukan validasi konfigurasi Nginx menggunakan `nginx -t` sebelum reload.
-
-## SSL
-
-* Pastikan domain sudah mengarah ke server sebelum melakukan generate SSL menggunakan Certbot.
-* Jangan menjalankan proses pembuatan sertifikat baru berulang-ulang karena Let's Encrypt memiliki rate limit.
+![home](./assets/screenshots/assessment.jpeg)
