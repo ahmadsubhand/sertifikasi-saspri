@@ -135,11 +135,9 @@ Ensure your local development environment has the following installed:
 Open your Laragon terminal and run:
 
 ```bash
-git clone <URL_REPOSITORY> saspri-app
-cd saspri-app
+git clone https://github.com/ahmadsubhand/sertifikasi-saspri
+cd sertifikasi-saspri
 ```
-
-Replace `<URL_REPOSITORY>` with your actual repository URL.
 
 #### 2. Install Dependencies
 
@@ -394,28 +392,29 @@ This password applies to all user roles:
 ## 🖥️ Screenshots
 
 1. Farm Profile
-![home](./assets/screenshots/profile.jpeg)
+
+    ![Farm Profile](./assets/screenshots/profile.jpeg)
 
 2. Certification Application Status
 
-![home](./assets/screenshots/application.jpeg)
+    ![Certification Application Status](./assets/screenshots/application.jpeg)
 
 3. Invitation Notifications
 
-![home](./assets/screenshots/notification.jpeg)
+    ![Invitation Notifications](./assets/screenshots/notification.jpeg)
 
 4. Invitation Preview
 
-![home](./assets/screenshots/invitation.jpeg)
+    ![Invitation Preview](./assets/screenshots/invitation.jpeg)
 
 5. Farm Assessment
 
-![home](./assets/screenshots/review.jpeg)
+    ![Farm Assessment](./assets/screenshots/review.jpeg)
 
 6. Certificate Issuance
 
-![home](./assets/screenshots/issuance.jpeg)
+    ![Certificate Issuance](./assets/screenshots/issuance.jpeg)
 
 7. Assessment Management
 
-![home](./assets/screenshots/assessment.jpeg)
+    ![hAssessment Management](./assets/screenshots/assessment.jpeg)
